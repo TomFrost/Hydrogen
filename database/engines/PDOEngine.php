@@ -47,7 +47,7 @@ abstract class PDOEngine extends DatabaseEngine {
 		try {
 			return new PDOStatement($this->pdo->execute($statement));
 		}
-		catch (PDOException e) {
+		catch (PDOException $e) {
 			throw new InvalidSQLException("Invalid SQL. Statement could not be executed.");
 		}
 	}
@@ -60,7 +60,7 @@ abstract class PDOEngine extends DatabaseEngine {
 		try {
 			return new PDOStatement($this->pdo->prepare($statement));
 		}
-		catch (PDOException e) {
+		catch (PDOException $e) {
 			throw new InvalidSQLException("Invalid SQL. Statement could not be prepared.");
 		}
 	}
@@ -69,7 +69,7 @@ abstract class PDOEngine extends DatabaseEngine {
 		try {
 			return new PDOStatement($this->pdo->query($statement));
 		}
-		catch (PDOException e) {
+		catch (PDOException $e) {
 			throw new InvalidSQLException("Invalid SQL. Query could not be executed.");
 		}
 	}
