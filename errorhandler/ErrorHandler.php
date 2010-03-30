@@ -89,18 +89,18 @@ class ErrorHandler {
 		static::init();
 	}
 	
-	public static function detatch() {
+	public static function detach() {
 		if (static::$handling) {
-			if (count(static::$handlerStack > 1))
+			if (count(static::$handlerStack) > 1)
 				array_pop(static::$handlerStack);
 			else
-				static::detatchAll();
+				static::detachAll();
 			return true;
 		}
 		return false;
 	}
 	
-	public static function detatchAll() {
+	public static function detachAll() {
 		if (static::$handling) {
 			static::$handlerStack = array();
 			restore_error_handler();
