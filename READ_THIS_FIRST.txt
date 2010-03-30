@@ -1,0 +1,30 @@
+Welcome to Hydrogen Alpha 1.
+http://www.hydrogenphp.com
+Requires PHP 5.3.0 or higher
+Intended to be used with an opcode cache such as XCache or APC.  Using Hydrogen without an opcode cache may result in a performance loss.
+
+-------------------------------------------------------
+
+STUFF YOU SHOULD KNOW
+
+This Hydrogen release was made solely to get a proof of concept out on the internet for peer review.  Some of the libraries within this release are fully documented, while others have absolutely no documentation at all.  This will change in a future release, and shortly after, the website should also have documentation and tutorials.  For now, we recommend that the only people who explore this code are the ones written permission-of-use has already been given to, as well as their peers.
+
+The idea behind Hydrogen is to make a PHP library that makes websites screamingly fast through intelligent caching.  The focus of the Hydrogen project (at this stage, at least), is the 'model' side of the MVC structure.  While each of Hydrogen's mini-libraries are very useful on their own, the hydrogen\model library is what ties the whole project together.  That library remains undocumented in this release, but future examples will show the power behind it, when used in conjunction with Hydrogen's very portable database tools.
+
+Aside from the model and other data operations that Hydrogen's libraries address, the secondary goal is to provide solid, flexible libraries for the tedious parts of web applications that developers find themselves writing over and over.  The config library is an end-all solution to text file-based website configs.  The error handler is a versatile crash manager that can be called on and layered without restriction.  The log library makes debugging a snap, mimicking logging standards set up by packages like log4j -- without the tedious configuration.
+
+Lastly, the goal behind Hydrogen is to offer developers a high-performance tool that speeds up development WITHOUT locking them into some incredibly restrictive application structure.  While all-inclusive MVC frameworks like CakePHP and CodeIgniter are great and make for a very rapid development process, being forced into a certain URL format and directory structure is often not ideal.  Hydrogen gives developers a super-fast engine and unparalleled portability without sacrificing the freedom to code however and wherever you want.
+
+That said, consider this release of Hydrogen to be COMPLETELY UNSTABLE.  It's been tested and makes most applications measurably faster, but the testing group was limited and not public.  Author not responsible for nuclear server explosion :)
+
+-------------------------------------------------------
+
+GETTING STARTED
+
+Copy hydrogen.autoconfig.sample.php to hydrogen.autoconfig.php and make any necessary changes to match your directory structure.
+
+Look at the configuration examples in the 'config/sample' folder, choose what's best for your project, and copy it to whatever patha nd filename you specify in the autoconfig.
+
+require_once() the file hydrogen.inc.php at the top of any PHP file that can be loaded directly.  USE AN ABSOLUTE PATH (PHP 5.3's __DIR__ constant is useful for this) to avoid generating expensive filesystem stats.
+
+Go!  Documentation coming soon.

@@ -1,0 +1,5 @@
+LICENSE for HYDROGEN ALPHA 1
+
+This version of Hydrogen is for personal use only.  It should not be changed, forked, distributed, sold, or used in any way except by the author or by the author's written permission.
+
+This license will be changed to a respectable open-source license most likely when it leaves alpha.  The author reserves the right to change the license at any time for any future release of Hydrogen.
