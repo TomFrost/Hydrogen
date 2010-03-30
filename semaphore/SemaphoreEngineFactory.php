@@ -1,7 +1,7 @@
 <?php
 namespace hydrogen\semaphore;
 
-use \hydrogen\config\Config;
+use hydrogen\config\Config;
 
 class SemaphoreEngineFactory {
 	protected static $engine = NULL;
@@ -10,7 +10,8 @@ class SemaphoreEngineFactory {
 	
 	public static function getEngine() {
 		if (is_null(static::$engine)) {
-			$engineClass = '\hydrogen\semaphore\engines\\' . Config::getVal('semaphore', 'engine') . 'Engine';
+			$engineName = Config::getVal('semaphore', 'engine', false) ?: 'No';
+			$engineClass = "\\hydrogen\\semaphore\\engines\\${engineName}Engine";
 			static::$engine = new $engineClass();
 		}
 		return static::$engine;
