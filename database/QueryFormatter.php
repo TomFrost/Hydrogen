@@ -1,7 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2009 - 2010, Frosted Design
+ * All rights reserved.
+ */
+
 namespace hydrogen\database;
 
-use \hydrogen\database\DatabaseEngineFactory;
+use hydrogen\database\DatabaseEngineFactory;
 
 abstract class QueryFormatter {
 	protected $verb, $queryArray;

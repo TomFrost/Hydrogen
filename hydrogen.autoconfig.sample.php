@@ -1,5 +1,9 @@
 <?php
 /**
+ * Copyright (c) 2009 - 2010, Frosted Design
+ * All rights reserved.
+ *
+ ********************************************
  * Config autoloader sample
  * Copy this to hydrogen.autoconfig.php
  */

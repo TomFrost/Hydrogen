@@ -1,8 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2009 - 2010, Frosted Design
+ * All rights reserved.
+ */
+
 namespace hydrogen\semaphore\engines;
 
-use \hydrogen\semaphore\SemaphoreEngine;
-use \hydrogen\cache\CacheEngineFactory;
+use hydrogen\semaphore\SemaphoreEngine;
+use hydrogen\cache\CacheEngineFactory;
 
 class CacheEngine extends SemaphoreEngine {
 	protected $engine;

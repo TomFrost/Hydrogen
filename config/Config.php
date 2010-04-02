@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2009 - 2010, Frosted Design
+ * All rights reserved.
+ */
+
 namespace hydrogen\config;
 
 use hydrogen\config\exceptions\ConfigKeyNotFoundException;

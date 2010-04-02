@@ -1,5 +1,9 @@
 <?php
-/**
+/*
+ * Copyright (c) 2009 - 2010, Frosted Design
+ * All rights reserved.
+ *
+ *************************************************************************
  * Hydrogen loader.  require_once() this file from any php page that can
  * be loaded directly.  This file will autoload any other hydrogen classes
  * as they're used, so no others requires are necessary.
