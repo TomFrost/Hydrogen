@@ -14,7 +14,7 @@ class TextFileEngine implements LogEngine {
 		$prefix = Config::getVal('log', 'fileprefix', false) ?: 'log';
 		$filename = $prefix . date('ymd') . '.log';
 		if ($logdir[0] != '/')
-			$logdir = __DIR__ . "/../../../../" . $logdir;
+			$logdir = __DIR__ . "/../../" . $logdir;
 		if ($logdir[strlen($logdir) - 1] != '/')
 			$logdir .= '/';
 		$this->logfile = $logdir . $filename;
