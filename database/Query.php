@@ -6,12 +6,12 @@
 
 namespace hydrogen\database;
 
-use \hydrogen\config\Config;
-use \hydrogen\database\exceptions\NoSuchVerbException;
-use \hydrogen\database\exceptions\InvalidSQLException;
-use \hydrogen\database\exceptions\DuplicateAliasException;
-use \hydrogen\database\DatabaseEngineFactory;
-use \hydrogen\database\statements\QueryStatement;
+use hydrogen\config\Config;
+use hydrogen\database\exceptions\NoSuchVerbException;
+use hydrogen\database\exceptions\InvalidSQLException;
+use hydrogen\database\exceptions\DuplicateAliasException;
+use hydrogen\database\DatabaseEngineFactory;
+use hydrogen\database\statements\QueryStatement;
 
 class Query {
 	public static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
