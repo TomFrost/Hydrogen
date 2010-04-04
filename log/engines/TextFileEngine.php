@@ -10,7 +10,6 @@ class TextFileEngine implements LogEngine {
 	protected $logfile, $fp;
 	
 	public function __construct() {
-		@date_default_timezone_set(@date_default_timezone_get());
 		$logdir = Config::getVal('log', 'logdir');
 		$prefix = Config::getVal('log', 'fileprefix', false) ?: 'log';
 		$filename = $prefix . date('ymd') . '.log';
