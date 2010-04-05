@@ -51,6 +51,7 @@ use hydrogen\semaphore\SemaphoreEngineFactory;
  */
 class Config {
 	protected static $values = array();
+	protected static $configPath = false;
 	
 	/**
 	 * Retrieves a specified value from the currently loaded configuration.
@@ -112,6 +113,7 @@ class Config {
 	public static function loadConfig($configFile, $cacheDir=false, $compareDates=true) {
 		if (!is_string($configFile) || ($configFile = trim($configFile)) == "")
 			throw new ConfigFileNotDefinedException('Config file must be an actual legal file path.');
+		static::$configPath = $configFile;
 		$loadOrig = true;
 		if ($cacheDir) {
 			$loadOrig = false;
@@ -182,6 +184,18 @@ class Config {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets the last config file path that {@link #loadConfig} was called with.  Note that this is
+	 * not guaranteed to be an absolute path, and the path is not guaranteed to have contained
+	 * a successfully parsed configuration file.
+	 *
+	 * @return The last known config file path, or false if {@link #loadConfig} has not yet been
+	 * 		called.
+	 */
+	public static function getConfigPath() {
+		return static::$configPath;
 	}
 	
 	/**
