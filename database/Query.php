@@ -69,7 +69,13 @@ class Query {
 		$this->havingStack = array();
 		$this->tableAliases = array();
 		$this->reqJoinCond = false;
-		$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
+		if(is_string($dbengine))
+			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
+		else{
+			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
+		$this->prefix = $this->dbengine->getReconstructArray();
+		$this->prefix =  $this->prefix['table_prefix'];
+		}
 	}
 	
 	public function getQueryTree() {
@@ -107,7 +113,7 @@ class Query {
 		$this->assertLegal();
 		if (is_string($table) && ($table = trim($table)) !== '' && 
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
-			$prefix = Config::getVal('database', 'table_prefix', false);
+			$prefix = $this->prefix;
 			if ($this->autoTablePrefix && $prefix)
 				$table = $prefix . $table;
 			$from = array(
@@ -176,7 +182,7 @@ class Query {
 		$this->assertLegal();
 		if (!is_string($table) || ($table = trim($table)) === '')
 			throw new InvalidSQLException('Invalid table name.');
-		$prefix = Config::getVal('database', 'table_prefix', false);
+		$prefix = $this->prefix;
 		if ($this->autoTablePrefix && $prefix)
 			$table = $prefix . $table;
 		if (!isset($this->query['INTO']))
@@ -193,7 +199,7 @@ class Query {
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
 			if ($alias && isset($this->tableAliases[$alias]))
 				throw new DuplicateAliasException("Alias '$alias' already in use.");
-			$prefix = Config::getVal('database', 'table_prefix', false);
+			$prefix = $this->prefix;
 			if ($this->autoTablePrefix && $prefix)
 				$table = $prefix . $table;
 			$this->tableAliases[$alias] = $table;
@@ -307,7 +313,7 @@ class Query {
 		$this->assertLegal();
 		if (is_string($table) && ($table = trim($table)) !== '' && 
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
-			$prefix = Config::getVal('database', 'table_prefix', false);
+			$prefix = $this->prefix;
 			if ($this->autoTablePrefix && $prefix)
 				$table = $prefix . $table;
 			$table = array(

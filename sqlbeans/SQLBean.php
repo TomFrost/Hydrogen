@@ -42,7 +42,10 @@ abstract class SQLBean {
 					$this->stored[$key] = $value;
 			}
 		}
-		$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
+		if(is_string($dbengine))
+			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
+		else
+			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
 		$this->dbreconstruct = $this->dbengine->getReconstructArray();
 	}
 	
@@ -211,7 +214,9 @@ abstract class SQLBean {
 	}
 	
 	public static function select($query=false, $doMapping=false, $mapOverride=false, $dbengine=false) {
-		if (!$dbengine)
+		if (is_string($dbengine))
+			$dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
+		else if(!$dbengine)
 			$dbengine = DatabaseEngineFactory::getEngine();
 		if (!$query)
 			$query = new Query('SELECT', $dbengine);

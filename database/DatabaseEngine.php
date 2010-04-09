@@ -175,10 +175,12 @@ abstract class DatabaseEngine {
 	 * 		username is required.
 	 * @param string|boolean password The password to connect with, or <code>false</code> if no
 	 * 		password is required.
+	 * @param string|boolean tablePrefix The prefix for tables, or <code>false</code> if no prefix
+	 *		is required
 	 * @throws hydrogen\database\exceptions\DatabaseConnectionException if a connection could not
 	 * 		be made.
 	 */
-	abstract protected function setConnection($host, $port, $socket, $database, $username, $password);
+	abstract protected function setConnection($host, $port, $socket, $database, $username, $password, $tablePrefix);
 	
 	/**
 	 * Gets an array of information needed to reconstruct this DatabaseEngine.  This is the same array
@@ -197,7 +199,8 @@ abstract class DatabaseEngine {
 	/**
 	 * Creates a new instance of this DatabaseEngine.  This should never be called directly;
 	 * rather, new database engine instances should be requested by calling
-	 * {@link DatabaseEngineFactory#getEngine}.  The DatabaseEngine is connected when created.
+	 * {@link DatabaseEngineFactory#getEngine} OR . {@link DatabaseEngineFactory#getEngineByName} 
+	 * The DatabaseEngine is connected when created.
 	 *
 	 * @param string|boolean host Hostname to connect to, or <code>false</code> to use a UNIX socket.
 	 * @param int|boolean port Port to connect to, or <code>false</code> to use a UNIX socket.
@@ -208,10 +211,12 @@ abstract class DatabaseEngine {
 	 * 		username is required.
 	 * @param string|boolean password The password to connect with, or <code>false</code> if no
 	 * 		password is required.
+	 * @param string|boolean tablePrefix The prefix for tables, or <code>false</code> if no prefix
+	 *		is required
 	 * @throws hydrogen\database\exceptions\DatabaseConnectionException if a connection could not
 	 * 		be made.
 	 */
-	public function __construct($host, $port, $socket, $database, $username, $password) {
+	public function __construct($host, $port, $socket, $database, $username, $password, $tablePrefix=false) {
 		$this->reconstruct = array(
 			'host' => $host,
 			'port' => $port,
@@ -219,9 +224,10 @@ abstract class DatabaseEngine {
 			'database' => $database,
 			'username' => $username,
 			'password' => $password,
-			'engine' => get_class($this)
+			'engine' => get_class($this),
+			'table_prefix' => $tablePrefix
 			);
-		$this->setConnection($host, $port, $socket, $database, $username, $password);
+		$this->setConnection($host, $port, $socket, $database, $username, $password, $tablePrefix);
 	}
 	
 	public function __sleep() {
@@ -235,7 +241,8 @@ abstract class DatabaseEngine {
 			$this->reconstruct['socket'],
 			$this->reconstruct['database'],
 			$this->reconstruct['username'],
-			$this->reconstruct['password']
+			$this->reconstruct['password'],
+			$this->reconstruct['table_prefix']
 			);
 	}
 }
