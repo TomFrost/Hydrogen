@@ -25,7 +25,7 @@ abstract class Model {
 		if (is_string($dbengine))
 			$dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
 		else
-			$dbengine = DatabaseEngineFactory::getEngine();
+			$dbengine =  $dbengine ?: DatabaseEngineFactory::getEngine();
 		$hash = spl_object_hash($dbengine);
 		if (!isset(static::$instances[$class]))
 			static::$instances[$class] = array();
