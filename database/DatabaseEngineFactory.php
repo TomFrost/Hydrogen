@@ -82,7 +82,7 @@ class DatabaseEngineFactory {
                                 $database ?: Config::getVal('database', 'database', $dbSelect),
                                 $username ?: Config::getVal('database', 'username', $dbSelect),
                                 $password ?: Config::getVal('database', 'password', $dbSelect),
-                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
+                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
                                 );
                 }
                 return static::$engine[$key];
@@ -123,7 +123,7 @@ class DatabaseEngineFactory {
                                 $database ?: Config::getVal('database', 'database', $dbSelect),
                                 $username ?: Config::getVal('database', 'username', $dbSelect),
                                 $password ?: Config::getVal('database', 'password', $dbSelect),
-                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
+                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
                                 );
                 }
                 return static::$engine[$key];

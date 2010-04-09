@@ -71,11 +71,10 @@ class Query {
 		$this->reqJoinCond = false;
 		if(is_string($dbengine))
 			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
-		else{
+		else
 			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
 		$this->prefix = $this->dbengine->getReconstructArray();
-		$this->prefix =  $this->prefix['table_prefix'];
-		}
+		$this->prefix = $this->prefix['table_prefix'];
 	}
 	
 	public function getQueryTree() {

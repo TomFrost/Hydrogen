@@ -69,7 +69,7 @@ class Config {
 	 * @throws ConfigKeyNotFoundException if the requested section/key pair does not
 	 * 		exist, and exceptionOnError is set to <code>true</code>.
 	 */
-	public static function getVal($section, $key, $subkey=false, $exceptionOnError=true) {
+	public static function getVal($section, $key, $subkey=false, $exceptionOnError=false) {
 		if($subkey == false){
 			if (isset(static::$values[$section][$key]))
 				return static::$values[$section][$key];

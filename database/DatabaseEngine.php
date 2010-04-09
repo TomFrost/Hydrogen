@@ -216,7 +216,7 @@ abstract class DatabaseEngine {
 	 * @throws hydrogen\database\exceptions\DatabaseConnectionException if a connection could not
 	 * 		be made.
 	 */
-	public function __construct($host, $port, $socket, $database, $username, $password, $tablePrefix=false) {
+	public function __construct($host, $port, $socket, $database, $username, $password, $tablePrefix) {
 		$this->reconstruct = array(
 			'host' => $host,
 			'port' => $port,

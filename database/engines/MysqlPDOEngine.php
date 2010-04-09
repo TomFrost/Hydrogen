@@ -11,7 +11,7 @@ use hydrogen\database\statements\GenericPDOStatement;
 
 class MysqlPDOEngine extends PDOEngine {
 	
-	public function setConnection($host, $port, $socket, $database, $username, $password) {
+	public function setConnection($host, $port, $socket, $database, $username, $password, $tablePrefix) {
 		if ($socket)
 			parent::setPDOConnection($host, $port, $socket, $database, $username, $password,
 				"mysql:unix_socket=$socket;dbname=$database");
