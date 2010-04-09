@@ -58,6 +58,8 @@ class Config {
 	 *
 	 * @param string section The section name under which to look for the key.
 	 * @param string key The key name for which to retrieve the value.
+	 * @param string | boolean subkey The subkey name for wich to retreive the value.
+	 *		<code>false</code> assumes there is no subkey and value is string
 	 * @param boolean exceptionOnError <code>true</code> to have this method throw
 	 * 		a {@link ConfigKeyNotFoundException} if the config file is not found;
 	 * 		<code>false</code> to return <code>false</code> instead.
@@ -67,23 +69,55 @@ class Config {
 	 * @throws ConfigKeyNotFoundException if the requested section/key pair does not
 	 * 		exist, and exceptionOnError is set to <code>true</code>.
 	 */
-	public static function getVal($section, $key, $exceptionOnError=true) {
-		if (isset(static::$values[$section][$key]))
-			return static::$values[$section][$key];
-		if ($exceptionOnError) {
-			$msg = "Config value not found: [$section][$key].";
-			$trace = debug_backtrace();
-			$call = false;
-			if (isset($trace[1])) {
-				$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
-				$msg .= " Value is required by $call";
+	public static function getVal($section, $key, $subkey=false, $exceptionOnError=true) {
+		if($subkey == false){
+			if (isset(static::$values[$section][$key]))
+				return static::$values[$section][$key];
+			if ($exceptionOnError) {
+				$msg = "Config value not found: [$section][$key].";
+				$trace = debug_backtrace();
+				$call = false;
+				if (isset($trace[1])) {
+					$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
+					$msg .= " Value is required by $call";
+				}
+				throw new ConfigKeyNotFoundException($msg, $call);
 			}
-			throw new ConfigKeyNotFoundException($msg, $call);
+			else
+			return false;
 		}
-		else
-			return '';
+		else{
+			if (isset(static::$values[$section][$key][$subkey]))
+				return static::$values[$section][$key][$subkey];
+			if ($exceptionOnError) {
+				$msg = "Config value not found: [$section][$key][$subkey].";
+				$trace = debug_backtrace();
+				$call = false;
+				if (isset($trace[1])) {
+					$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
+					$msg .= " Value is required by $call";
+				}
+				throw new ConfigKeyNotFoundException($msg, $call);
+			}
+			else
+			return false;
+		}
 	}
-	
+	/**
+	 * Retrieves a specified required value from the currently loaded configuration.
+	 *
+	 * @param string section The section name under which to look for the key.
+	 * @param string key The key name for which to retrieve the value.
+	 * @param string | boolean subkey The subkey name for wich to retreive the value.
+	 *		<code>false</code> assumes there is no subkey and value is string
+	 * @return The value of the requested section/key.
+	 * @throws ConfigKeyNotFoundException if the requested section/key pair does not
+	 * 		exist.
+	 */
+	public static function getRequiredVal($section, $key, $subkey=false) {
+		$return = static::getVal($section, $key, $subkey, true);
+		return $return;
+	}
 	/**
 	 * Loads the specified configuration file with or without caching.
 	 *

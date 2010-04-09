@@ -19,7 +19,7 @@ class Log {
 	protected $engine, $maxlevel;
 	
 	protected function __construct() {
-		$class = '\\' . __NAMESPACE__ . '\engines\\' . (Config::getVal('log', 'engine', false) ?: 'No') . 'Engine';
+		$class = '\\' . __NAMESPACE__ . '\engines\\' . (Config::getVal('log', 'engine') ?: 'No') . 'Engine';
 		$this->engine = new $class();
 		$this->maxlevel = Config::getVal('log', 'loglevel', false) ?: 1;
 	}

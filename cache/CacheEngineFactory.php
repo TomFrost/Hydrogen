@@ -36,7 +36,7 @@ class CacheEngineFactory {
 		if (!isset(self::$engine))
 			static::$engine = array();
 		if (!$engine)
-			$engine = Config::getVal('cache', 'engine', false);
+			$engine = Config::getVal('cache', 'engine');
 		if (!$engine)
 			$engine = 'No';
 		if (!isset(static::$engine[$engine])) {

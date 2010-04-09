@@ -21,8 +21,8 @@ class MemcacheEngine implements CacheEngine {
 	
 	public function __construct() {
 		$res = new Memcache();
-		$host = Config::getVal('cache', 'memcache_host', false) ?: 'localhost';
-		$port = Config::getVal('cache', 'memcache_port', false) ?: 11211;
+		$host = Config::getVal('cache', 'memcache_host') ?: 'localhost';
+		$port = Config::getVal('cache', 'memcache_port') ?: 11211;
 		$res->addServer($host, $port);
 		$this->memcache = $res;
 	}

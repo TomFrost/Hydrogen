@@ -290,7 +290,7 @@ class RECacheManager {
 	}
 	
 	protected function uniqueKey($type, $key) {
-		return Config::getVal('recache', 'unique_name') . ':' . $type . ':' . $key;
+		return Config::getRequiredVal('recache', 'unique_name') . ':' . $type . ':' . $key;
 	}
 	
 	protected function get_miss() {
