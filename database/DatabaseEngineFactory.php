@@ -122,7 +122,8 @@ class DatabaseEngineFactory {
 			Config::getVal('database', 'socket', $dbConfigName),
 			Config::getVal('database', 'database', $dbConfigName),
 			Config::getVal('database', 'username', $dbConfigName),
-			Config::getVal('database', 'password', $dbConfigName)
+			Config::getVal('database', 'password', $dbConfigName),
+			Config::getVal('database', 'table_prefix', $dbConfigName)
 			);
 	}
 }
