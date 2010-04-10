@@ -100,8 +100,9 @@ class DatabaseEngineFactory {
 	 * as the dbConfigName argument to get the appropriate DatabaseEngine.  If no dbConfigName
 	 * is specified, the "primary" sub-key will be used since it appears first in the file.
 	 *
-	 * @param string dbConfigName The subkey of the engine configuration to pull from the
-	 * 		{@link \hydrogen\config\Config} object.
+	 * @param string|boolean dbConfigName OPTIONAL: The sub-key of the engine configuration to
+	 * 		pull from the {@link \hydrogen\config\Config} object.  If false or unspecified, the
+	 * 		first (or only) database configuration is pulled from Config.
 	 * @throws hydrogen\database\exceptions\DatabaseConnectionException if a connection could not
 	 * 		be made.
 	 * @return DatabaseEngine The requested DatabaseEngine with a connection to the specified
