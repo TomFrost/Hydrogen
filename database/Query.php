@@ -73,8 +73,7 @@ class Query {
 			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
 		else
 			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
-		$this->prefix = $this->dbengine->getReconstructArray();
-		$this->prefix = $this->prefix['table_prefix'];
+		$this->prefix = $this->dbengine->getTablePrefix();
 	}
 	
 	public function getQueryTree() {
@@ -112,9 +111,8 @@ class Query {
 		$this->assertLegal();
 		if (is_string($table) && ($table = trim($table)) !== '' && 
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
-			$prefix = $this->prefix;
-			if ($this->autoTablePrefix && $prefix)
-				$table = $prefix . $table;
+			if ($this->autoTablePrefix && $this->prefix)
+				$table = $this->prefix . $table;
 			$from = array(
 				'table' => $table,
 				'alias' => $alias
@@ -181,9 +179,8 @@ class Query {
 		$this->assertLegal();
 		if (!is_string($table) || ($table = trim($table)) === '')
 			throw new InvalidSQLException('Invalid table name.');
-		$prefix = $this->prefix;
-		if ($this->autoTablePrefix && $prefix)
-			$table = $prefix . $table;
+		if ($this->autoTablePrefix && $this->prefix)
+			$table = $this->prefix . $table;
 		if (!isset($this->query['INTO']))
 			$this->query['INTO'] = array();
 		$this->query['INTO']['table'] = $table;
@@ -198,9 +195,8 @@ class Query {
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
 			if ($alias && isset($this->tableAliases[$alias]))
 				throw new DuplicateAliasException("Alias '$alias' already in use.");
-			$prefix = $this->prefix;
-			if ($this->autoTablePrefix && $prefix)
-				$table = $prefix . $table;
+			if ($this->autoTablePrefix && $this->prefix)
+				$table = $this->prefix . $table;
 			$this->tableAliases[$alias] = $table;
 			if (!isset($this->query['JOIN']))
 				$this->query['JOIN'] = array();
@@ -312,9 +308,8 @@ class Query {
 		$this->assertLegal();
 		if (is_string($table) && ($table = trim($table)) !== '' && 
 				($alias === false || (is_string($alias) && ($alias = trim($alias)) !== ''))) {
-			$prefix = $this->prefix;
-			if ($this->autoTablePrefix && $prefix)
-				$table = $prefix . $table;
+			if ($this->autoTablePrefix && $this->prefix)
+				$table = $this->prefix . $table;
 			$table = array(
 				'table' => $table,
 				'alias' => $alias
