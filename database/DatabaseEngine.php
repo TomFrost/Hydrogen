@@ -197,6 +197,18 @@ abstract class DatabaseEngine {
 	}
 	
 	/**
+	 * Gets the table prefix that this engine was initialized with.  The prefix itself does
+	 * not affect the function of the DatabaseEngine, but is stored as a convenience for any
+	 * methods that may want to automatically prepend the user-chosen prefix to table names.
+	 *
+	 * @return string The prefix that friendly libraries should prepend to any table names, or
+	 * 		an empty string if no prefix was set for this engine.
+	 */
+	public function getTablePrefix() {
+		return $this->reconstruct[table_prefix] ?: '';
+	}
+	
+	/**
 	 * Creates a new instance of this DatabaseEngine.  This should never be called directly;
 	 * rather, new database engine instances should be requested by calling
 	 * {@link DatabaseEngineFactory#getEngine} OR . {@link DatabaseEngineFactory#getEngineByName} 
@@ -212,7 +224,7 @@ abstract class DatabaseEngine {
 	 * @param string|boolean password The password to connect with, or <code>false</code> if no
 	 * 		password is required.
 	 * @param string|boolean tablePrefix The prefix for tables, or <code>false</code> if no prefix
-	 *		is required
+	 *		is required.
 	 * @throws hydrogen\database\exceptions\DatabaseConnectionException if a connection could not
 	 * 		be made.
 	 */
