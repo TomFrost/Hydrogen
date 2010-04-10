@@ -103,8 +103,7 @@ class Config {
 	 * 		exist.
 	 */
 	public static function getRequiredVal($section, $key, $subkey=false) {
-		$return = static::getVal($section, $key, $subkey, true);
-		return $return;
+		return static::getVal($section, $key, $subkey, true);
 	}
 	
 	/**
