@@ -70,39 +70,27 @@ class Config {
 	 * 		exist, and exceptionOnError is set to <code>true</code>.
 	 */
 	public static function getVal($section, $key, $subkey=false, $exceptionOnError=false) {
-		if($subkey == false){
-			if (isset(static::$values[$section][$key]))
-				return static::$values[$section][$key];
-			if ($exceptionOnError) {
-				$msg = "Config value not found: [$section][$key].";
-				$trace = debug_backtrace();
-				$call = false;
-				if (isset($trace[1])) {
-					$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
-					$msg .= " Value is required by $call";
-				}
-				throw new ConfigKeyNotFoundException($msg, $call);
+		if ($subkey === false && isset(static::$values[$section][$key]))
+			return static::$values[$section][$key];
+		else if ($subkey && isset(static::$values[$section][$key][$subkey]))
+			return static::$values[$section][$key][$subkey];
+		
+		if ($exceptionOnError) {
+			$msg = "Config value not found: [$section][$key]";
+			if ($subkey === true)
+				$msg .= "[$subkey]";
+			$msg .= ".";
+			$trace = debug_backtrace();
+			$call = false;
+			if (isset($trace[1])) {
+				$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
+				$msg .= " Value is required by $call";
 			}
-			else
-			return false;
+			throw new ConfigKeyNotFoundException($msg, $call);
 		}
-		else{
-			if (isset(static::$values[$section][$key][$subkey]))
-				return static::$values[$section][$key][$subkey];
-			if ($exceptionOnError) {
-				$msg = "Config value not found: [$section][$key][$subkey].";
-				$trace = debug_backtrace();
-				$call = false;
-				if (isset($trace[1])) {
-					$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
-					$msg .= " Value is required by $call";
-				}
-				throw new ConfigKeyNotFoundException($msg, $call);
-			}
-			else
-			return false;
-		}
+		return false;
 	}
+	
 	/**
 	 * Retrieves a specified required value from the currently loaded configuration.
 	 *
@@ -118,6 +106,7 @@ class Config {
 		$return = static::getVal($section, $key, $subkey, true);
 		return $return;
 	}
+	
 	/**
 	 * Loads the specified configuration file with or without caching.
 	 *
