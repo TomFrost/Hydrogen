@@ -52,41 +52,42 @@ class DatabaseEngineFactory {
 	 * 		database server.
 	 */
 	public static function getEngine($host=false, $port=false, $socket=false,
-                        $database=false, $username=false, $password=false, $engine=false, $tablePrefix=false) {
-                $dbSelectKey = Config::getRequiredVal('database','engine');
-                if(is_array($dbSelectKey)){
-                        $dbSelectKey = array_keys($dbSelectKey);
-                        $dbSelect = $dbSelectKey[0];
-                }
-                else 
-                        $dbSelect = false;
-                $host = $host ?: Config::getVal('database', 'host', $dbSelect);
-                $port = $port ?: Config::getVal('database', 'port', $dbSelect);
-                $socket = $socket ?: Config::getVal('database', 'socket', $dbSelect);
-                $database = $database ?: Config::getVal('database', 'database', $dbSelect);
-                $username = $username ?: Config::getVal('database', 'username', $dbSelect);
-                $password = $password ?: Config::getVal('database', 'password', $dbSelect);
-                $tablePrefix = $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
-                $engine = $engine ?: Config::getRequiredVal('database', 'engine', $dbSelect);
-                if (strpos($engine, 'hydrogen') !== false)
-                        $engineClass = &$engine;
-                else
-                        $engineClass = '\hydrogen\database\engines\\' . $engine . 'Engine';
-                $key = ($host ?: '') . ':' . ($port ?: '') . ':' . ($socket ?: '') . ':' . 
-                        ($database ?: '') . ':' . ($username ?: '') . ':' . ($engineClass ?: '') . ':' . ($tablePrefix ?: '');
-                if (!isset(static::$engine[$key])) {
-                        static::$engine[$key] = new $engineClass(
-                                $host ?: Config::getVal('database', 'host', $dbSelect),
-                                $port ?: Config::getVal('database', 'port', $dbSelect),
-                                $socket ?: Config::getVal('database', 'socket', $dbSelect),
-                                $database ?: Config::getVal('database', 'database', $dbSelect),
-                                $username ?: Config::getVal('database', 'username', $dbSelect),
-                                $password ?: Config::getVal('database', 'password', $dbSelect),
-                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
-                                );
-                }
-                return static::$engine[$key];
-        }
+			$database=false, $username=false, $password=false, $engine=false, $tablePrefix=false) {
+		$dbSelectKey = Config::getRequiredVal('database','engine');
+		if(is_array($dbSelectKey)){
+			$dbSelectKey = array_keys($dbSelectKey);
+			$dbSelect = $dbSelectKey[0];
+		}
+		else 
+			$dbSelect = false;
+		$host = $host ?: Config::getVal('database', 'host', $dbSelect);
+		$port = $port ?: Config::getVal('database', 'port', $dbSelect);
+		$socket = $socket ?: Config::getVal('database', 'socket', $dbSelect);
+		$database = $database ?: Config::getVal('database', 'database', $dbSelect);
+		$username = $username ?: Config::getVal('database', 'username', $dbSelect);
+		$password = $password ?: Config::getVal('database', 'password', $dbSelect);
+		$tablePrefix = $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
+		$engine = $engine ?: Config::getRequiredVal('database', 'engine', $dbSelect);
+		if (strpos($engine, 'hydrogen') !== false)
+			$engineClass = &$engine;
+		else
+			$engineClass = '\hydrogen\database\engines\\' . $engine . 'Engine';
+		$key = ($host ?: '') . ':' . ($port ?: '') . ':' . ($socket ?: '') . ':' . 
+			($database ?: '') . ':' . ($username ?: '') . ':' . ($engineClass ?: '') . ':' . ($tablePrefix ?: '');
+		if (!isset(static::$engine[$key])) {
+			static::$engine[$key] = new $engineClass(
+				$host ?: Config::getVal('database', 'host', $dbSelect),
+				$port ?: Config::getVal('database', 'port', $dbSelect),
+				$socket ?: Config::getVal('database', 'socket', $dbSelect),
+				$database ?: Config::getVal('database', 'database', $dbSelect),
+				$username ?: Config::getVal('database', 'username', $dbSelect),
+				$password ?: Config::getVal('database', 'password', $dbSelect),
+				$tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
+				);
+		}
+		return static::$engine[$key];
+	}
+	
 	/**
 	 * Creates a new instance of this DatabaseEngine if the specified connection is new, or returns
 	 * the stored engine for a connection that an engine's already been instantiated for.  The
@@ -100,34 +101,34 @@ class DatabaseEngineFactory {
 	 * @return DatabaseEngine The requested DatabaseEngine with a connection to the specified
 	 * 		database server.
 	 */
-        public static function getEngineByName($dbSelect, $tablePrefix=false) {
-                $host = Config::getVal('database', 'host', $dbSelect);
-                $port = Config::getVal('database', 'port', $dbSelect);
-                $socket = Config::getVal('database', 'socket', $dbSelect);
-                $database = Config::getVal('database', 'database', $dbSelect);
-                $username = Config::getVal('database', 'username', $dbSelect);
-                $password = Config::getVal('database', 'password', $dbSelect);
-                $tablePrefix = $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
-                $engine = Config::getRequiredVal('database', 'engine', $dbSelect);
-                if (strpos($engine, 'hydrogen') !== false)
-                        $engineClass = &$engine;
-                else
-                        $engineClass = '\hydrogen\database\engines\\' . $engine . 'Engine';
-                $key = ($host ?: '') . ':' . ($port ?: '') . ':' . ($socket ?: '') . ':' . 
-                        ($database ?: '') . ':' . ($username ?: '') . ':' . ($engineClass ?: '') . ':' . ($tablePrefix ?: '');
-                if (!isset(static::$engine[$key])) {
-                        static::$engine[$key] = new $engineClass(
-                                $host ?: Config::getVal('database', 'host', $dbSelect),
-                                $port ?: Config::getVal('database', 'port', $dbSelect),
-                                $socket ?: Config::getVal('database', 'socket', $dbSelect),
-                                $database ?: Config::getVal('database', 'database', $dbSelect),
-                                $username ?: Config::getVal('database', 'username', $dbSelect),
-                                $password ?: Config::getVal('database', 'password', $dbSelect),
-                                $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
-                                );
-                }
-                return static::$engine[$key];
-        }
+	public static function getEngineByName($dbSelect, $tablePrefix=false) {
+		$host = Config::getVal('database', 'host', $dbSelect);
+		$port = Config::getVal('database', 'port', $dbSelect);
+		$socket = Config::getVal('database', 'socket', $dbSelect);
+		$database = Config::getVal('database', 'database', $dbSelect);
+		$username = Config::getVal('database', 'username', $dbSelect);
+		$password = Config::getVal('database', 'password', $dbSelect);
+		$tablePrefix = $tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect);
+		$engine = Config::getRequiredVal('database', 'engine', $dbSelect);
+		if (strpos($engine, 'hydrogen') !== false)
+			$engineClass = &$engine;
+		else
+			$engineClass = '\hydrogen\database\engines\\' . $engine . 'Engine';
+		$key = ($host ?: '') . ':' . ($port ?: '') . ':' . ($socket ?: '') . ':' . 
+			($database ?: '') . ':' . ($username ?: '') . ':' . ($engineClass ?: '') . ':' . ($tablePrefix ?: '');
+		if (!isset(static::$engine[$key])) {
+			static::$engine[$key] = new $engineClass(
+				$host ?: Config::getVal('database', 'host', $dbSelect),
+				$port ?: Config::getVal('database', 'port', $dbSelect),
+				$socket ?: Config::getVal('database', 'socket', $dbSelect),
+				$database ?: Config::getVal('database', 'database', $dbSelect),
+				$username ?: Config::getVal('database', 'username', $dbSelect),
+				$password ?: Config::getVal('database', 'password', $dbSelect),
+				$tablePrefix ?: Config::getVal('database', 'table_prefix', $dbSelect)
+				);
+		}
+		return static::$engine[$key];
+	}
 }
 
 ?>
