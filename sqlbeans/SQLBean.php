@@ -7,6 +7,7 @@
 namespace hydrogen\sqlbeans;
 
 use hydrogen\database\Query;
+use hydrogen\database\DatabaseEngine;
 use hydrogen\database\DatabaseEngineFactory;
 use hydrogen\sqlbeans\exceptions\MissingPrimaryKeyException;
 use hydrogen\sqlbeans\exceptions\NoStoredValuesException;
@@ -42,10 +43,8 @@ abstract class SQLBean {
 					$this->stored[$key] = $value;
 			}
 		}
-		if(is_string($dbengine))
-			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
-		else
-			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
+		$this->dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		$this->dbreconstruct = $this->dbengine->getReconstructArray();
 	}
 	
@@ -54,14 +53,15 @@ abstract class SQLBean {
 	}
 	
 	public function __wakeup() {
-		$this->dbengine = DatabaseEngineFactory::getEngine(
+		$this->dbengine = DatabaseEngineFactory::getCustomEngine(
+			$this->dbreconstruct['engine'],
 			$this->dbreconstruct['host'],
 			$this->dbreconstruct['port'],
 			$this->dbreconstruct['socket'],
 			$this->dbreconstruct['database'],
 			$this->dbreconstruct['username'],
 			$this->dbreconstruct['password'],
-			$this->dbreconstruct['engine']
+			$this->dbreconstruct['table_prefix']
 			);
 	}
 	
@@ -214,10 +214,8 @@ abstract class SQLBean {
 	}
 	
 	public static function select($query=false, $doMapping=false, $mapOverride=false, $dbengine=false) {
-		if (is_string($dbengine))
-			$dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
-		else if(!$dbengine)
-			$dbengine = DatabaseEngineFactory::getEngine();
+		$dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		if (!$query)
 			$query = new Query('SELECT', $dbengine);
 		if ($mapOverride)
@@ -321,7 +319,7 @@ abstract class SQLBean {
 			foreach ($changedMap as $map) {
 				if ($this->mapped[$map]) {
 					$class = static::$beanMap[$map]['joinBean'];
-					$query = new Query('SELECT');
+					$query = new Query('SELECT', $this->dbengine);
 					$fkey = static::$beanMap[$map]['foreignKey'];
 					$hasMapped = $this->mapped[$map]->hasMappedBeans();
 					if ($hasMapped)
@@ -329,7 +327,7 @@ abstract class SQLBean {
 					else
 						$query->where($fkey . ' = ?', $this->stored[$fkey]);
 					$query->limit(1);
-					$result = $class::select($query, $hasMapped);
+					$result = $class::select($query, $hasMapped, false, $this->dbengine);
 					$this->mapped[$map] = $result ? $result[0] : false;
 				}
 			}
