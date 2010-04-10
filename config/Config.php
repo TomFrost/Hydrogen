@@ -93,6 +93,7 @@ class Config {
 	
 	/**
 	 * Retrieves a specified required value from the currently loaded configuration.
+	 * This is equivalent to calling {@link #getVal} with a final argument of true.
 	 *
 	 * @param string section The section name under which to look for the key.
 	 * @param string key The key name for which to retrieve the value.
