@@ -22,10 +22,8 @@ abstract class Model {
 	
 	public static function getInstance($dbengine=false) {
 		$class = get_called_class();
-		if (is_string($dbengine))
-			$dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
-		else
-			$dbengine =  $dbengine ?: DatabaseEngineFactory::getEngine();
+		$dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		$hash = spl_object_hash($dbengine);
 		if (!isset(static::$instances[$class]))
 			static::$instances[$class] = array();
