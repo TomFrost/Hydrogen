@@ -69,10 +69,8 @@ class Query {
 		$this->havingStack = array();
 		$this->tableAliases = array();
 		$this->reqJoinCond = false;
-		if(is_string($dbengine))
-			$this->dbengine = DatabaseEngineFactory::getEngine($dbengine);
-		else
-			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
+		$this->dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		$this->prefix = $this->dbengine->getTablePrefix();
 	}
 	
