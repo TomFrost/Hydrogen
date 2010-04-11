@@ -205,7 +205,7 @@ abstract class DatabaseEngine {
 	 * 		an empty string if no prefix was set for this engine.
 	 */
 	public function getTablePrefix() {
-		return $this->reconstruct[table_prefix] ?: '';
+		return $this->reconstruct['table_prefix'] ?: '';
 	}
 	
 	/**

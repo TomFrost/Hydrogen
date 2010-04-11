@@ -70,7 +70,7 @@ class Query {
 		$this->tableAliases = array();
 		$this->reqJoinCond = false;
 		if(is_string($dbengine))
-			$this->dbengine = DatabaseEngineFactory::getEngineByName($dbengine);
+			$this->dbengine = DatabaseEngineFactory::getEngine($dbengine);
 		else
 			$this->dbengine = $dbengine ?: DatabaseEngineFactory::getEngine();
 		$this->prefix = $this->dbengine->getTablePrefix();

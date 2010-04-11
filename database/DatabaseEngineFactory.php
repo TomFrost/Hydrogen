@@ -111,8 +111,10 @@ class DatabaseEngineFactory {
 	public static function getEngine($dbConfigName=false) {
 		if ($dbConfigName === false) {
 			$engines = Config::getRequiredVal('database','engine');
-			if (is_array($engines))
-				$dbConfigName = (array_keys($engines))[0];
+			if (is_array($engines)) {
+				$engines = array_keys($engines);
+				$dbConfigName = $engines[0];
+			}
 		}
 			
 		return static::getCustomEngine(
