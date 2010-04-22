@@ -13,6 +13,7 @@ use hydrogen\config\exceptions\InvalidConfigFileException;
 use hydrogen\config\exceptions\ConfigCacheDirNotWritableException;
 use hydrogen\config\exceptions\ConfigCacheDirNotFoundException;
 use hydrogen\config\exceptions\InvalidPathException;
+use hydrogen\config\exceptions\IllegalBasePathException;
 use hydrogen\semaphore\SemaphoreEngineFactory;
 
 /**
@@ -52,14 +53,38 @@ use hydrogen\semaphore\SemaphoreEngineFactory;
  */
 class Config {
 	protected static $values = array();
-	protected static $configPath = false;
+	protected static $basePath = false;
+	
+	/**
+	 * Sets the base path of this webapp.  This is the only configuration value that
+	 * is not accessed or changed with the rest of the config options.  This is 
+	 * because many other config values and libraries depend on it, and it can only
+	 * be set once.
+	 *
+	 * This function should be called before any part of Hydrogen is interacted with.
+	 * Normally, it is called as the very first instruction in 
+	 * hydrogen.autoconfig.php.
+	 *
+	 * @param basePath string The path to the root of this webapp.
+	 * @throws InvalidPathException if the provided path is relative, or if the
+	 * 		base path has already been set.
+	 */
+	public static function setBasePath($basePath) {
+		if (static::$basePath === false) {
+			if (static::isRelativePath($basePath))
+				throw new InvalidPathException("Base path must be absolute.");
+			static::$basePath = $basePath;
+		}
+		else
+			throw new InvalidPathException("Base path cannot be changed.");
+	}
 	
 	/**
 	 * Retrieves a specified value from the currently loaded configuration.
 	 *
 	 * @param string section The section name under which to look for the key.
 	 * @param string key The key name for which to retrieve the value.
-	 * @param string | boolean subkey The subkey name for wich to retreive the value.
+	 * @param string | boolean subkey The subkey name for which to retrieve the value.
 	 *		<code>false</code> assumes there is no subkey and value is string
 	 * @param boolean exceptionOnError <code>true</code> to have this method throw
 	 * 		a {@link ConfigKeyNotFoundException} if the config file is not found;
@@ -101,7 +126,7 @@ class Config {
 	 *
 	 * @param string section The section name under which to look for the key.
 	 * @param string key The key name for which to retrieve the value.
-	 * @param string | boolean subkey The subkey name for wich to retreive the value.
+	 * @param string | boolean subkey The subkey name for which to retrieve the value.
 	 *		<code>false</code> assumes there is no subkey and value is string
 	 * @return The value of the requested section/key.
 	 * @throws ConfigKeyNotFoundException if the requested section/key pair does not
@@ -140,12 +165,13 @@ class Config {
 	public static function loadConfig($configFile, $cacheDir=false, $compareDates=true) {
 		if (!is_string($configFile) || ($configFile = trim($configFile)) == "")
 			throw new ConfigFileNotDefinedException('Config file must be an actual legal file path.');
-		static::$configPath = $configFile;
+		$configFile = static::getAbsolutePath($configFile);
+		echo $configFile;
 		$loadOrig = true;
 		if ($cacheDir) {
 			$loadOrig = false;
-			$cachePath = $cacheDir . DIRECTORY_SEPARATOR . 'hydrogen' .
-					DIRECTORY_SEPARATOR . 'config';
+			$cachePath = static::getAbsolutePath($cacheDir) . DIRECTORY_SEPARATOR . 
+				'hydrogen' . DIRECTORY_SEPARATOR . 'config';
 			$cacheFile = 'config.quickload.php';
 			$fullPath = $cachePath . DIRECTORY_SEPARATOR . $cacheFile;
 			if ($compareDates) {
@@ -214,63 +240,56 @@ class Config {
 	}
 	
 	/**
-	 * Gets the last config file path that {@link #loadConfig} was called with.  Note that this is
-	 * not guaranteed to be an absolute path, and the path is not guaranteed to have contained
-	 * a successfully parsed configuration file.
+	 * Gets the base path of this webapp, set by the {@link #setBasePath} function.
 	 *
-	 * @return The last known config file path, or false if {@link #loadConfig} has not yet been
+	 * @return The base path, or false if {@link #setBasePath} has not yet been
 	 * 		called.
 	 */
-	public static function getConfigPath() {
-		return static::$configPath;
+	public static function getBasePath() {
+		return static::$basePath;
 	}
 	
 	/**
-	 * Converts relative paths to absolute paths by treating the location
-	 * of the config file as the starting point for relative paths.  Note that
-	 * the config file path used is the same that is returned by
-	 * {@link #getConfigPath}.  Therefore, the last call to {@link #loadConfig}
-	 * determines the starting point for determining the starting point for
-	 * relative path resolution.
+	 * Converts relative paths to absolute paths by treating the base path as
+	 * the starting point for relative paths.
 	 *
 	 * Absolute paths are given WITHOUT using stat()-expensive functions like
 	 * realpath().  The benefit is that absolute paths are generated very quickly
 	 * and the target file/folder does not have to exist.  However, the path
 	 * returned may contain double-dots (i.e. /home/name/www/../config) which is
-	 * acceptable to most PHP functions.  This function can be forced to resolve the
-	 * path without double-dots if necessary.
+	 * acceptable as an absolute path to most PHP functions.  This function can be 
+	 * forced to resolve the path without double-dots if necessary.
 	 *
 	 * If an absolute path is given, the same absolute path will be returned
-	 * unaltered.
+	 * unaltered (unless removeDots is set to true, in which case it will be
+	 * cleaned before being returned).
 	 *
 	 * This function works for both UNIX-based filesystems and Windows-based
 	 * filesystems.
 	 *
-	 * @param path string The path to be made absolute in reference to the last
-	 * 		config path used.
+	 * @param path string The path to be made absolute in reference to the base path.
 	 * @param removeDots boolean true to remove single dots from the resulting path
 	 * 		and to remove double-dots (and their preceding directories) as well.
 	 * 		false to allow these artifacts to remain.  PHP accepts these paths as
 	 * 		absolute, so unless absolutely necessary, this argument should be omitted
 	 * 		or kept false.
-	 * @return string An absolute path relative to the last used config path.  If an
+	 * @return string An absolute path relative to the base path.  If an
 	 * 		absolute path was supplied, it will not be transformed at all unless
 	 * 		removeDots was set to true.
-	 * @throws InvalidPathException if {@link #loadConfig} has not been called before
-	 * 		this function, or if the config path used in that call was relative
-	 * 		itself.
+	 * @throws InvalidPathException if {@link #setBasePath} has not been called before
+	 * 		this function.
 	 */
 	public static function getAbsolutePath($path, $removeDots=false) {
 		if (static::isRelativePath($path)) {
-			if (static::$configPath === false) {
+			if (static::$basePath === false) {
 				throw new InvalidPathException("The config file path has not been " .
 					"set.  An absolute path cannot be generated.");
 			}
-			if (static::isRelativePath(static::$configPath)) {
+			if (static::isRelativePath(static::$basePath)) {
 				throw new InvalidPathException("In order to call " .
 					"Config::getAbsolutePath, the config path must be absolute.");
 			}
-			$path = dirname(static::$configPath) . DIRECTORY_SEPARATOR . $path;
+			$path = static::$basePath . DIRECTORY_SEPARATOR . $path;
 		}
 		if ($removeDots) {
 			$singleDot = DIRECTORY_SEPARATOR . '.' . DIRECTORY_SEPARATOR;
