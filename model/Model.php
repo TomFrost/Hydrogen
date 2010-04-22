@@ -6,30 +6,23 @@
 
 namespace hydrogen\model;
 
-use hydrogen\database\DatabaseEngineFactory;
 use hydrogen\recache\RECacheManager;
 use hydrogen\model\exceptions\NoSuchMethodException;
 use hydrogen\log\Log;
 
 abstract class Model {
 	protected static $instances = array();
-	protected $dbengine, $cm;
+	protected $cm;
 	
-	protected function __construct($dbengine) {
-		$this->dbengine = $dbengine;
+	protected function __construct() {
 		$this->cm = RECacheManager::getInstance();
 	}
 	
-	public static function getInstance($dbengine=false) {
+	public static function getInstance() {
 		$class = get_called_class();
-		$dbengine = ($dbengine instanceof DatabaseEngine) ?
-			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
-		$hash = spl_object_hash($dbengine);
 		if (!isset(static::$instances[$class]))
-			static::$instances[$class] = array();
-		if (!isset(static::$instances[$class][$hash]))
-			static::$instances[$class][$hash] = new $class($dbengine);
-		return static::$instances[$class][$hash];
+			static::$instances[$class] = new $class();
+		return static::$instances[$class];
 	}
 	
 	public function __call($func, $args) {

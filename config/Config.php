@@ -83,11 +83,13 @@ class Config {
 			$msg .= ".";
 			$trace = debug_backtrace();
 			$call = false;
-			// TODO: Show the appropriate function name when this was called through getRequiredVal.
-			if (isset($trace[1])) {
-				$call = $trace[1]['class'] . $trace[1]['type'] . $trace[1]['function'];
-				$msg .= " Value is required by $call";
+			$i = 1;
+			while ((!$call || $call === 'hydrogen\config\Config::getRequiredVal') && isset($trace[$i])) {
+				$call = $trace[$i]['class'] . $trace[$i]['type'] . $trace[$i]['function'];
+				$i++;
 			}
+			if ($call)
+				$msg .= " Value is required by $call";
 			throw new ConfigKeyNotFoundException($msg, $call);
 		}
 		return false;
