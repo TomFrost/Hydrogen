@@ -8,7 +8,6 @@ namespace hydrogen\log\engines;
 
 use hydrogen\log\Log;
 use hydrogen\log\LogEngine;
-use hydrogen\log\exceptions\InvalidPathException;
 use hydrogen\config\Config;
 
 class TextFileEngine implements LogEngine {
@@ -20,14 +19,8 @@ class TextFileEngine implements LogEngine {
 		$prefix = Config::getVal('log', 'fileprefix', false) ?: 'log';
 		$filename = $prefix . date('ymd') . '.log';
 			
-		// If the path is relative, attempt to make it relative from the
-		// config file path
-		if ($this->isRelativePath($logdir)) {
-			if (!$this->isRelativePath(Config::getConfigPath()))
-				$logdir = dirname(Config::getConfigPath()) . DIRECTORY_SEPARATOR . $logdir;
-			else
-				throw new InvalidPathException("The config file path must be absolute in order to use a relative path for the log file.");
-		}
+		// Get our path relative to the config file
+		$logdir = Config::getAbsolutePath($logdir);
 		
 		// Add the trailing slash if necessary
 		if ($logdir[strlen($logdir) - 1] != DIRECTORY_SEPARATOR)
@@ -74,20 +67,6 @@ class TextFileEngine implements LogEngine {
 	public function __destruct() {
 		if (isset($this->fp))
 			@fclose($this->fp);
-	}
-	
-	protected function isRelativePath($path) {
-		if (DIRECTORY_SEPARATOR === '\\') {
-			// Windows filesystem-specific
-			$char = (int)$path[0];
-			if ((($char >= (int)'a' && $char <= (int)'z') ||
-				($char >= (int)'A' && $char <= (int)'Z')) &&
-				$path[1] === ':' && $path[2] === DIRECTORY_SEPARATOR)
-				return false;
-		}
-		if ($path[0] === DIRECTORY_SEPARATOR)
-			return false;
-		return true;
 	}
 }
 

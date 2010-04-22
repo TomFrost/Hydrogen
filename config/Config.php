@@ -12,6 +12,7 @@ use hydrogen\config\exceptions\ConfigFileNotFoundException;
 use hydrogen\config\exceptions\InvalidConfigFileException;
 use hydrogen\config\exceptions\ConfigCacheDirNotWritableException;
 use hydrogen\config\exceptions\ConfigCacheDirNotFoundException;
+use hydrogen\config\exceptions\InvalidPathException;
 use hydrogen\semaphore\SemaphoreEngineFactory;
 
 /**
@@ -220,6 +221,96 @@ class Config {
 	 */
 	public static function getConfigPath() {
 		return static::$configPath;
+	}
+	
+	/**
+	 * Converts relative paths to absolute paths by treating the location
+	 * of the config file as the starting point for relative paths.  Note that
+	 * the config file path used is the same that is returned by
+	 * {@link #getConfigPath}.  Therefore, the last call to {@link #loadConfig}
+	 * determines the starting point for determining the starting point for
+	 * relative path resolution.
+	 *
+	 * Absolute paths are given WITHOUT using stat()-expensive functions like
+	 * realpath().  The benefit is that absolute paths are generated very quickly
+	 * and the target file/folder does not have to exist.  However, the path
+	 * returned may contain double-dots (i.e. /home/name/www/../config) which is
+	 * acceptable to most PHP functions.  This function can be forced to resolve the
+	 * path without double-dots if necessary.
+	 *
+	 * If an absolute path is given, the same absolute path will be returned
+	 * unaltered.
+	 *
+	 * This function works for both UNIX-based filesystems and Windows-based
+	 * filesystems.
+	 *
+	 * @param path string The path to be made absolute in reference to the last
+	 * 		config path used.
+	 * @param removeDots boolean true to remove single dots from the resulting path
+	 * 		and to remove double-dots (and their preceding directories) as well.
+	 * 		false to allow these artifacts to remain.  PHP accepts these paths as
+	 * 		absolute, so unless absolutely necessary, this argument should be omitted
+	 * 		or kept false.
+	 * @return string An absolute path relative to the last used config path.  If an
+	 * 		absolute path was supplied, it will not be transformed at all unless
+	 * 		removeDots was set to true.
+	 * @throws InvalidPathException if {@link #loadConfig} has not been called before
+	 * 		this function, or if the config path used in that call was relative
+	 * 		itself.
+	 */
+	public static function getAbsolutePath($path, $removeDots=false) {
+		if (static::isRelativePath($path)) {
+			if (static::$configPath === false) {
+				throw new InvalidPathException("The config file path has not been " .
+					"set.  An absolute path cannot be generated.");
+			}
+			if (static::isRelativePath(static::$configPath)) {
+				throw new InvalidPathException("In order to call " .
+					"Config::getAbsolutePath, the config path must be absolute.");
+			}
+			$path = dirname(static::$configPath) . DIRECTORY_SEPARATOR . $path;
+		}
+		if ($removeDots) {
+			$singleDot = DIRECTORY_SEPARATOR . '.' . DIRECTORY_SEPARATOR;
+			do {
+				$path = str_replace($singleDot, DIRECTORY_SEPARATOR, $path, $count);
+			} while ($count !== 0);
+			$doubleSlash = DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR;
+			do {
+				$path = str_replace($doubleSlash, DIRECTORY_SEPARATOR, $path, $count);
+			} while ($count !== 0);
+			$safeSep = DIRECTORY_SEPARATOR;
+			if (DIRECTORY_SEPARATOR === '\\')
+				$safeSep = '\\\\';
+			else if (DIRECTORY_SEPARATOR === '/')
+				$safeSep = '\\/';
+			$doubleDot = $safeSep . "[^$safeSep]+" . $safeSep . "\\.\\." . $safeSep;
+			do {
+				$path = preg_replace('/' . $doubleDot . '/',
+					DIRECTORY_SEPARATOR, $path, -1, $count);
+			} while ($count !== 0);
+		}
+		return $path;
+	}
+	
+	/**
+	 * Tests to see if the given path is relative.
+	 *
+	 * @param path string The path to be tested.
+	 * @return true if the path is relative; false otherwise.
+	 */
+	protected static function isRelativePath($path) {
+		if (DIRECTORY_SEPARATOR === '\\') {
+			// Windows filesystem-specific
+			$char = (int)$path[0];
+			if ((($char >= (int)'a' && $char <= (int)'z') ||
+				($char >= (int)'A' && $char <= (int)'Z')) &&
+				$path[1] === ':' && $path[2] === DIRECTORY_SEPARATOR)
+				return false;
+		}
+		if ($path[0] === DIRECTORY_SEPARATOR)
+			return false;
+		return true;
 	}
 	
 	/**
