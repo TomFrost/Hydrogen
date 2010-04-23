@@ -57,26 +57,20 @@ class Config {
 	
 	/**
 	 * Sets the base path of this webapp.  This is the only configuration value that
-	 * is not accessed or changed with the rest of the config options.  This is 
-	 * because many other config values and libraries depend on it, and it can only
-	 * be set once.
+	 * is not accessed or changed with the rest of the config options, because many
+	 * config options depend on this value.
 	 *
 	 * This function should be called before any part of Hydrogen is interacted with.
 	 * Normally, it is called as the very first instruction in 
 	 * hydrogen.autoconfig.php.
 	 *
-	 * @param basePath string The path to the root of this webapp.
-	 * @throws InvalidPathException if the provided path is relative, or if the
-	 * 		base path has already been set.
+	 * @param basePath string The absolute path to the root of this webapp.
+	 * @throws InvalidPathException if the provided path is relative.
 	 */
 	public static function setBasePath($basePath) {
-		if (static::$basePath === false) {
-			if (static::isRelativePath($basePath))
-				throw new InvalidPathException("Base path must be absolute.");
-			static::$basePath = $basePath;
-		}
-		else
-			throw new InvalidPathException("Base path cannot be changed.");
+		if (static::isRelativePath($basePath))
+			throw new InvalidPathException("Base path must be absolute.");
+		static::$basePath = $basePath;
 	}
 	
 	/**
