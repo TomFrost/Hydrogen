@@ -51,6 +51,8 @@ class View {
 	
 	protected static $vars = array();
 	protected static $view = false;
+	protected static $appURL = false;
+	protected static $viewURL = false;
 	
 	/**
 	 * Sets a variable or array of variables to the specified value(s)
@@ -178,6 +180,66 @@ class View {
 	 */
 	public function loadView($viewName) {
 		static::load($viewName);
+	}
+	
+	/**
+	 * Generates a URL relative to the base URL of this web application.
+	 * Calling this function with no arguments returns the base URL set in
+	 * the config file, with the trailing slash (if there is one) removed.
+	 *
+	 * Optionally, this function may be called with a path, which will be
+	 * appended to the base URL before it is returned.
+	 *
+	 * @param path string|boolean The path to append to the base app URL, or
+	 * 		false to return the base URL with no additional path.
+	 * @return string The base URL for this web app with the given path appended,
+	 * 		if provided.
+	 */
+	public function appURL($path=false) {
+		if (static::$appURL === false) {
+			static::$appURL = Config::getRequiredVal("general", "app_url");
+			if (static::$appURL[strlen(static::$appURL) - 1] == '/')
+				static::$appURL = substr(static::$appURL, 0, -1);
+		}
+		if ($path !== false) {
+			if ($path[0] == '/')
+				return static::$appURL . $path;
+			return static::$appURL . '/' . $path;
+		}
+		return static::$appURL;
+	}
+	
+	/**
+	 * Generates a URL relative to the root view URL of this web application.
+	 * Calling this function with no arguments returns the root view URL for
+	 * the currently used view, with no trailing slash.  Calling this function
+	 * with a path returns the root view URL with the given path appended to it.
+	 *
+	 * If the Config value [view]->root_url is set, this will be used as the root
+	 * view URL.  Otherwise, the Config value [view]->url_path will be appended to
+	 * the URL stored in [general]->app_url.
+	 *
+	 * @param path string|boolean The path to append to the root view URL, or
+	 * 		false to return the view URL with no additional path.
+	 * @return string The root URL for this view with the given path appended,
+	 * 		if provided.
+	 */
+	public function viewURL($path=false) {
+		if (static::$viewURL === false) {
+			static::$viewURL = Config::getVal("view", "root_url");
+			if (static::$viewURL === false) {
+				static::$viewURL = $this->appURL(Config::getRequiredVal("view", 
+					"url_path"));
+			}
+			if (static::$viewURL[strlen(static::$viewURL) - 1] == '/')
+				static::$viewURL = substr(static::$viewURL, 0, -1);
+		}
+		if ($path !== false) {
+			if ($path[0] == '/')
+				return static::$viewURL . $path;
+			return static::$viewURL . '/' . $path;
+		}
+		return static::$viewURL;
 	}
 	
 	/**
