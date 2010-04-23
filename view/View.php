@@ -125,37 +125,6 @@ class View {
 	}
 	
 	/**
-	 * Adds the specified string to the specified variable.  If the specified
-	 * target variable is a string, the provided value will be concatenated to it.
-	 * If the specified variable is an array, a new array index will be added with
-	 * the specified value.
-	 *
-	 * This can be used for page-scope or request-scope variables.  Request-scope
-	 * variables much be supplied with the $this->varName syntax.  If the variable
-	 * specified is a request-scope variable and did not previously exist, it will
-	 * be created.
-	 *
-	 * This function is especially useful for things like CSS and Javascript
-	 * includes.  For example:
-	 *
-	 * <pre>
-	 * $this->addTo($this->css, '<link href="pagestyle.css" type="text/css" />');
-	 * </pre>
-	 *
-	 * A view can then output the $this->css variable, which will have all the CSS 
-	 * links accumulated during the course of processing the View.
-	 * 
-	 * @param variable mixed The variable that should be appended.
-	 * @param value mixed The value that the given variable should be appended with.
-	 */
-	public function addTo(&$variable, $value) {
-		if (is_array($variable))
-			$variable[] = $value;
-		else
-			$variable .= $value;
-	}
-	
-	/**
 	 * Loads the specified view within the currently executing view.  For
 	 * example, in any given view, you could execute:
 	 *
