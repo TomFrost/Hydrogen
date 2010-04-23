@@ -19,8 +19,6 @@ use hydrogen\config\Config;
  * absolute path that will allow your app to be moved or installed anywhere without
  * changing this value.  The following example assumes that this autoconfig file is
  * two levels down from the root of the app.
- *
- * Once set, this value can never be changed for the duration of the page request.
  */
 Config::setBasePath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "..");
 
