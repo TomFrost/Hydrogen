@@ -42,8 +42,8 @@ Config::setBasePath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR .
  * simply delete the cached config file.
  */
 Config::loadConfig(
-	__DIR__ . 'config' . DIRECTORY_SEPARATOR . 'config.ini.php', // Config file path
-	__DIR__ . 'cache', // Cache folder path
+	'config' . DIRECTORY_SEPARATOR . 'config.ini.php', // Config file path
+	'cache', // Cache folder path
 	true // Check for config file changes before using cached version?
 	);
 	
