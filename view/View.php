@@ -9,6 +9,44 @@ namespace hydrogen\view;
 use hydrogen\config\Config;
 use hydrogen\view\exceptions\NoSuchViewException;
 
+/**
+ * The View class is a basic view implementation, allowing a separate view
+ * layer with its own request-level variable scope and page-level variable scope.
+ *
+ * At any point during the execution of the web application (but preferably in the
+ * Controller layer), variables can be injected into the View layer -- either before
+ * the view is loaded using {@link #setVar}, or at the same time the view is loaded
+ * in {@link #load}.  Inside the view, these request-scope variables can be accessed
+ * with $this->variableName.  Page-scope variables are local PHP variables such as
+ * $varName.
+ *
+ * Views are stored in a directory defined by the config value "folder" in group
+ * "view".  View names are the names of the PHP files in that folder (without
+ * the trailing ".php").  So for example, if the view folder were "views" and inside
+ * of that folder was the file main.php, that view could be loaded by executing:
+ *
+ * <pre>
+ * use hydrogen\view\View;
+ * View::load("main");
+ * </pre>
+ *
+ * Similarly, if the php file were in a subfolder called "common", it could be loaded
+ * with:
+ *
+ * <pre>
+ * use hydrogen\view\View;
+ * View::load("common/main");
+ * </pre>
+ *
+ * Or, if you wish to load common/header from inside a view php file:
+ *
+ * <pre>
+ * $this->loadView("common/header");
+ * </pre>
+ *
+ * View can be easily extended to include more functions or completely change the
+ * loading format for the library.
+ */
 class View {
 	
 	protected static $vars = array();
