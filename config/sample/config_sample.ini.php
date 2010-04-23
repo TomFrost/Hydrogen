@@ -3,6 +3,9 @@
 ; Hydrogen Configuration
 ;*************************************************************************
 
+[general]
+app_url = "http://example.com/app/folder"
+
 [cache]
 engine = "Memcache"
 

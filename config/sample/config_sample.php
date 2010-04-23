@@ -1,5 +1,8 @@
 <?php
 hydrogen\config\Config::setConfigArray(array(
+	'general' => array(
+		'app_url' => 'http://example.com/app/folder'
+		),
 	'cache' => array(
 		'engine' => 'Memcache'
 		),

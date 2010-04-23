@@ -47,14 +47,14 @@ Config::loadConfig(
 	
 /*
  * The rest of this file can be used to override user-specified config settings or
- * set config items that shouldn't necessarily be presented to the user.  A good
- * example of this is the view folder.  Your application probably doesn't call for the
- * user to be able to change that, so you can remove it from the config file and
- * define it here.
- *
- * Note that all relative paths contained in config values will be resolved from the
- * base path given earlier in this file.
+ * set config new items that shouldn't be presented to the user.
  */
-Config::setVal("view", "folder", "views");
+
+// The folder, relative to the base path, where views for the View library are stored.
+Config::setVal("view", "folder", "themes" . DIRECTORY_SEPARATOR . "default");
+
+// The URL path to add to the general->app_url config value to target view files
+// within the web browser.  This is usually the same as the folder above.
+Config::setVal("view", "urlpath", "themes/default");
 
 ?>
