@@ -166,7 +166,6 @@ class Config {
 		if (!is_string($configFile) || ($configFile = trim($configFile)) == "")
 			throw new ConfigFileNotDefinedException('Config file must be an actual legal file path.');
 		$configFile = static::getAbsolutePath($configFile);
-		echo $configFile;
 		$loadOrig = true;
 		if ($cacheDir) {
 			$loadOrig = false;
