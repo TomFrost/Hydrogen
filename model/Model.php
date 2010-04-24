@@ -47,7 +47,6 @@ abstract class Model {
 					$key = (isset(static::$modelID) ? static::$modelID : get_class($this)) . '_' . substr($func, 0, -2);
 					foreach($args as $arg)
 						$key .= '_' . (is_bool($arg) ? ($arg ? '1' : '0') : $arg);
-					$gstring = print_r($groups, true);
 					return $this->cm->recache_get($key, $ttl, $groups, array($this, $method), $args);
 				}
 			}
