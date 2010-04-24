@@ -44,10 +44,7 @@ class MemcacheEngine implements CacheEngine {
 	}
 
 	public function set($key, $value, $ttl) {
-		$success = true;
-		if (!$this->memcache->replace($key, $value, false, $ttl))
-			$success = $this->memcache->add($key, $value, false, $ttl);
-		return $success;
+		return $this->memcache->set($key, $value, false, $ttl);
 	}
 
 	public function increment($key, $value=1) {
