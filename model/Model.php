@@ -40,7 +40,7 @@ abstract class Model {
 					return call_user_func_array(array($this, $method), $args);
 				else {
 					$data = explode('_', substr($method, strlen($func)));
-					$ttl = isset($data[0]) ? $data[0] : 300;
+					$ttl = $data[0] !== '' ? $data[0] : 300;
 					$groups = array();
 					for ($i = 1; $i < count($data); $i++)
 						$groups[] = &$data[$i];
