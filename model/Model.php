@@ -44,7 +44,7 @@ abstract class Model {
 					$groups = array();
 					for ($i = 1; $i < count($data); $i++)
 						$groups[] = &$data[$i];
-					$key = (isset(static::$modelID) ? static::$modelID : get_class($this)) . '_' . substr($func, 0, -2);
+					$key = 'm:' . (isset(static::$modelID) ? static::$modelID : get_class($this)) . '_' . substr($func, 0, -2);
 					foreach($args as $arg)
 						$key .= '_' . (is_bool($arg) ? ($arg ? '1' : '0') : $arg);
 					return $this->cm->recache_get($key, $ttl, $groups, array($this, $method), $args);
