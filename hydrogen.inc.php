@@ -35,6 +35,10 @@ function load($namespace) {
 	return false;
 }
 
+function loadPath($absPath) {
+	return include($absPath);
+}
+
 spl_autoload_register(__NAMESPACE__ . '\load');
 include(__DIR__ . DIRECTORY_SEPARATOR . 'hydrogen.autoconfig.php');
 
