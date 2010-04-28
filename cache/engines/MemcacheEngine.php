@@ -56,7 +56,7 @@ class MemcacheEngine implements CacheEngine {
 	}
 	
 	public function delete($key) {
-		return $this->memcache->delete($key);
+		return $this->memcache->delete($key, 0);
 	}
 	
 	public function deleteAll() {
