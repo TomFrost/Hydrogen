@@ -21,21 +21,25 @@ class Dispatcher {
 	const RULE_URL_REGEX_MATCH = 11;
 	
 	protected static $dispatchRules = array();
+	protected static $controllerPaths = array();
 	
-	public static function dispatch() {
+	public static function dispatch($defaultNamespace='\\') {
 		$handled = false;
-		if (count($dispatchRules) === 0)
-			return static::dispatchPathInfoAutoMap();
-		foreach ($dispatchRules as $rule) {
+		if (count(static::$dispatchRules) === 0)
+			return static::dispatchPathInfoAutoMap($defaultNamespace);
+		foreach (static::$dispatchRules as $rule) {
 			switch ($rule[0]) {
 				case self::RULE_PATHINFO_AUTO_MAP:
-					$handled = static::dispatchPathInfoAutoMap();
+					$handled = static::dispatchPathInfoAutoMap(
+						$rule[1]['namespace']
+						);
 					break;
 				case self::RULE_PATHINFO_FOLDER_MAP:
 					$handled = static::dispatchPathInfoFolderMap(
 						$rule[1]['cIndex'],
 						$rule[1]['fIndex'],
-						$rule[1]['aIndex']
+						$rule[1]['aIndex'],
+						$rule[1]['namespace'] ?: $defaultNamespace
 						);
 					break;
 				case self::RULE_PATHINFO_REGEX_MAP:
@@ -43,7 +47,8 @@ class Dispatcher {
 						$rule[1]['regex'],
 						$rule[1]['cIndex'],
 						$rule[1]['fIndex'],
-						$rule[1]['aIndex']
+						$rule[1]['aIndex'],
+						$rule[1]['namespace'] ?: $defaultNamespace
 						);
 					break;
 				case self::RULE_PATHINFO_REGEX_MATCH:
@@ -58,7 +63,8 @@ class Dispatcher {
 					$handled = static::dispatchGetVarMap(
 						$rule[1]['cVar'],
 						$rule[1]['fVar'],
-						$rule[1]['aVar']
+						$rule[1]['aVar'],
+						$rule[1]['namespace'] ?: $defaultNamespace
 						);
 					break;
 				case self::RULE_GETVAR_MATCH:
@@ -66,7 +72,7 @@ class Dispatcher {
 						$rule[1]['match'],
 						$rule[1]['cName'],
 						$rule[1]['fName'],
-						$rule[1]['aVar'],
+						$rule[1]['aVar']
 						);
 					break;
 				case self::RULE_GETVAR_REGEX_MATCH:
@@ -74,14 +80,15 @@ class Dispatcher {
 						$rule[1]['regex'],
 						$rule[1]['cName'],
 						$rule[1]['fName'],
-						$rule[1]['aVar'],
+						$rule[1]['aVar']
 						);
 					break;
 				case self::RULE_POSTVAR_MAP:
 					$handled = static::dispatchPostVarMap(
 						$rule[1]['cVar'],
 						$rule[1]['fVar'],
-						$rule[1]['aVar']
+						$rule[1]['aVar'],
+						$rule[1]['namespace'] ?: $defaultNamespace
 						);
 					break;
 				case self::RULE_POSTVAR_MATCH:
@@ -89,7 +96,7 @@ class Dispatcher {
 						$rule[1]['match'],
 						$rule[1]['cName'],
 						$rule[1]['fName'],
-						$rule[1]['aVar'],
+						$rule[1]['aVar']
 						);
 					break;
 				case self::RULE_POSTVAR_REGEX_MATCH:
@@ -97,7 +104,7 @@ class Dispatcher {
 						$rule[1]['regex'],
 						$rule[1]['cName'],
 						$rule[1]['fName'],
-						$rule[1]['aVar'],
+						$rule[1]['aVar']
 						);
 					break;
 				case self::RULE_URL_REGEX_MAP:
@@ -105,7 +112,8 @@ class Dispatcher {
 						$rule[1]['regex'],
 						$rule[1]['cIndex'],
 						$rule[1]['fIndex'],
-						$rule[1]['aIndex']
+						$rule[1]['aIndex'],
+						$rule[1]['namespace'] ?: $defaultNamespace
 						);
 					break;
 				case self::RULE_URL_REGEX_MATCH:
@@ -123,6 +131,14 @@ class Dispatcher {
 		return false;
 	}
 	
+	public static function addControllerInclude($controllerName, $phpPath) {
+		static::$controllerPaths[$controllerName] = $phpPath;
+	}
+	
+	public static function addControllerIncludes($arrayMap) {
+		static::$controllerPaths = array_merge(static::$controllerPaths, $arrayMap);
+	}
+	
 	public static function addRule($type, $argArray=false) {
 		static::$dispatchRules[] = array($type, $argArray);
 	}
@@ -131,27 +147,33 @@ class Dispatcher {
 		static::$dispatchRules = array_merge(static::$dispatchRules, $ruleArray);
 	}
 	
-	public static function addPathInfoAutoMapRule() {
-		static::addRule(self::RULE_PATHINFO_AUTO_MAP);
-	}
-	
-	public static function addPathInfoFolderMapRule($cIndex, $fIndex, $argIndexArray) {
-		static::addRule(self::RULE_PATHINFO_FOLDER_MAP,
+	public static function addPathInfoAutoMapRule($namespace=false) {
+		static::addRule(self::RULE_PATHINFO_AUTO_MAP,
 			array(
-				"cIndex" => $cIndex,
-				"fIndex" => $fIndex,
-				"aIndex" => $argIndexArray
+				"namespace" => $namespace
 				)
 			);
 	}
 	
-	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex, $argIndexArray) {
+	public static function addPathInfoFolderMapRule($cIndex, $fIndex, $argIndexArray, $namespace=false) {
+		static::addRule(self::RULE_PATHINFO_FOLDER_MAP,
+			array(
+				"cIndex" => $cIndex,
+				"fIndex" => $fIndex,
+				"aIndex" => $argIndexArray,
+				"namespace" => $namespace
+				)
+			);
+	}
+	
+	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex, $argIndexArray, $namespace=false) {
 		static::addRule(self::RULE_PATHINFO_REGEX_MAP,
 			array(
 				"regex" => $regex,
 				"cIndex" => $cIndex,
 				"fIndex" => $fIndex,
-				"aIndex" => $argIndexArray
+				"aIndex" => $argIndexArray,
+				"namespace" => $namespace
 				)
 			);
 	}
@@ -167,12 +189,13 @@ class Dispatcher {
 			);
 	}
 	
-	public static function addGetVarMapRule($cVar, $fVar, $argVars) {
+	public static function addGetVarMapRule($cVar, $fVar, $argVars, $namespace=false) {
 		static::addRule(self::RULE_GETVAR_MAP,
 			array(
 				"cVar" => $cVar,
 				"fVar" => $fVar,
-				"aVar" => $argVars
+				"aVar" => $argVars,
+				"namespace" => $namespace
 				)
 			);
 	}
@@ -199,12 +222,13 @@ class Dispatcher {
 			);
 	}
 	
-	public static function addPostVarMapRule($cVar, $fVar, $argVars) {
+	public static function addPostVarMapRule($cVar, $fVar, $argVars, $namespace=false) {
 		static::addRule(self::RULE_POSTVAR_MAP,
 			array(
 				"cVar" => $cVar,
 				"fVar" => $fVar,
-				"aVar" => $argVars
+				"aVar" => $argVars,
+				"namespace" => $namespace
 				)
 			);
 	}
@@ -231,13 +255,14 @@ class Dispatcher {
 			);
 	}
 	
-	public static function addUrlRegexMapRule($regex, $cIndex, $fIndex, $argIndexArray) {
+	public static function addUrlRegexMapRule($regex, $cIndex, $fIndex, $argIndexArray, $namespace=false) {
 		static::addRule(self::RULE_URL_REGEX_MAP,
 			array(
 				"regex" => $regex,
 				"cIndex" => $cIndex,
 				"fIndex" => $fIndex,
-				"aIndex" => $argIndexArray
+				"aIndex" => $argIndexArray,
+				"namespace" => $namespace
 				)
 			);
 	}
@@ -253,21 +278,78 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchPathInfoAutoMap() {
-		if (!isset($_SERVER['PATH_INFO']))
-			return false;
-		$tokens = explode('/', $_SERVER['PATH_INFO']);
-	}
-	
-	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex, $aIndex) {
+	protected static function passRequest($namespace, $controller, $function, $args) {
+		// Generate the fully qualified class name
+		if ($namespace[0] !== '\\')
+			$namespace = '\\' . $namespace;
+		if ($namespace[strlen($namespace) - 1] !== '\\')
+			$namespace .= '\\';
+		$controller = ucfirst($controller);
+		$class = $namespace . $controller;
 		
+		// Include the file if this class isn't loaded
+		if (!class_exists($class) && isset($controllerPaths[$class]))
+			\hydrogen\loadPath($controllerPaths[$class]);
+			
+		// Call it, Cap'n.
+		$inst = $class::getInstance();
+		call_user_func_array(array($inst, $function), $args);
+		return true;
 	}
 	
-	protected static function dispatchPathInfoRegexMap($regex, $cIndex, $fIndex, $aIndex) {
-		
+	protected static function dispatchPathInfoAutoMap($namespace) {
+		if (isset($_SERVER['PATH_INFO'])) {
+			$tokens = explode('/', $_SERVER['PATH_INFO']);
+			if (count($tokens) >= 3) {
+				$args = array_slice($tokens, 3);
+				return static::passRequest($namespace, $tokens[1], $tokens[2], $args);
+			}
+		}
+		return false;
 	}
 	
-	protected static function dispatchGetVarMap($cVar, $fVar, $aVar) {
+	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex, $aIndex, $namespace) {
+		if (isset($_SERVER['PATH_INFO'])) {
+			$tokens = explode('/', $_SERVER['PATH_INFO']);
+			if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
+				$args = array();
+				if (is_array($aIndex) && count($aIndex) > 0) {
+					foreach ($aIndex as $i) {
+						if (isset($tokens[$i]))
+							$args[] = &$tokens[$i];
+						else
+							return false;
+					}
+				}
+				return static::passRequest($namespace, $tokens[$cIndex], 
+					$tokens[$fIndex], $args);
+			}
+		}
+		return false;
+	}
+	
+	protected static function dispatchPathInfoRegexMap($regex, $cIndex, $fIndex, $aIndex, $namespace) {
+		if (isset($_SERVER['PATH_INFO'])) {
+			if (preg_match($regex, $_SERVER['PATH_INFO'], $match) > 0) {
+				if (isset($match[$cIndex]) && isset($match[$fIndex])) {
+					$args = array();
+					if (is_array($aIndex) && count($aIndex) > 0) {
+						foreach ($aIndex as $i) {
+							if (isset($match[$i]))
+								$args[] = &$match[$i];
+							else
+								return false;
+						}
+					}
+					return static::passRequest($namespace, $match[$cIndex], 
+						$match[$fIndex], $args);
+				}
+			}
+		}
+		return false;
+	}
+	
+	protected static function dispatchGetVarMap($cVar, $fVar, $aVar, $namespace) {
 		
 	}
 	
@@ -279,7 +361,7 @@ class Dispatcher {
 		
 	}
 	
-	protected static function dispatchPostVarMap($cVar, $fVar, $aVar) {
+	protected static function dispatchPostVarMap($cVar, $fVar, $aVar, $namespace) {
 		
 	}
 	
@@ -291,7 +373,7 @@ class Dispatcher {
 		
 	}
 	
-	protected static function dispatchUrlRegexMap($regex, $cIndex, $fIndex, $aIndex) {
+	protected static function dispatchUrlRegexMap($regex, $cIndex, $fIndex, $aIndex, $namespace) {
 		
 	}
 	
