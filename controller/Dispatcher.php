@@ -65,7 +65,7 @@ class Dispatcher {
 						);
 					break;
 				case self::RULE_PATHINFO_MATCH:
-					$handled = static::dispatchPathInfoRegexMatch(
+					$handled = static::dispatchPathInfoMatch(
 						$rule[1]['match'],
 						$rule[1]['cName'],
 						$rule[1]['fName']
@@ -334,25 +334,33 @@ class Dispatcher {
 		return true;
 	}
 	
+	protected static function getArgsFromTokens($tokens, $aIndex) {
+		$args = array();
+		if (is_array($aIndex) && count($aIndex) > 0) {
+			foreach ($aIndex as $i) {
+				if (isset($tokens[$i]))
+					$args[] = &$tokens[$i];
+				else
+					return false;
+			}
+		}
+		return $args;
+	}
+	
 	protected static function dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
-			$args = array();
-			if (is_array($aIndex) && count($aIndex) > 0) {
-				foreach ($aIndex as $i) {
-					if (isset($tokens[$i]))
-						$args[] = &$tokens[$i];
-					else
-						return false;
-				}
-			}
-			return static::passRequest($tokens[$cIndex], 
-				$tokens[$fIndex], $args, $namespace, $suffix);
+			$args = static::getArgsFromTokens($tokens, $aIndex);
+			if ($args !== false)
+				return static::passRequest($tokens[$cIndex], $tokens[$fIndex], $args, $namespace, $suffix);
 		}
 		return false;
 	}
 	
-	protected static function dispatchMatchFromTokens($tokens, $aIndex, $cName, $fName) {
-		
+	protected static function dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex) {
+		$args = static::getArgsFromTokens($tokens, $aIndex);
+		if ($args !== false)
+			return static::passRequest($cName, $fName, $args);
+		return false;
 	}
 	
 	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
@@ -380,6 +388,21 @@ class Dispatcher {
 				return dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex,
 					$namespace, $suffix);
 			}
+		}
+		return false;
+	}
+	
+	protected static function dispatchPathInfoRegexMatch($regex, $cName, $fName, $aIndex) {
+		$pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+		if (preg_match($regex, $pathInfo, $tokens) > 0)
+			return dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex);
+		return false;
+	}
+	
+	protected static function dispatchPathInfoMatch($match, $cName, $fName) {
+		if ((isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] === $match)
+				|| (!isset($_SERVER['PATH_INFO']) && $match === '')) {
+			return passRequest($cName, $fName);
 		}
 		return false;
 	}
