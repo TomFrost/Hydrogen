@@ -11,14 +11,16 @@ class Dispatcher {
 	const RULE_PATHINFO_FOLDER_MAP = 1;
 	const RULE_PATHINFO_REGEX_MAP = 2;
 	const RULE_PATHINFO_REGEX_MATCH = 3;
-	const RULE_GETVAR_MAP = 4;
-	const RULE_GETVAR_MATCH = 5;
-	const RULE_GETVAR_REGEX_MATCH = 6;
-	const RULE_POSTVAR_MAP = 7;
-	const RULE_POSTVAR_MATCH = 8;
-	const RULE_POSTVAR_REGEX_MATCH = 9;
-	const RULE_URL_REGEX_MAP = 10;
-	const RULE_URL_REGEX_MATCH = 11;
+	const RULE_PATHINFO_MATCH = 4;
+	const RULE_GETVAR_MAP = 5;
+	const RULE_GETVAR_MATCH = 6;
+	const RULE_GETVAR_REGEX_MATCH = 7;
+	const RULE_POSTVAR_MAP = 8;
+	const RULE_POSTVAR_MATCH = 9;
+	const RULE_POSTVAR_REGEX_MATCH = 10;
+	const RULE_URL_REGEX_MAP = 11;
+	const RULE_URL_REGEX_MATCH = 12;
+	const RULE_MATCH_ALL = 13;
 	
 	protected static $dispatchRules = array();
 	protected static $controllerPaths = array();
@@ -60,6 +62,13 @@ class Dispatcher {
 						$rule[1]['cName'],
 						$rule[1]['fName'],
 						$rule[1]['aIndex']
+						);
+					break;
+				case self::RULE_PATHINFO_MATCH:
+					$handled = static::dispatchPathInfoRegexMatch(
+						$rule[1]['match'],
+						$rule[1]['cName'],
+						$rule[1]['fName']
 						);
 					break;
 				case self::RULE_GETVAR_MAP:
@@ -130,6 +139,12 @@ class Dispatcher {
 						$rule[1]['aIndex']
 						);
 					break;
+				case self::RULE_MATCH_ALL:
+					$handled = static::dispatchMatchAll(
+						$rule[1]['cName'],
+						$rule[1]['fName']
+						);
+					break;
 			}
 			if ($handled === true)
 				return true;
@@ -194,6 +209,16 @@ class Dispatcher {
 				"cName" => $cName,
 				"fName" => $fName,
 				"aIndex" => $argIndexArray
+				)
+			);
+	}
+	
+	public static function addPathInfoMatchRule($match, $cName, $fName) {
+		static::addRule(self::RULE_PATHINFO_REGEX_MATCH,
+			array(
+				"match" => $match,
+				"cName" => $cName,
+				"fName" => $fName
 				)
 			);
 	}
@@ -290,7 +315,7 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function passRequest($namespace, $suffix, $controller, $function, $args) {
+	protected static function passRequest($controller, $function, $args=false, $namespace=false, $suffix=false) {
 		// Generate the fully qualified class name
 		if ($namespace[0] !== '\\')
 			$namespace = '\\' . $namespace;
@@ -309,12 +334,33 @@ class Dispatcher {
 		return true;
 	}
 	
+	protected static function dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
+		if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
+			$args = array();
+			if (is_array($aIndex) && count($aIndex) > 0) {
+				foreach ($aIndex as $i) {
+					if (isset($tokens[$i]))
+						$args[] = &$tokens[$i];
+					else
+						return false;
+				}
+			}
+			return static::passRequest($tokens[$cIndex], 
+				$tokens[$fIndex], $args, $namespace, $suffix);
+		}
+		return false;
+	}
+	
+	protected static function dispatchMatchFromTokens($tokens, $aIndex, $cName, $fName) {
+		
+	}
+	
 	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
 			if (count($tokens) >= 3) {
 				$args = array_slice($tokens, 3);
-				return static::passRequest($namespace, $suffix, $tokens[1], $tokens[2], $args);
+				return static::passRequest($tokens[1], $tokens[2], $args, $namespace, $suffix);
 			}
 		}
 		return false;
@@ -323,39 +369,16 @@ class Dispatcher {
 	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
-			if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
-				$args = array();
-				if (is_array($aIndex) && count($aIndex) > 0) {
-					foreach ($aIndex as $i) {
-						if (isset($tokens[$i]))
-							$args[] = &$tokens[$i];
-						else
-							return false;
-					}
-				}
-				return static::passRequest($namespace, $suffix, $tokens[$cIndex], 
-					$tokens[$fIndex], $args);
-			}
+			return dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix);
 		}
 		return false;
 	}
 	
 	protected static function dispatchPathInfoRegexMap($regex, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
-			if (preg_match($regex, $_SERVER['PATH_INFO'], $match) > 0) {
-				if (isset($match[$cIndex]) && isset($match[$fIndex])) {
-					$args = array();
-					if (is_array($aIndex) && count($aIndex) > 0) {
-						foreach ($aIndex as $i) {
-							if (isset($match[$i]))
-								$args[] = &$match[$i];
-							else
-								return false;
-						}
-					}
-					return static::passRequest($namespace, $suffix, $match[$cIndex], 
-						$match[$fIndex], $args);
-				}
+			if (preg_match($regex, $_SERVER['PATH_INFO'], $tokens) > 0) {
+				return dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex,
+					$namespace, $suffix);
 			}
 		}
 		return false;
@@ -390,6 +413,10 @@ class Dispatcher {
 	}
 	
 	protected static function dispatchUrlRegexMatch($regex, $cName, $fName, $aIndex) {
+		
+	}
+	
+	protected static function dispatchMatchAll($cName, $fName) {
 		
 	}
 	
