@@ -42,12 +42,12 @@ class MemcachedEngine implements CacheEngine {
 	
 	public function replace($key, $value, $ttl) {
 		$key = self::fixKeyWhiteSpace($key);
-		return $this->memcached>replace($key, $value, $ttl);
+		return $this->memcached->replace($key, $value, $ttl);
 	}
 	
 	public function get($key) {
 		$key = self::fixKeyWhiteSpace($key);
-		return $this->memcached>get($key);
+		return $this->memcached->get($key);
 	}
 
 	public function set($key, $value, $ttl) {
