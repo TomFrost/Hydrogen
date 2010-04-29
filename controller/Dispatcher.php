@@ -341,7 +341,7 @@ class Dispatcher {
 				if (isset($tokens[$i]))
 					$args[] = &$tokens[$i];
 				else
-					return false;
+					$args[] = false;
 			}
 		}
 		return $args;
@@ -350,16 +350,14 @@ class Dispatcher {
 	protected static function dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
 			$args = static::getArgsFromTokens($tokens, $aIndex);
-			if ($args !== false)
-				return static::passRequest($tokens[$cIndex], $tokens[$fIndex], $args, $namespace, $suffix);
+			return static::passRequest($tokens[$cIndex], $tokens[$fIndex], $args, $namespace, $suffix);
 		}
 		return false;
 	}
 	
 	protected static function dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex) {
 		$args = static::getArgsFromTokens($tokens, $aIndex);
-		if ($args !== false)
-			return static::passRequest($cName, $fName, $args);
+		return static::passRequest($cName, $fName, $args);
 		return false;
 	}
 	
