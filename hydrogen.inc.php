@@ -30,13 +30,13 @@ function load($namespace) {
 	}
 	if (!$firstword) {
 		$fullpath = __DIR__ . $path . DIRECTORY_SEPARATOR . $name . '.php';
-		return include($fullpath);
+		return include_once($fullpath);
 	}
 	return false;
 }
 
 function loadPath($absPath) {
-	return include($absPath);
+	return include_once($absPath);
 }
 
 spl_autoload_register(__NAMESPACE__ . '\load');
