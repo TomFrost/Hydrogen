@@ -6,6 +6,8 @@
 
 namespace hydrogen\controller;
 
+use hydrogen\controller\exceptions\NoSuchMethodException;
+
 class Dispatcher {
 	const RULE_HOME_MATCH = 0;
 	const RULE_PATHINFO_AUTO_MAP = 1;
@@ -359,7 +361,12 @@ class Dispatcher {
 		if (@class_exists($class)) {	
 			// Call it, Cap'n.
 			$inst = $class::getInstance();
-			call_user_func_array(array($inst, $function), $args ?: array());
+			try {
+				call_user_func_array(array($inst, $function), $args ?: array());
+			}
+			catch (NoSuchMethodException $e) {
+				return false;
+			}
 			return true;
 		}
 		return false;
