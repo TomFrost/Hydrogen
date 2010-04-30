@@ -7,20 +7,21 @@
 namespace hydrogen\controller;
 
 class Dispatcher {
-	const RULE_PATHINFO_AUTO_MAP = 0;
-	const RULE_PATHINFO_FOLDER_MAP = 1;
-	const RULE_PATHINFO_REGEX_MAP = 2;
-	const RULE_PATHINFO_REGEX_MATCH = 3;
-	const RULE_PATHINFO_MATCH = 4;
-	const RULE_GETVAR_MAP = 5;
-	const RULE_GETVAR_MATCH = 6;
-	const RULE_GETVAR_REGEX_MATCH = 7;
-	const RULE_POSTVAR_MAP = 8;
-	const RULE_POSTVAR_MATCH = 9;
-	const RULE_POSTVAR_REGEX_MATCH = 10;
-	const RULE_URL_REGEX_MAP = 11;
-	const RULE_URL_REGEX_MATCH = 12;
-	const RULE_MATCH_ALL = 13;
+	const RULE_HOME_MATCH = 0;
+	const RULE_PATHINFO_AUTO_MAP = 1;
+	const RULE_PATHINFO_FOLDER_MAP = 2;
+	const RULE_PATHINFO_REGEX_MAP = 3;
+	const RULE_PATHINFO_REGEX_MATCH = 4;
+	const RULE_PATHINFO_MATCH = 5;
+	const RULE_GETVAR_MAP = 6;
+	const RULE_GETVAR_MATCH = 7;
+	const RULE_GETVAR_REGEX_MATCH = 8;
+	const RULE_POSTVAR_MAP = 9;
+	const RULE_POSTVAR_MATCH = 10;
+	const RULE_POSTVAR_REGEX_MATCH = 11;
+	const RULE_URL_REGEX_MAP = 12;
+	const RULE_URL_REGEX_MATCH = 13;
+	const RULE_MATCH_ALL = 14;
 	
 	protected static $dispatchRules = array();
 	protected static $controllerPaths = array();
@@ -31,6 +32,12 @@ class Dispatcher {
 			return static::dispatchPathInfoAutoMap($defaultNamespace, $defaultSuffix);
 		foreach (static::$dispatchRules as $rule) {
 			switch ($rule[0]) {
+				case self::RULE_HOME_MATCH:
+					$handled = static::dispatchHomeMatch(
+						$rule[1]['cName'],
+						$rule[1]['fName']
+						);
+					break;
 				case self::RULE_PATHINFO_AUTO_MAP:
 					$handled = static::dispatchPathInfoAutoMap(
 						$rule[1]['namespace'] ?: $defaultNamespace,
@@ -166,6 +173,15 @@ class Dispatcher {
 	
 	public static function addRules($ruleArray) {
 		static::$dispatchRules = array_merge(static::$dispatchRules, $ruleArray);
+	}
+	
+	public static function addHomeMatchRule($cName, $fName) {
+		static::addRule(self::RULE_HOME_MATCH,
+			array(
+				"cName" => $cName,
+				"fName" => $fName
+				)
+			);
 	}
 	
 	public static function addPathInfoAutoMapRule($namespace=false, $suffix=false) {
@@ -315,23 +331,36 @@ class Dispatcher {
 			);
 	}
 	
+	public static function addMatchAllRule($cName, $fName) {
+		static::addRule(self::RULE_MATCH_ALL,
+			array(
+				"cName" => $cName,
+				"fName" => $fName
+				)
+			);
+	}
+	
 	protected static function passRequest($controller, $function, $args=false, $namespace=false, $suffix=false) {
 		// Generate the fully qualified class name
-		if ($namespace[0] !== '\\')
-			$namespace = '\\' . $namespace;
-		if ($namespace[strlen($namespace) - 1] !== '\\')
-			$namespace .= '\\';
+		if ($namespace !== false) {
+			if ($namespace[0] !== '\\')
+				$namespace = '\\' . $namespace;
+			if ($namespace[strlen($namespace) - 1] !== '\\')
+				$namespace .= '\\';
+		}
 		$controller = ucfirst($controller) . $suffix;
 		$class = $namespace . $controller;
 		
 		// Include the file if this class isn't loaded
 		if (!class_exists($class) && isset($controllerPaths[$class]))
 			\hydrogen\loadPath($controllerPaths[$class]);
-			
-		// Call it, Cap'n.
-		$inst = $class::getInstance();
-		call_user_func_array(array($inst, $function), $args);
-		return true;
+		if (class_exists($class)) {	
+			// Call it, Cap'n.
+			$inst = $class::getInstance();
+			call_user_func_array(array($inst, $function), $args ?: array());
+			return true;
+		}
+		return false;
 	}
 	
 	protected static function getArgsFromTokens($tokens, $aIndex) {
@@ -361,6 +390,10 @@ class Dispatcher {
 		return false;
 	}
 	
+	protected static function dispatchHomeMatch($cName, $fName) {
+		return static::dispatchPathInfoMatch('', $cName, $fName);
+	}
+	
 	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
@@ -375,7 +408,7 @@ class Dispatcher {
 	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
-			return dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix);
+			return static::dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix);
 		}
 		return false;
 	}
@@ -383,7 +416,7 @@ class Dispatcher {
 	protected static function dispatchPathInfoRegexMap($regex, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			if (preg_match($regex, $_SERVER['PATH_INFO'], $tokens) > 0) {
-				return dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex,
+				return static::dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex,
 					$namespace, $suffix);
 			}
 		}
@@ -393,14 +426,14 @@ class Dispatcher {
 	protected static function dispatchPathInfoRegexMatch($regex, $cName, $fName, $aIndex) {
 		$pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
 		if (preg_match($regex, $pathInfo, $tokens) > 0)
-			return dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex);
+			return static::dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex);
 		return false;
 	}
 	
 	protected static function dispatchPathInfoMatch($match, $cName, $fName) {
 		if ((isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] === $match)
 				|| (!isset($_SERVER['PATH_INFO']) && $match === '')) {
-			return passRequest($cName, $fName);
+			return static::passRequest($cName, $fName);
 		}
 		return false;
 	}
@@ -438,7 +471,7 @@ class Dispatcher {
 	}
 	
 	protected static function dispatchMatchAll($cName, $fName) {
-		
+		return static::passRequest($cName, $fName);
 	}
 	
 	/**
