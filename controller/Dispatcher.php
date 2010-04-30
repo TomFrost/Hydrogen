@@ -16,7 +16,7 @@ use hydrogen\controller\exceptions\MissingArgumentException;
  * Using Dispatcher is a simple process.  The first step is defining dispatch rules,
  * which is done by calling the Dispatcher::add______Rule family of functions.  See the
  * documentation for those functions for details.  Once the rules have been defined,
- * Dispatcher::dispatch() can be called to send the request to the appropriate
+ * {@link #dispatch} can be called to send the request to the appropriate
  * controller.
  *
  * When Dispatcher::dispatch() is called, each rule is checked in the order in which
@@ -39,6 +39,15 @@ use hydrogen\controller\exceptions\MissingArgumentException;
  * the first letter of the controller name is automatically capitalized when looking
  * for the matching controller class.  This is done to comply with popular naming
  * conventions for PHP, where all class names start with a capital letter.
+ *
+ * Matching rules trigger whenever certain conditions are met in the URL, and redirect
+ * to a specified controller and function.  Often, arguments can be pulled from these
+ * conditions and passed to the specified function.
+ *
+ * In the case where a class autoloader is not being used, paths to the controller
+ * PHP files may be specified with the {@link #addControllerInclude} and
+ * {@link #addControllerIncludes} commands.  The PHP file for a given controller is
+ * included only when a rule with that controller is matched.
  *
  * If the Dispatcher fails to match the request to any of the rules, 
  * Dispatcher::dispatch() returns false.  At this point, a 404 page can be displayed
