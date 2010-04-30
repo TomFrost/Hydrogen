@@ -7,6 +7,7 @@
 namespace hydrogen\controller;
 
 use hydrogen\controller\exceptions\NoSuchMethodException;
+use hydrogen\controller\exceptions\MissingArgumentException;
 
 class Dispatcher {
 	const RULE_HOME_MATCH = 0;
@@ -27,6 +28,7 @@ class Dispatcher {
 	
 	protected static $dispatchRules = array();
 	protected static $controllerPaths = array();
+	protected static $oldHandler = false;
 	
 	public static function dispatch($defaultNamespace='\\', $defaultSuffix=false) {
 		$handled = false;
@@ -342,7 +344,21 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function passRequest($controller, $function, $args=false, $namespace=false, $suffix=false) {
+	public static function missingArgHandler($errno, $errstr, $errfile, $errline) {
+		$errCheck = "Missing argument";
+		if ($errCheck === substr($errstr, 0, strlen($errCheck)))
+			throw new MissingArgumentException();
+		else {
+			$caller = debug_backtrace();
+			$caller = $caller[1];
+			trigger_error($errstr . ' in <strong>' . $caller['function'] .
+				'</strong> called from <strong>' . $caller['file'] . 
+				'</strong> on line <strong>' . $caller['line'] .
+				"</strong>\n<br />error handler", E_USER_WARNING);
+		}
+	}
+	
+	protected static function passRequest($controller, $function, $args=false, $namespace=false, $suffix=false, $argProtection=false) {
 		// Generate the fully qualified class name
 		if ($namespace !== false) {
 			if ($namespace[0] !== '\\')
@@ -361,10 +377,18 @@ class Dispatcher {
 		if (@class_exists($class)) {	
 			// Call it, Cap'n.
 			$inst = $class::getInstance();
+			if ($argProtection === true) {
+				static::$oldHandler = set_error_handler(
+					"\hydrogen\controller\Dispatcher::missingArgHandler",
+					E_WARNING);
+			}
 			try {
 				call_user_func_array(array($inst, $function), $args ?: array());
 			}
 			catch (NoSuchMethodException $e) {
+				return false;
+			}
+			catch (MissingArgumentException $e) {
 				return false;
 			}
 			return true;
@@ -408,7 +432,7 @@ class Dispatcher {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
 			if (count($tokens) >= 3) {
 				$args = array_slice($tokens, 3);
-				return static::passRequest($tokens[1], $tokens[2], $args, $namespace, $suffix);
+				return static::passRequest($tokens[1], $tokens[2], $args, $namespace, $suffix, true);
 			}
 		}
 		return false;
