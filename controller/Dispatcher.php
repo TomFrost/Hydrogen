@@ -352,9 +352,11 @@ class Dispatcher {
 		$class = $namespace . $controller;
 		
 		// Include the file if this class isn't loaded
-		if (!class_exists($class) && isset($controllerPaths[$class]))
+		if (!@class_exists($class) && isset($controllerPaths[$class]))
 			\hydrogen\loadPath($controllerPaths[$class]);
-		if (class_exists($class)) {	
+			
+		// Call it if everything's there
+		if (@class_exists($class)) {	
 			// Call it, Cap'n.
 			$inst = $class::getInstance();
 			call_user_func_array(array($inst, $function), $args ?: array());
