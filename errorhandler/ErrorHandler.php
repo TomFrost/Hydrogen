@@ -139,7 +139,7 @@ class ErrorHandler {
 			Log::error($errstr, $errfile, $errline);
 		ob_end_clean();
 		$ad = static::$handlerStack[count(static::$handlerStack) - 1];
-		header("HTTP/1.1 " . $ad->responseCode);
+		static::sendHttpCodeHeader($ad->responseCode);
 		switch ($ad->errorType) {
 			case ActionDescriptor::ERRORTYPE_DEFAULT:
 				die(static::constructErrorPage($ad->responseCode));
@@ -162,6 +162,10 @@ class ErrorHandler {
 	
 	public static function printBuffer($page) {
 		return $page;
+	}
+	
+	public static function sendHttpCodeHeader($codeString, $httpVer='1.1') {
+		header("HTTP/$httpVer " . $codeString);
 	}
 	
 	protected static function constructErrorPage($errorCode) {
