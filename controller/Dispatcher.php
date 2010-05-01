@@ -357,7 +357,8 @@ class Dispatcher {
 		return false;
 	}
 	
-	public static function addPathInfoFolderMapRule($cIndex, $fIndex, $argIndexArray, $namespace=false, $suffix=false) {
+	public static function addPathInfoFolderMapRule($cIndex, $fIndex,
+			$argIndexArray, $namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_FOLDER_MAP,
 			array(
 				"cIndex" => $cIndex,
@@ -369,15 +370,18 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex, $aIndex, $namespace, $suffix) {
+	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex,
+			$aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			$tokens = explode('/', $_SERVER['PATH_INFO']);
-			return static::dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex, $namespace, $suffix);
+			return static::dispatchMapFromTokens($tokens, $cIndex,
+				$fIndex, $aIndex, $namespace, $suffix);
 		}
 		return false;
 	}
 	
-	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex, $argIndexArray, $namespace=false, $suffix=false) {
+	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex,
+			$argIndexArray, $namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_REGEX_MAP,
 			array(
 				"regex" => $regex,
@@ -390,11 +394,12 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchPathInfoRegexMap($regex, $cIndex, $fIndex, $aIndex, $namespace, $suffix) {
+	protected static function dispatchPathInfoRegexMap($regex, $cIndex,
+			$fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
 			if (preg_match($regex, $_SERVER['PATH_INFO'], $tokens) > 0) {
-				return static::dispatchMapFromTokens($tokens, $cIndex, $fIndex, $aIndex,
-					$namespace, $suffix);
+				return static::dispatchMapFromTokens($tokens, $cIndex,
+					$fIndex, $aIndex, $namespace, $suffix);
 			}
 		}
 		return false;
@@ -415,8 +420,10 @@ class Dispatcher {
 	protected static function dispatchPathInfoRegexMatch($regex, $cName, 
 			$fName, $aIndex) {
 		$pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
-		if (preg_match($regex, $pathInfo, $tokens) > 0)
-			return static::dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex);
+		if (preg_match($regex, $pathInfo, $tokens) > 0) {
+			return static::dispatchMatchFromTokens($tokens, $cName,
+				$fName, $aIndex);
+		}
 		return false;
 	}
 	
@@ -464,7 +471,8 @@ class Dispatcher {
 		return false;
 	}
 	
-	public static function addGetVarMatchRule($matchArray, $cName, $fName, $argVars) {
+	public static function addGetVarMatchRule($matchArray, $cName,
+			$fName, $argVars) {
 		static::addRule(self::RULE_GETVAR_MATCH,
 			array(
 				"match" => $matchArray,
@@ -475,7 +483,8 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchGetVarMatch($match, $cName, $fName, $aVar) {
+	protected static function dispatchGetVarMatch($match, $cName,
+			$fName, $aVar) {
 		foreach ($match as $key => $val) {
 			if (!isset($_GET[$key]) || $_GET[$key] != $val)
 				return false;
@@ -496,7 +505,8 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchGetVarRegexMatch($regex, $cName, $fName, $aVar) {
+	protected static function dispatchGetVarRegexMatch($regex, $cName,
+			$fName, $aVar) {
 		foreach ($regex as $key => $val) {
 			if (!isset($_GET[$key]) || !preg_match($val, $_GET[$key]))
 				return false;
@@ -540,9 +550,12 @@ class Dispatcher {
 			);
 	}
 	
-	protected static function dispatchUrlRegexMatch($regex, $cName, $fName, $aIndex) {
-		if (preg_match($regex, statis::getRequestedURL(), $matches))
-			return static::dispatchMatchFromTokens($matches, $cName, $fName, $aIndex);
+	protected static function dispatchUrlRegexMatch($regex, $cName,
+			$fName, $aIndex) {
+		if (preg_match($regex, statis::getRequestedURL(), $matches)) {
+			return static::dispatchMatchFromTokens($matches, $cName,
+				$fName, $aIndex);
+		}
 		return false;
 	}
 	
