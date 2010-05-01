@@ -77,6 +77,18 @@ class Dispatcher {
 	protected static $controllerPaths = array();
 	protected static $oldHandler = false;
 	
+	/**
+	 * Initiates the process of analyzing the current request against the registered
+	 * set of rules.  Rules should be added to the dispatcher before calling this
+	 * function.  When a rule matches the current request, the request is sent to
+	 * the controller and function specified in that rule.  At the completion of the
+	 * controller's execution, this function returns true.  If no rules match, this
+	 * function returns false.
+	 *
+	 * @return boolean true if a rule matched and the request was successfully passed
+	 * 		to a controller/function; false if no rules match.  By extension, this
+	 * 		function will return false if no rules have been defined.
+	 */
 	public static function dispatch() {
 		$handled = false;
 		foreach (static::$dispatchRules as $rule) {
@@ -183,11 +195,34 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Associates a controller name with a path to a PHP file.  If a rule matches
+	 * during the {@link #dispatch} call, the matching controller's PHP file
+	 * will be automatically included if it's been defined.  Do not use this
+	 * function if the controller classes being used with Dispatcher are
+	 * automatically included by other means.
+	 *
+	 * @param controllerName string The full name of the controller for which to
+	 * 		associate the PHP file.  A full name includes the entire namespace
+	 * 		and class name.
+	 * @param phpPath string The path to the PHP file to include.  This can either
+	 * 		be an absolute path, or a path relative to this application's base path.
+	 */
 	public static function addControllerInclude($controllerName, $phpPath) {
+		if ($controllerName[0] !== '\\')
+			$controllerName = '\\' . $controllerName;
 		static::$controllerPaths[$controllerName] = $phpPath;
 	}
 	
-	public static function addControllerIncludes($arrayMap) {
+	/**
+	 * Adds an array of controller classes and their PHP paths as key => value pairs.
+	 * These paths function the same way as they do in the {@link #addControllerInclude}
+	 * method.
+	 *
+	 * @param arrayMap array An associative array of full class names => PHP files to
+	 * 		include as specified in {@link #addControllerInclude}.
+	 */
+	public static function addControllerIncludeArray($arrayMap) {
 		static::$controllerPaths = array_merge(static::$controllerPaths, $arrayMap);
 	}
 	
