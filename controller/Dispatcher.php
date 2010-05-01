@@ -220,16 +220,33 @@ class Dispatcher {
 	 * method.
 	 *
 	 * @param arrayMap array An associative array of full class names => PHP files to
-	 * 		include as specified in {@link #addControllerInclude}.
+	 * 		include as specified in {@link #addControllerInclude}.  Each controller
+	 * 		name MUST begin with a backslash in order to be matched.
 	 */
 	public static function addControllerIncludeArray($arrayMap) {
 		static::$controllerPaths = array_merge(static::$controllerPaths, $arrayMap);
 	}
 	
-	public static function addRule($type, $argArray=false) {
+	/**
+	 * Appends a rule of the specified type to the Dispatcher's rule list.  It's
+	 * rarely appropriate to call this function directly -- instead, see Dispatcher's
+	 * add________Rule family of functions for adding specific rule types.
+	 *
+	 * @param type int The Dispatcher constant of the rule type to be added.
+	 * @param argArray array An array of arguments required for the specified rule
+	 * 		type.
+	 */
+	public static function addRule($type, $argArray) {
 		static::$dispatchRules[] = array($type, $argArray);
 	}
 	
+	/**
+	 * Appends an array of multiple rule arrays to the Dispatcher's rule set.  It's
+	 * rarely appropriate to call this function directly -- instead, see Dispatcher's
+	 * add________Rule family of functions for adding specific rule types.
+	 *
+	 * @param ruleArray array A properly formatted array of rule arrays.
+	 */
 	public static function addRules($ruleArray) {
 		static::$dispatchRules = array_merge(static::$dispatchRules, $ruleArray);
 	}
