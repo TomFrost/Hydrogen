@@ -251,6 +251,18 @@ class Dispatcher {
 		static::$dispatchRules = array_merge(static::$dispatchRules, $ruleArray);
 	}
 	
+	/**
+	 * Matches when a PHP file has been called with either no PATH_INFO data, or just
+	 * a slash for the PATH_INFO.  This is the equivalent to calling the function
+	 * {@link #addPathInfoMatch} with a blank match argument.
+	 *
+	 * When using GetVar-related dispatching rules, make sure they come before this one.
+	 * Otherwise, this rule will match because there's no PATH_INFO and the GET
+	 * arguments will be ignored.
+	 *
+	 * @param cName string The full controller name to call, including the namespace.
+	 * @param fName function The function name to call within the given controller.
+	 */
 	public static function addHomeMatchRule($cName, $fName) {
 		static::addRule(self::RULE_HOME_MATCH,
 			array(
@@ -260,6 +272,57 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addHomeMatchRule}.
+	 *
+	 * @param cName string The full controller name to call, including the namespace.
+	 * @param fName function The function name to call within the given controller.
+	 */
+	protected static function dispatchHomeMatch($cName, $fName) {
+		return static::dispatchPathInfoMatch('', $cName, $fName);
+	}
+		
+	/**
+	 * Matches in the case that a PATH_INFO exists with a controller name as its
+	 * first element and a function name as its second element, with all other
+	 * elements passed as arguments.
+	 *
+	 * The controller name element will be automatically capitalized by Dispatcher
+	 * during processing, as all class names should start with a capital letter by
+	 * common PHP naming convention.  Past that, a supplied namespace can be
+	 * prepended to the controller name, and a suffix can be appended to it.  That
+	 * allows, for example, the \myapp\controllers\HomeController to be called
+	 * whenever the word "home" is passed as the first PATH_INFO element.
+	 *
+	 * If no function name is given in PATH_INFO, Dispatcher will attempt to call
+	 * a method named "index" within the given controller.  If no such method exists,
+	 * the rule does not match.
+	 *
+	 * If the function specified has required arguments, and not enough elements were
+	 * given in the PATH_INFO to meet that number of required arguments, the rule
+	 * will not match.  If this is not the intended functionality, a good solution
+	 * would be to make the controller function's arguments optional.
+	 *
+	 * Examples (PATH_INFO value => What happens):
+	 * /home/welcome => Home controller's "welcome" function is called.
+	 * /home => Home controller's "index" function is called if it exists, no match 
+	 * 		otherwise.
+	 * /blog/post/43/hello_world => Blog controller's "post" function is called with
+	 * 		the arguments "43" and "hello_world".
+	 * /blog/post => If the Blog controller's "post" function requires the above two
+	 * 		arguments, this rule will not match.  Otherwise, the function will be
+	 *		called with no arguments.
+	 *
+	 * NOTE: Due to a limitation in PHP's error handling, whenever a warning is 
+	 * encountered in the controller and/or view that this rule triggers, the warning 
+	 * will be send as E_USER_WARNING rather than E_WARNING.  This is the only rule
+	 * that has this effect.
+	 *
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
 	public static function addPathInfoAutoMapRule($namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_AUTO_MAP,
 			array(
@@ -267,6 +330,31 @@ class Dispatcher {
 				"suffix" => $suffix
 				)
 			);
+	}
+	
+	/**
+	 * Dispatches a rule set by {@link #addPathInfoAutoMapRule}.
+	 *
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
+	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
+		if (isset($_SERVER['PATH_INFO'])) {
+			$tokens = explode('/', $_SERVER['PATH_INFO']);
+			if (count($tokens) >= 2) {
+				if (count($tokens) > 3)
+					$args = array_slice($tokens, 3);
+				else
+					$args = array();
+				return static::passRequest(
+					$tokens[1],
+					isset($tokens[2]) ? $tokens[2] : "index",
+					$args, $namespace, $suffix, true);
+			}
+		}
+		return false;
 	}
 	
 	public static function addPathInfoFolderMapRule($cIndex, $fIndex, $argIndexArray, $namespace=false, $suffix=false) {
@@ -480,27 +568,6 @@ class Dispatcher {
 	protected static function dispatchMatchFromTokens($tokens, $cName, $fName, $aIndex) {
 		$args = static::getArgsFromTokens($tokens, $aIndex);
 		return static::passRequest($cName, $fName, $args);
-		return false;
-	}
-	
-	protected static function dispatchHomeMatch($cName, $fName) {
-		return static::dispatchPathInfoMatch('', $cName, $fName);
-	}
-	
-	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
-		if (isset($_SERVER['PATH_INFO'])) {
-			$tokens = explode('/', $_SERVER['PATH_INFO']);
-			if (count($tokens) >= 2) {
-				if (count($tokens) > 3)
-					$args = array_slice($tokens, 3);
-				else
-					$args = array();
-				return static::passRequest(
-					$tokens[1],
-					isset($tokens[2]) ? $tokens[2] : "index",
-					$args, $namespace, $suffix, true);
-			}
-		}
 		return false;
 	}
 	
