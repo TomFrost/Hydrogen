@@ -591,6 +591,39 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the request's query string contains two predefined
+	 * variables that map to a controller and a function.  Additional variables
+	 * may be defined to be passed as arguments into the controller.
+	 *
+	 * For example, assume this query string:
+	 * ?target=blog&action=read&post=43&type=full
+	 * 
+	 * Setting cVar to "target" will cause Dispatcher to instantiate the Blog
+	 * controller.  Like all mapping rules, the controller name is
+	 * automatically capitalized.  Optionally, a namespace and a suffix can
+	 * be provided to add to this class name before instantiation.
+	 *
+	 * Setting fVar to "read" will call the read() function inside of the
+	 * Blog controller.  Setting argVars to array("post", "type") will pass
+	 * "43" and "full" (in that order) as arguments into the read() function
+	 * when it is called.
+	 *
+	 * @param cVar string The name of the GET variable to use as the controller
+	 * 		name.
+	 * @param fVar string The name of the GET variable to use as the
+	 * 		function name.
+	 * @param argVars array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append
+	 * 		a suffix.
+	 */
 	public static function addGetVarMapRule($cVar, $fVar, $argVars,
 			$namespace=false, $suffix=false) {
 		static::addRule(self::RULE_GETVAR_MAP,
@@ -604,6 +637,24 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addGetVarMapRule}.
+	 *
+	 * @param cVar string The name of the GET variable to use as the controller
+	 * 		name.
+	 * @param fVar string The name of the GET variable to use as the
+	 * 		function name.
+	 * @param argVars array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append
+	 * 		a suffix.
+	 */
 	protected static function dispatchGetVarMap($cVar, $fVar, $aVar,
 			$namespace, $suffix) {
 		if (isset($_GET[$cVar]) && isset($_GET[$fVar])) {
