@@ -470,6 +470,23 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addPathInfoRegexMapRule}.
+	 *
+	 * @param regex string A valid perl-style, slash-delineated regular
+	 * 		expression string to match against the request's PATH_INFO.
+	 * @param cIndex int The index of the matched parenthetical element to use as
+	 * 		the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use as
+	 * 		the function name, starting with 1.
+	 * @param aIndex array An array of one or many integers, defining which
+	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
+	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
 	protected static function dispatchPathInfoRegexMap($regex, $cIndex,
 			$fIndex, $aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
@@ -515,7 +532,7 @@ class Dispatcher {
 	}
 	
 	/**
-	 * Dispatches a rule set by {@link #addPathInfoFolderMapRule}.
+	 * Dispatches a rule set by {@link #addPathInfoRegexMatchRule}.
 	 *
 	 * @param regex string A valid perl-style, slash-delineated regular
 	 * 		expression string to match against the request's PATH_INFO.
@@ -535,6 +552,18 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the PATH_INFO matches the string provided in $match
+	 * exactly.  If this rule matches, the request is dispatched to the
+	 * specified controller and function.  It is impossible to pass arguments
+	 * to the function using this rule.
+	 *
+	 * @param match string The string that much match PATH_INFO exactly.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 */
 	public static function addPathInfoMatchRule($match, $cName, $fName) {
 		static::addRule(self::RULE_PATHINFO_REGEX_MATCH,
 			array(
@@ -545,6 +574,15 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addPathInfoMatchRule}.
+	 *
+	 * @param match string The string that much match PATH_INFO exactly.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 */
 	protected static function dispatchPathInfoMatch($match, $cName, $fName) {
 		if ((isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] === $match)
 				|| (!isset($_SERVER['PATH_INFO']) && $match === '')) {
