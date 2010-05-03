@@ -357,6 +357,33 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when a PATH_INFO is supplied with the specified elements mapping
+	 * to an existing Controller class and function.  This is similar to the rule
+	 * set by {@link #addPathInfoAutoMapRule}, except that any element of the
+	 * PATH_INFO can be set to be the controller name or function name, and
+	 * other element indices can be set as arguments.
+	 *
+	 * For example, assume this PATH_INFO: /a/b/c/d/e
+	 * A cIndex of 2 would use 'B' as the controller name.  As with all Mapping
+	 * 		rules, the first letter of the controller is capitalized, and a
+	 * 		namespace and suffix can be added to it.
+	 * An fIndex of 4 would use 'd' as the function name.
+	 * An aIndex set to array(1, 3) would send "a" and "c" as arguments, in that
+	 * 		order.  The "e" element would be ignored entirely.
+	 *
+	 * @param cIndex int The index of the PATH_INFO element to use as the controller
+	 * 		name, starting with 1.
+	 * @param fIndex int The index of the PATH_INFO element to use as the function
+	 * 		name, starting with 1.
+	 * @param argIndexArray array An array of one or many integers, defining which
+	 * 		PATH_INFO elements to use as arguments.  Any indices that do not exist
+	 * 		in the PATH_INFO will be sent into the function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
 	public static function addPathInfoFolderMapRule($cIndex, $fIndex,
 			$argIndexArray, $namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_FOLDER_MAP,
@@ -370,6 +397,21 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addPathInfoFolderMapRule}.
+	 *
+	 * @param cIndex int The index of the PATH_INFO element to use as the controller
+	 * 		name, starting with 1.
+	 * @param fIndex int The index of the PATH_INFO element to use as the function
+	 * 		name, starting with 1.
+	 * @param aIndex array An array of one or many integers, defining which
+	 * 		PATH_INFO elements to use as arguments.  Any indices that do not exist
+	 * 		in the PATH_INFO will be sent into the function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
 	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex,
 			$aIndex, $namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
@@ -380,6 +422,40 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the PATH_INFO matches the given perl-style regular
+	 * expression string.  As with all mapping rules, the controller name
+	 * and function name must be contained within the PATH_INFO.  With this
+	 * regex rule, there must be at least two parenthetical matches -- one
+	 * to find the controller name in the PATH_INFO, and one to find the function
+	 * name.  Additional indices may be included for parenthetical matches that
+	 * should be sent to the function as arguments.
+	 *
+	 * Also similarly to all mapping rules, the controller name will be automatically
+	 * capitalized, and a namespace and/or suffix may be specified to be added
+	 * to the controller name before instantiation.
+	 *
+	 * Example:
+	 * If the PATH_INFO is: /blog_comments/post54
+	 * Then this RegEx string will match: /^\/(\w+)_(\w+)\/post(\d+)$/
+	 * If the cIndex is 1, the fIndex is 2, and the argIndexArray is array(3), then
+	 * the Blog controller's comments() function will be called with "54" as an
+	 * argument.
+	 *
+	 * @param regex string A valid perl-style, slash-delineated regular
+	 * 		expression string to match against the request's PATH_INFO.
+	 * @param cIndex int The index of the matched parenthetical element to use as
+	 * 		the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use as
+	 * 		the function name, starting with 1.
+	 * @param argIndexArray array An array of one or many integers, defining which
+	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
+	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
+	 * 		controller name, or false to not append a suffix.
+	 */
 	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex,
 			$argIndexArray, $namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_REGEX_MAP,
@@ -405,6 +481,27 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the PATH_INFO matches the given perl-style regular
+	 * expression string.  When the rule matches, the request will be sent
+	 * to the specified controller and function.  Optionally, the function
+	 * can be called with any number of arguments matched in parentheses
+	 * in the regular expression string.
+	 *
+	 * Example:
+	 * If the PATH_INFO is: /blog/comments/post54
+	 * Then this RegEx string will match: /^\/blog\/comments\/post(\d+)$/
+	 * and the argument "54" will be sent to the specified controller/function if
+	 * the argIndexArray is array(1).
+	 *
+	 * @param regex string A valid perl-style, slash-delineated regular
+	 * 		expression string to match against the request's PATH_INFO.
+	 * @param cName string The full controller name to call, including the namespace.
+	 * @param fName function The function name to call within the given controller.
+	 * @param argIndexArray array An array of one or many integers, defining which
+	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
+	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 */
 	public static function addPathInfoRegexMatchRule($regex, $cName, $fName,
 			$argIndexArray) {
 		static::addRule(self::RULE_PATHINFO_REGEX_MATCH,
@@ -417,6 +514,17 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addPathInfoFolderMapRule}.
+	 *
+	 * @param regex string A valid perl-style, slash-delineated regular
+	 * 		expression string to match against the request's PATH_INFO.
+	 * @param cName string The full controller name to call, including the namespace.
+	 * @param fName function The function name to call within the given controller.
+	 * @param aIndex array An array of one or many integers, defining which
+	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
+	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 */
 	protected static function dispatchPathInfoRegexMatch($regex, $cName, 
 			$fName, $aIndex) {
 		$pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
@@ -603,8 +711,8 @@ class Dispatcher {
 		$class = $namespace . $controller;
 		
 		// Include the file if this class isn't loaded
-		if (!@class_exists($class) && isset($controllerPaths[$class]))
-			\hydrogen\loadPath($controllerPaths[$class]);
+		if (!@class_exists($class) && isset(static::$controllerPaths[$class]))
+			\hydrogen\loadPath(static::$controllerPaths[$class]);
 			
 		// Call it if everything's there
 		if (@class_exists($class)) {	
