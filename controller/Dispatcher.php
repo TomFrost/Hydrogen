@@ -644,7 +644,7 @@ class Dispatcher {
 	 * 		name.
 	 * @param fVar string The name of the GET variable to use as the
 	 * 		function name.
-	 * @param argVars array An array of variable names whose contents should
+	 * @param aVar array An array of variable names whose contents should
 	 * 		be passed as arguments into the given function.  Any GET variable
 	 * 		listed that does not exist will have boolean false passed in its
 	 * 		place.
@@ -668,6 +668,37 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the provided GET variables match the provided values.
+	 * When the match is confirmed, the specified controller class is
+	 * instantiated, and the specified function is called.  Optionally, an
+	 * array of GET variables may be specified, whose values will be sent
+	 * as arguments to the specified function.  In the case where an
+	 * argument variable doesn't exist in the query string, boolean
+	 * false is sent in its place.
+	 *
+	 * For example, assume this query string:
+	 * ?target=blog&action=read&post=43&type=full
+	 *
+	 * The following matchArray will cause this rule to match:
+	 * array("target" => "blog", "action" => "read")
+	 *
+	 * And if this array is specified as argVars...
+	 * array("post", "type")
+	 * ...then the values "43" and "full" will be passed as arguments into
+	 * whatever function is specified in $fName.
+	 *
+	 * @param matchArray array An associative array of GET variable names to
+	 * 		the values they must match.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param argVars array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 */
 	public static function addGetVarMatchRule($matchArray, $cName,
 			$fName, $argVars) {
 		static::addRule(self::RULE_GETVAR_MATCH,
@@ -680,6 +711,20 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addGetVarMatchRule}.
+	 *
+	 * @param matchArray array An associative array of GET variable names to
+	 * 		the values they must match.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param aVar array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 */
 	protected static function dispatchGetVarMatch($match, $cName,
 			$fName, $aVar) {
 		foreach ($match as $key => $val) {
