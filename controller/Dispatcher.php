@@ -735,6 +735,37 @@ class Dispatcher {
 			static::getArgsFromAssocArray($_GET, $aVar));
 	}
 	
+	/**
+	 * Matches when the provided GET variables match the provided perl-style
+	 * regular expressions.  When the match is confirmed, the specified
+	 * controller class is instantiated, and the specified function is called.
+	 * Optionally, an array of GET variables may be specified, whose values
+	 * will be sent as arguments to the specified function.  In the case where
+	 * an argument variable doesn't exist in the query string, boolean
+	 * false is sent in its place.
+	 *
+	 * For example, assume this query string:
+	 * ?action=blog_read&post=43&type=full
+	 *
+	 * The following matchArray will cause this rule to match:
+	 * array("action" => "/blog_\w+/", "type" => "/FULL/i")
+	 *
+	 * And if this array is specified as argVars...
+	 * array("post")
+	 * ...then the value "43" will be passed as an argument into whatever
+	 * function is specified in $fName.
+	 *
+	 * @param matchArray array An associative array of GET variable names to
+	 * 		the perl-style regular expression strings they must match.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param argVars array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 */
 	public static function addGetVarRegexMatchRule($matchArray, $cName,
 			$fName, $argVars) {
 		static::addRule(self::RULE_GETVAR_REGEX_MATCH,
@@ -747,6 +778,20 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addGetVarRegexMatchRule}.
+	 *
+	 * @param matchArray array An associative array of GET variable names to
+	 * 		the perl-style regular expression strings they must match.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param aVar array An array of variable names whose contents should
+	 * 		be passed as arguments into the given function.  Any GET variable
+	 * 		listed that does not exist will have boolean false passed in its
+	 * 		place.
+	 */
 	protected static function dispatchGetVarRegexMatch($regex, $cName,
 			$fName, $aVar) {
 		foreach ($regex as $key => $val) {
