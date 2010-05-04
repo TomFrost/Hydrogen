@@ -1120,6 +1120,8 @@ class Dispatcher {
 	 * 		any warnings that are generated naturally by PHP will come as an
 	 * 		E_USER_WARNING rather than an E_WARNING, due to limitations in
 	 * 		PHP's error system.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function passRequest($controller, $function, $args=false, 
 			$namespace=false, $suffix=false, $argProtection=false) {
