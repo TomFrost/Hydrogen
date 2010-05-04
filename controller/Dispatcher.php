@@ -1041,6 +1041,25 @@ class Dispatcher {
 		return static::passRequest($cName, $fName);
 	}
 	
+	/**
+	 * Dispatches any mapping rule that's been reduced to an array of tokens
+	 * and a set of index values.
+	 *
+	 * @param tokens array An array of strings from which the indices will
+	 * 		we pulled.
+	 * @param cIndex int The index of the token to use as the controller name.
+	 * @param fIndex int The index of the token to use as the function name.
+	 * @param aIndex array An array of token indices to be sent as arguments
+	 * 		to the controller function, in the order in which they're defined.
+	 * 		Any indicies that do not exist in the tokens array will be sent as
+	 * 		boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		controller name, or false to not append a suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
 	protected static function dispatchMapFromTokens($tokens, $cIndex, $fIndex,
 			$aIndex, $namespace, $suffix) {
 		if (isset($tokens[$cIndex]) && isset($tokens[$fIndex])) {
@@ -1052,6 +1071,24 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Dispatches any matching rule that's been reduced to an array of tokens,
+	 * a controller class name, a function name, and a set of indices to be
+	 * sent to the controller as arguments.
+	 *
+	 * @param tokens array An array of strings from which the indices will
+	 * 		we pulled.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param aIndex array An array of token indices to be sent as arguments
+	 * 		to the controller function, in the order in which they're defined.
+	 * 		Any indicies that do not exist in the tokens array will be sent as
+	 * 		boolean false.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
 	protected static function dispatchMatchFromTokens($tokens, $cName, $fName,
 			$aIndex) {
 		$args = static::getArgsFromTokens($tokens, $aIndex);
@@ -1059,6 +1096,31 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Attempts to pass the current page request to a specified controller,
+	 * calling a function with a list of arguments.
+	 *
+	 * @param controller string The class name of the controller to which the
+	 * 		request should be passed.  This can either be a fully qualified
+	 * 		class name with a namespace, or a simple name that can have
+	 * 		a namespace prepended and a suffix appended to it later.
+	 * @param function string The name of the function inside of the controller
+	 * 		to be called.
+	 * @param args array|boolean An array of arguments to be passed to the
+	 * 		specified function, in order; false for no arguments.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		controller name, or false to use the root namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		controller name, or false to not append a suffix.
+	 * @param argProtection boolean true to have this function return false if
+	 * 		the specified function has more required arguments than what was
+	 * 		included in the args array.  If false, this protection will be
+	 * 		turned off and PHP's usual warning when a function with missing
+	 * 		parameters is called will be fired.  Note that, if this is true,
+	 * 		any warnings that are generated naturally by PHP will come as an
+	 * 		E_USER_WARNING rather than an E_WARNING, due to limitations in
+	 * 		PHP's error system.
+	 */
 	protected static function passRequest($controller, $function, $args=false, 
 			$namespace=false, $suffix=false, $argProtection=false) {
 		// Generate the fully qualified class name
@@ -1098,6 +1160,15 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Generates the exact URL that was used to request this page from the web
+	 * browser, minus any hash mark (#) that may be in it and anything after
+	 * that point.  This URL includes everything from the protocol to the
+	 * query string.  It ignores any username, password, and port that may have
+	 * been included.
+	 *
+	 * @return string The page request URL.
+	 */
 	protected static function getRequestedURL() {
 		$url = 'http';
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
@@ -1106,6 +1177,17 @@ class Dispatcher {
 		return $url;
 	}
 	
+	/**
+	 * Generates an array of arguments from a token array and an index array.
+	 * Any index that does not exist in the token array will be added to the
+	 * resulting arguments array as boolean false.
+	 *
+	 * @param tokens array An array of strings from which the argument indicies
+	 * 		will be pulled.
+	 * @param aIndex array An array of indicies to pull from the tokens array.
+	 * @return array An array of arguments in the order they were specified in
+	 * 		the aIndex array.
+	 */
 	protected static function getArgsFromTokens($tokens, $aIndex) {
 		$args = array();
 		if (is_array($aIndex) && count($aIndex) > 0) {
@@ -1119,6 +1201,19 @@ class Dispatcher {
 		return $args;
 	}
 	
+	/**
+	 * Generates an array of arguments from an associative array and an array
+	 * of keys to pull from the source array.  Any key in the keyArray that
+	 * does not exist in the associative array will be added to the resulting
+	 * arguments array as boolean false.
+	 *
+	 * @param assoc array A source array of key => value pairs from which
+	 * 		arguments should be pulled.
+	 * @param keyArray array An array of key names to be pulled from the
+	 * 		associative array.
+	 * @return array An array of arguments in the order they were specified in
+	 * 		the keyArray.
+	 */
 	protected static function getArgsFromAssocArray($assoc, $keyArray) {
 		$args = array();
 		if (is_array($assoc) && count($assoc) > 0
@@ -1133,6 +1228,20 @@ class Dispatcher {
 		return $args;
 	}
 	
+	/**
+	 * The handler used by the argument protection system in
+	 * {@link #passRequest}.  Even though this argument is public for PHP
+	 * error handling purposes, it should never be called directly.
+	 *
+	 * This error handler throws a {@link MissingArgumentException} whenever
+	 * the error is, in fact, for a missing argument.  Otherwise, the handler
+	 * re-throws the error as an E_USER_WARNING.
+	 *
+	 * @param errno int The error type number.
+	 * @param errstr string A string describing the error.
+	 * @param errfile string The filename in which the error occurred.
+	 * @param errline int The line number on which the error occurred.
+	 */
 	public static function missingArgHandler($errno, $errstr, $errfile, $errline) {
 		$errCheck = "Missing argument";
 		if ($errCheck === substr($errstr, 0, strlen($errCheck)))
