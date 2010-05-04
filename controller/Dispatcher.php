@@ -1004,6 +1004,20 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * This rule matches everything.  Whenever this rule is reached, it will
+	 * always match and trigger the specified controller and function.  The
+	 * only way this rule can be unsuccessful is if either the specified
+	 * controller class or function name do not exist.
+	 *
+	 * It is not possible to pass arguments to the specified function with
+	 * this rule.
+	 *
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 */
 	public static function addMatchAllRule($cName, $fName) {
 		static::addRule(self::RULE_MATCH_ALL,
 			array(
@@ -1013,6 +1027,16 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addMatchAllRule}.
+	 *
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
 	protected static function dispatchMatchAll($cName, $fName) {
 		return static::passRequest($cName, $fName);
 	}
