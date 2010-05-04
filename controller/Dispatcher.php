@@ -854,6 +854,43 @@ class Dispatcher {
 			static::getArgsFromAssocArray($_GET, $aVar));
 	}
 	
+	/**
+	 * Matches when the supplied perl-style regular expression string matches
+	 * the request URL.  The regex string should have at least two
+	 * paranthetical matches; one to use as the controller name to be called,
+	 * and one to use as a function name.  Any additional paranthetical
+	 * matches can be used as arguments to the function.
+	 *
+	 * The request URL being compared is the full URL in the address bar,
+	 * minus any hash mark (#) and what's after it.
+	 *
+	 * Example request URL:
+	 * http://www.mydomain.com/appname/tom_blog/read_post?postId=83
+	 *
+	 * The following regex string will match:
+	 * /\/(\w+)_(\w+)\/(\w+)_post\?postId=(\d+)$/
+	 *
+	 * With cIndex=2, fIndex=3, and argIndexArray=array(4, 1), the Blog
+	 * controller will be instantiated, and the post() function will be
+	 * called with "83" and "tom" sent as arguments, in that order.
+	 *
+	 * @param regex string The perl-style regular expression to match the
+	 * 		request URL.
+	 * @param cIndex int The index of the matched parenthetical element to use
+	 * 		as the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use
+	 * 		as the function name, starting with 1.
+	 * @param argIndexArray array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
+	 */
 	public static function addUrlRegexMapRule($regex, $cIndex, $fIndex,
 			$argIndexArray, $namespace=false, $suffix=false) {
 		static::addRule(self::RULE_URL_REGEX_MAP,
@@ -868,6 +905,28 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addUrlRegexMapRule}.
+	 *
+	 * @param regex string The perl-style regular expression to match the
+	 * 		request URL.
+	 * @param cIndex int The index of the matched parenthetical element to use
+	 * 		as the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use
+	 * 		as the function name, starting with 1.
+	 * @param aIndex array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
 	protected static function dispatchUrlRegexMap($regex, $cIndex, $fIndex,
 			$aIndex, $namespace, $suffix) {
 		if (preg_match($regex, statis::getRequestedURL(), $matches)) {
