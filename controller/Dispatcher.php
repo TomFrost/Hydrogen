@@ -10,54 +10,55 @@ use hydrogen\controller\exceptions\NoSuchMethodException;
 use hydrogen\controller\exceptions\MissingArgumentException;
 
 /**
- * The Dispatcher class processes a single page request with a list of rules that
- * determines to which controller the request should be sent.
+ * The Dispatcher class processes a single page request with a list of rules
+ * that determines to which controller the request should be sent.
  *
- * Using Dispatcher is a simple process.  The first step is defining dispatch rules,
- * which is done by calling the Dispatcher::add______Rule family of functions.  See the
- * documentation for those functions for details.  Once the rules have been defined,
- * {@link #dispatch} can be called to send the request to the appropriate
- * controller.
+ * Using Dispatcher is a simple process.  The first step is defining dispatch
+ * rules, which is done by calling the Dispatcher::add______Rule family of
+ * functions.  See the documentation for those functions for details.  Once the
+ * rules have been defined, {@link #dispatch} can be called to send the request
+ * to the appropriate controller.
  *
- * When Dispatcher::dispatch() is called, each rule is checked in the order in which
- * it was set.  Once a rule matches the current request, the associated controller is
- * immediately triggered and no other rules are processed.
+ * When Dispatcher::dispatch() is called, each rule is checked in the order in
+ * which it was set.  Once a rule matches the current request, the associated
+ * controller is immediately triggered and no other rules are processed.
  *
- * There are two types of rules: Mapping rules and Matching rules.  A mapping rule should
- * be used when the name of the controller/function to be called is contained in the
- * url somewhere.  The most popular mapping rule (in this and other frameworks) is
- * the pathinfo auto map rule, which takes URLs like this:
+ * There are two types of rules: Mapping rules and Matching rules.  A mapping
+ * rule should be used when the name of the controller/function to be called is
+ * contained in the url somewhere.  The most popular mapping rule (in this and
+ * other frameworks) is the pathinfo auto map rule, which takes URLs like this:
  *
  * <pre>
  * http://mysite.com/myapp/index.php/blog/post/82/hi_there_everyone
  * </pre>
  *
  * And maps them to the Blog controller, calling the function post() with the
- * arguments "82" and "hi_there_everyone".  Optionally, a namespace and/or a class
- * suffix could be provided to trigger, for example, the myapp\controllers\BlogController
- * class instead of just the "Blog" class.  Note, however, that for mapping functions,
- * the first letter of the controller name is automatically capitalized when looking
- * for the matching controller class.  This is done to comply with popular naming
- * conventions for PHP, where all class names start with a capital letter.
+ * arguments "82" and "hi_there_everyone".  Optionally, a namespace and/or a
+ * class suffix could be provided to trigger, for example, the
+ * myapp\controllers\BlogController class instead of just the "Blog" class.
+ * Note, however, that for mapping functions, the first letter of the
+ * controller name is automatically capitalized when looking for the matching
+ * controller class.  This is done to comply with popular naming conventions
+ * for PHP, where all class names start with a capital letter.
  *
- * Matching rules trigger whenever certain conditions are met in the URL, and redirect
- * to a specified controller and function.  Often, arguments can be pulled from these
- * conditions and passed to the specified function.
+ * Matching rules trigger whenever certain conditions are met in the URL, and
+ * redirect to a specified controller and function.  Often, arguments can be
+ * pulled from these conditions and passed to the specified function.
  *
- * In the case where a class autoloader is not being used, paths to the controller
- * PHP files may be specified with the {@link #addControllerInclude} and
- * {@link #addControllerIncludes} commands.  The PHP file for a given controller is
- * included only when a rule with that controller is matched.
+ * In the case where a class autoloader is not being used, paths to the
+ * controller PHP files may be specified with the {@link #addControllerInclude}
+ * and {@link #addControllerIncludes} commands.  The PHP file for a given
+ * controller is included only when a rule with that controller is matched.
  *
  * If the Dispatcher fails to match the request to any of the rules, 
- * Dispatcher::dispatch() returns false.  At this point, a 404 page can be displayed
- * manually if that's the desired effect.  Another option is to set a "Match All" rule
- * as the final rule, which sends any request that hasn't matched any other rule to a
- * certain controller.  This controller could load a 404 page, for simplicity and
- * consistency.
+ * Dispatcher::dispatch() returns false.  At this point, a 404 page can be
+ * displayed manually if that's the desired effect.  Another option is to set a
+ * "Match All" rule as the final rule, which sends any request that hasn't
+ * matched any other rule to a certain controller.  This controller could load
+ * a 404 page, for simplicity and consistency.
  *
- * Remember, though, to always set a Home Match rule, or else direct loads to the
- * public-facing PHP file will be ignored!
+ * Remember, though, to always set a Home Match rule, or else direct loads to
+ * the public-facing PHP file will be ignored!
  */
 class Dispatcher {
 	const RULE_HOME_MATCH = 0;
@@ -78,16 +79,17 @@ class Dispatcher {
 	protected static $oldHandler = false;
 	
 	/**
-	 * Initiates the process of analyzing the current request against the registered
-	 * set of rules.  Rules should be added to the dispatcher before calling this
-	 * function.  When a rule matches the current request, the request is sent to
-	 * the controller and function specified in that rule.  At the completion of the
-	 * controller's execution, this function returns true.  If no rules match, this
-	 * function returns false.
+	 * Initiates the process of analyzing the current request against the
+	 * registered set of rules.  Rules should be added to the dispatcher before
+	 * calling this function.  When a rule matches the current request, the
+	 * request is sent to the controller and function specified in that rule.
+	 * At the completion of the controller's execution, this function returns
+	 * true.  If no rules match, this function returns false.
 	 *
-	 * @return boolean true if a rule matched and the request was successfully passed
-	 * 		to a controller/function; false if no rules match.  By extension, this
-	 * 		function will return false if no rules have been defined.
+	 * @return boolean true if a rule matched and the request was successfully
+	 * 		passed to a controller/function; false if no rules match.  By
+	 * 		extension, this function will return false if no rules have been
+	 * 		defined.
 	 */
 	public static function dispatch() {
 		$handled = false;
@@ -196,17 +198,18 @@ class Dispatcher {
 	}
 	
 	/**
-	 * Associates a controller name with a path to a PHP file.  If a rule matches
-	 * during the {@link #dispatch} call, the matching controller's PHP file
-	 * will be automatically included if it's been defined.  Do not use this
-	 * function if the controller classes being used with Dispatcher are
+	 * Associates a controller name with a path to a PHP file.  If a rule
+	 * matches during the {@link #dispatch} call, the matching controller's PHP
+	 * file will be automatically included if it's been defined.  Do not use
+	 * this function if the controller classes being used with Dispatcher are
 	 * automatically included by other means.
 	 *
-	 * @param controllerName string The full name of the controller for which to
-	 * 		associate the PHP file.  A full name includes the entire namespace
-	 * 		and class name.
-	 * @param phpPath string The path to the PHP file to include.  This can either
-	 * 		be an absolute path, or a path relative to this application's base path.
+	 * @param controllerName string The full name of the controller for which
+	 * 		to associate the PHP file.  A full name includes the entire
+	 * 		namespace and class name.
+	 * @param phpPath string The path to the PHP file to include.  This can
+	 * 		either be an absolute path, or a path relative to this
+	 * 		application's base path.
 	 */
 	public static function addControllerInclude($controllerName, $phpPath) {
 		if ($controllerName[0] !== '\\')
@@ -215,35 +218,38 @@ class Dispatcher {
 	}
 	
 	/**
-	 * Adds an array of controller classes and their PHP paths as key => value pairs.
-	 * These paths function the same way as they do in the {@link #addControllerInclude}
-	 * method.
+	 * Adds an array of controller classes and their PHP paths as key => value
+	 * pairs.  These paths function the same way as they do in the
+	 * {@link #addControllerInclude} method.
 	 *
-	 * @param arrayMap array An associative array of full class names => PHP files to
-	 * 		include as specified in {@link #addControllerInclude}.  Each controller
-	 * 		name MUST begin with a backslash in order to be matched.
+	 * @param arrayMap array An associative array of full class names => PHP
+	 * 		files to include as specified in {@link #addControllerInclude}.
+	 * 		Each controller name MUST begin with a backslash in order to be
+	 * 		matched.
 	 */
 	public static function addControllerIncludeArray($arrayMap) {
 		static::$controllerPaths = array_merge(static::$controllerPaths, $arrayMap);
 	}
 	
 	/**
-	 * Appends a rule of the specified type to the Dispatcher's rule list.  It's
-	 * rarely appropriate to call this function directly -- instead, see Dispatcher's
-	 * add________Rule family of functions for adding specific rule types.
+	 * Appends a rule of the specified type to the Dispatcher's rule list.
+	 * It's rarely appropriate to call this function directly -- instead, see
+	 * Dispatcher's add________Rule family of functions for adding specific
+	 * rule types.
 	 *
 	 * @param type int The Dispatcher constant of the rule type to be added.
-	 * @param argArray array An array of arguments required for the specified rule
-	 * 		type.
+	 * @param argArray array An array of arguments required for the specified
+	 * 		rule type.
 	 */
 	public static function addRule($type, $argArray) {
 		static::$dispatchRules[] = array($type, $argArray);
 	}
 	
 	/**
-	 * Appends an array of multiple rule arrays to the Dispatcher's rule set.  It's
-	 * rarely appropriate to call this function directly -- instead, see Dispatcher's
-	 * add________Rule family of functions for adding specific rule types.
+	 * Appends an array of multiple rule arrays to the Dispatcher's rule set.
+	 * It's rarely appropriate to call this function directly -- instead, see
+	 * Dispatcher's add________Rule family of functions for adding specific
+	 * rule types.
 	 *
 	 * @param ruleArray array A properly formatted array of rule arrays.
 	 */
@@ -252,16 +258,18 @@ class Dispatcher {
 	}
 	
 	/**
-	 * Matches when a PHP file has been called with either no PATH_INFO data, or just
-	 * a slash for the PATH_INFO.  This is the equivalent to calling the function
-	 * {@link #addPathInfoMatch} with a blank match argument.
+	 * Matches when a PHP file has been called with either no PATH_INFO data,
+	 * or just a slash for the PATH_INFO.  This is the equivalent to calling
+	 * the function {@link #addPathInfoMatch} with a blank match argument.
 	 *
-	 * When using GetVar-related dispatching rules, make sure they come before this one.
-	 * Otherwise, this rule will match because there's no PATH_INFO and the GET
-	 * arguments will be ignored.
+	 * When using GetVar-related dispatching rules, make sure they come before
+	 * this one.  Otherwise, this rule will match because there's no PATH_INFO
+	 * and the GET arguments will be ignored.
 	 *
-	 * @param cName string The full controller name to call, including the namespace.
-	 * @param fName function The function name to call within the given controller.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
 	 */
 	public static function addHomeMatchRule($cName, $fName) {
 		static::addRule(self::RULE_HOME_MATCH,
@@ -275,53 +283,61 @@ class Dispatcher {
 	/**
 	 * Dispatches a rule set by {@link #addHomeMatchRule}.
 	 *
-	 * @param cName string The full controller name to call, including the namespace.
-	 * @param fName function The function name to call within the given controller.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchHomeMatch($cName, $fName) {
 		return static::dispatchPathInfoMatch('', $cName, $fName);
 	}
 		
 	/**
-	 * Matches in the case that a PATH_INFO exists with a controller name as its
-	 * first element and a function name as its second element, with all other
-	 * elements passed as arguments.
+	 * Matches in the case that a PATH_INFO exists with a controller name as
+	 * its first element and a function name as its second element, with all
+	 * other elements passed as arguments.
 	 *
-	 * The controller name element will be automatically capitalized by Dispatcher
-	 * during processing, as all class names should start with a capital letter by
-	 * common PHP naming convention.  Past that, a supplied namespace can be
-	 * prepended to the controller name, and a suffix can be appended to it.  That
-	 * allows, for example, the \myapp\controllers\HomeController to be called
-	 * whenever the word "home" is passed as the first PATH_INFO element.
+	 * The controller name element will be automatically capitalized by
+	 * Dispatcher during processing, as all class names should start with a
+	 * capital letter by common PHP naming convention.  Past that, a supplied
+	 * namespace can be prepended to the controller name, and a suffix can be
+	 * appended to it.  That allows, for example, the
+	 * \myapp\controllers\HomeController to be called whenever the word "home"
+	 * is passed as the first PATH_INFO element.
 	 *
-	 * If no function name is given in PATH_INFO, Dispatcher will attempt to call
-	 * a method named "index" within the given controller.  If no such method exists,
-	 * the rule does not match.
+	 * If no function name is given in PATH_INFO, Dispatcher will attempt to
+	 * call a method named "index" within the given controller.  If no such
+	 * method exists, the rule does not match.
 	 *
-	 * If the function specified has required arguments, and not enough elements were
-	 * given in the PATH_INFO to meet that number of required arguments, the rule
-	 * will not match.  If this is not the intended functionality, a good solution
-	 * would be to make the controller function's arguments optional.
+	 * If the function specified has required arguments, and not enough
+	 * elements were given in the PATH_INFO to meet that number of required
+	 * arguments, the rule will not match.  If this is not the intended
+	 * functionality, a good solution would be to make the controller
+	 * function's arguments optional.
 	 *
 	 * Examples (PATH_INFO value => What happens):
 	 * /home/welcome => Home controller's "welcome" function is called.
-	 * /home => Home controller's "index" function is called if it exists, no match 
-	 * 		otherwise.
-	 * /blog/post/43/hello_world => Blog controller's "post" function is called with
-	 * 		the arguments "43" and "hello_world".
-	 * /blog/post => If the Blog controller's "post" function requires the above two
-	 * 		arguments, this rule will not match.  Otherwise, the function will be
-	 *		called with no arguments.
+	 * /home => Home controller's "index" function is called if it exists, no
+	 * 		match otherwise.
+	 * /blog/post/43/hello_world => Blog controller's "post" function is called
+	 * 		with the arguments "43" and "hello_world".
+	 * /blog/post => If the Blog controller's "post" function requires the
+	 * 		above two arguments, this rule will not match.  Otherwise, the
+	 * 		function will be called with no arguments.
 	 *
 	 * NOTE: Due to a limitation in PHP's error handling, whenever a warning is 
-	 * encountered in the controller and/or view that this rule triggers, the warning 
-	 * will be send as E_USER_WARNING rather than E_WARNING.  This is the only rule
-	 * that has this effect.
+	 * encountered in the controller and/or view that this rule triggers, the
+	 * warning will be send as E_USER_WARNING rather than E_WARNING.  This is
+	 * the only rule that has this effect.
 	 *
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
 	 */
 	public static function addPathInfoAutoMapRule($namespace=false, $suffix=false) {
 		static::addRule(self::RULE_PATHINFO_AUTO_MAP,
@@ -335,10 +351,14 @@ class Dispatcher {
 	/**
 	 * Dispatches a rule set by {@link #addPathInfoAutoMapRule}.
 	 *
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchPathInfoAutoMap($namespace, $suffix) {
 		if (isset($_SERVER['PATH_INFO'])) {
@@ -359,30 +379,33 @@ class Dispatcher {
 	
 	/**
 	 * Matches when a PATH_INFO is supplied with the specified elements mapping
-	 * to an existing Controller class and function.  This is similar to the rule
-	 * set by {@link #addPathInfoAutoMapRule}, except that any element of the
-	 * PATH_INFO can be set to be the controller name or function name, and
+	 * to an existing Controller class and function.  This is similar to the
+	 * rule set by {@link #addPathInfoAutoMapRule}, except that any element of
+	 * the PATH_INFO can be set to be the controller name or function name, and
 	 * other element indices can be set as arguments.
 	 *
 	 * For example, assume this PATH_INFO: /a/b/c/d/e
-	 * A cIndex of 2 would use 'B' as the controller name.  As with all Mapping
-	 * 		rules, the first letter of the controller is capitalized, and a
-	 * 		namespace and suffix can be added to it.
+	 * A cIndex of 2 would use 'B' as the controller name.  As with all
+	 * 		Mapping rules, the first letter of the controller is capitalized,
+	 * 		and a namespace and suffix can be added to it.
 	 * An fIndex of 4 would use 'd' as the function name.
-	 * An aIndex set to array(1, 3) would send "a" and "c" as arguments, in that
-	 * 		order.  The "e" element would be ignored entirely.
+	 * An aIndex set to array(1, 3) would send "a" and "c" as arguments, in
+	 * 		that order.  The "e" element would be ignored entirely.
 	 *
-	 * @param cIndex int The index of the PATH_INFO element to use as the controller
-	 * 		name, starting with 1.
-	 * @param fIndex int The index of the PATH_INFO element to use as the function
-	 * 		name, starting with 1.
-	 * @param argIndexArray array An array of one or many integers, defining which
-	 * 		PATH_INFO elements to use as arguments.  Any indices that do not exist
-	 * 		in the PATH_INFO will be sent into the function as boolean false.
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * @param cIndex int The index of the PATH_INFO element to use as the
+	 * 		controller name, starting with 1.
+	 * @param fIndex int The index of the PATH_INFO element to use as the
+	 * 		function name, starting with 1.
+	 * @param argIndexArray array An array of one or many integers, defining
+	 * 		which PATH_INFO elements to use as arguments.  Any indices that do
+	 * 		not exist in the PATH_INFO will be sent into the function as
+	 * 		boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
 	 */
 	public static function addPathInfoFolderMapRule($cIndex, $fIndex,
 			$argIndexArray, $namespace=false, $suffix=false) {
@@ -400,17 +423,22 @@ class Dispatcher {
 	/**
 	 * Dispatches a rule set by {@link #addPathInfoFolderMapRule}.
 	 *
-	 * @param cIndex int The index of the PATH_INFO element to use as the controller
-	 * 		name, starting with 1.
-	 * @param fIndex int The index of the PATH_INFO element to use as the function
-	 * 		name, starting with 1.
+	 * @param cIndex int The index of the PATH_INFO element to use as the
+	 * 		controller name, starting with 1.
+	 * @param fIndex int The index of the PATH_INFO element to use as the
+	 * 		function name, starting with 1.
 	 * @param aIndex array An array of one or many integers, defining which
-	 * 		PATH_INFO elements to use as arguments.  Any indices that do not exist
-	 * 		in the PATH_INFO will be sent into the function as boolean false.
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * 		PATH_INFO elements to use as arguments.  Any indices that do not
+	 * 		exist in the PATH_INFO will be sent into the function as boolean
+	 * 		false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchPathInfoFolderMap($cIndex, $fIndex,
 			$aIndex, $namespace, $suffix) {
@@ -427,34 +455,37 @@ class Dispatcher {
 	 * expression string.  As with all mapping rules, the controller name
 	 * and function name must be contained within the PATH_INFO.  With this
 	 * regex rule, there must be at least two parenthetical matches -- one
-	 * to find the controller name in the PATH_INFO, and one to find the function
-	 * name.  Additional indices may be included for parenthetical matches that
-	 * should be sent to the function as arguments.
+	 * to find the controller name in the PATH_INFO, and one to find the
+	 * function name.  Additional indices may be included for parenthetical
+	 * matches that should be sent to the function as arguments.
 	 *
-	 * Also similarly to all mapping rules, the controller name will be automatically
-	 * capitalized, and a namespace and/or suffix may be specified to be added
-	 * to the controller name before instantiation.
+	 * Also similarly to all mapping rules, the controller name will be
+	 * automatically capitalized, and a namespace and/or suffix may be
+	 * specified to be added to the controller name before instantiation.
 	 *
 	 * Example:
 	 * If the PATH_INFO is: /blog_comments/post54
 	 * Then this RegEx string will match: /^\/(\w+)_(\w+)\/post(\d+)$/
-	 * If the cIndex is 1, the fIndex is 2, and the argIndexArray is array(3), then
-	 * the Blog controller's comments() function will be called with "54" as an
-	 * argument.
+	 * If the cIndex is 1, the fIndex is 2, and the argIndexArray is array(3),
+	 * then the Blog controller's comments() function will be called with "54"
+	 * as an argument.
 	 *
 	 * @param regex string A valid perl-style, slash-delineated regular
 	 * 		expression string to match against the request's PATH_INFO.
-	 * @param cIndex int The index of the matched parenthetical element to use as
-	 * 		the controller name, starting with 1.
-	 * @param fIndex int The index of the matched parenthetical element to use as
-	 * 		the function name, starting with 1.
-	 * @param argIndexArray array An array of one or many integers, defining which
-	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
-	 * 		exist in the regex matches will be sent into the function as boolean false.
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * @param cIndex int The index of the matched parenthetical element to use
+	 * 		as the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use
+	 * 		as the function name, starting with 1.
+	 * @param argIndexArray array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
 	 */
 	public static function addPathInfoRegexMapRule($regex, $cIndex, $fIndex,
 			$argIndexArray, $namespace=false, $suffix=false) {
@@ -475,17 +506,22 @@ class Dispatcher {
 	 *
 	 * @param regex string A valid perl-style, slash-delineated regular
 	 * 		expression string to match against the request's PATH_INFO.
-	 * @param cIndex int The index of the matched parenthetical element to use as
-	 * 		the controller name, starting with 1.
-	 * @param fIndex int The index of the matched parenthetical element to use as
-	 * 		the function name, starting with 1.
+	 * @param cIndex int The index of the matched parenthetical element to use
+	 * 		as the controller name, starting with 1.
+	 * @param fIndex int The index of the matched parenthetical element to use
+	 * 		as the function name, starting with 1.
 	 * @param aIndex array An array of one or many integers, defining which
-	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
-	 * 		exist in the regex matches will be sent into the function as boolean false.
-	 * @param namespace string|boolean The namespace to prepend to the PATH_INFO-provided
-	 * 		controller name, or false to use the root namespace.
-	 * @param suffix string|boolean The suffix to append to the PATH_INFO-provided
-	 * 		controller name, or false to not append a suffix.
+	 * 		parenthetical regex matches to use as arguments.  Any indices that
+	 * 		do not exist in the regex matches will be sent into the function as
+	 * 		boolean false.
+	 * @param namespace string|boolean The namespace to prepend to the
+	 * 		PATH_INFO-provided controller name, or false to use the root
+	 * 		namespace.
+	 * @param suffix string|boolean The suffix to append to the
+	 * 		PATH_INFO-provided controller name, or false to not append a
+	 * 		suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchPathInfoRegexMap($regex, $cIndex,
 			$fIndex, $aIndex, $namespace, $suffix) {
@@ -513,11 +549,14 @@ class Dispatcher {
 	 *
 	 * @param regex string A valid perl-style, slash-delineated regular
 	 * 		expression string to match against the request's PATH_INFO.
-	 * @param cName string The full controller name to call, including the namespace.
-	 * @param fName function The function name to call within the given controller.
-	 * @param argIndexArray array An array of one or many integers, defining which
-	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
-	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param argIndexArray array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
 	 */
 	public static function addPathInfoRegexMatchRule($regex, $cName, $fName,
 			$argIndexArray) {
@@ -536,11 +575,16 @@ class Dispatcher {
 	 *
 	 * @param regex string A valid perl-style, slash-delineated regular
 	 * 		expression string to match against the request's PATH_INFO.
-	 * @param cName string The full controller name to call, including the namespace.
-	 * @param fName function The function name to call within the given controller.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
 	 * @param aIndex array An array of one or many integers, defining which
-	 * 		parenthetical regex matches to use as arguments.  Any indices that do not 
-	 * 		exist in the regex matches will be sent into the function as boolean false.
+	 * 		parenthetical regex matches to use as arguments.  Any indices that
+	 * 		do not exist in the regex matches will be sent into the function as
+	 * 		boolean false.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchPathInfoRegexMatch($regex, $cName, 
 			$fName, $aIndex) {
@@ -582,6 +626,8 @@ class Dispatcher {
 	 * 		namespace.
 	 * @param fName function The function name to call within the given
 	 * 		controller.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchPathInfoMatch($match, $cName, $fName) {
 		if ((isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] === $match)
@@ -654,6 +700,8 @@ class Dispatcher {
 	 * @param suffix string|boolean The suffix to append to the
 	 * 		PATH_INFO-provided controller name, or false to not append
 	 * 		a suffix.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchGetVarMap($cVar, $fVar, $aVar,
 			$namespace, $suffix) {
@@ -724,6 +772,8 @@ class Dispatcher {
 	 * 		be passed as arguments into the given function.  Any GET variable
 	 * 		listed that does not exist will have boolean false passed in its
 	 * 		place.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchGetVarMatch($match, $cName,
 			$fName, $aVar) {
@@ -791,6 +841,8 @@ class Dispatcher {
 	 * 		be passed as arguments into the given function.  Any GET variable
 	 * 		listed that does not exist will have boolean false passed in its
 	 * 		place.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
 	 */
 	protected static function dispatchGetVarRegexMatch($regex, $cName,
 			$fName, $aVar) {
