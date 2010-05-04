@@ -936,6 +936,37 @@ class Dispatcher {
 		return false;
 	}
 	
+	/**
+	 * Matches when the supplied perl-style regular expression string matches
+	 * the request URL.  On a match, the specified controller is instantiated
+	 * and the specified function is called.  Any parenthetical matches within
+	 * the regex string can be targetted as arguments to be sent to the
+	 * controller function.
+	 *
+	 * The request URL being compared is the full URL in the address bar,
+	 * minus any hash mark (#) and what's after it.
+	 *
+	 * Example request URL:
+	 * http://www.mydomain.com/appname/tom_blog/read_post?postId=83
+	 *
+	 * The following regex string will match:
+	 * /\/(\w+)_blog\/read_post\?postId=(\d+)$/
+	 *
+	 * The following argIndexArray will send the arguments "83" and "tom" to
+	 * the specified function, in that order:
+	 * array(2, 1)
+	 *
+	 * @param regex string The perl-style regular expression to match the
+	 * 		request URL.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param argIndexArray array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
+	 */
 	public static function addUrlRegexMatchRule($regex, $cName, $fName,
 			$argIndexArray) {
 		static::addRule(self::RULE_URL_REGEX_MATCH,
@@ -948,6 +979,22 @@ class Dispatcher {
 			);
 	}
 	
+	/**
+	 * Dispatches a rule set by {@link #addUrlRegexMatchRule}.
+	 *
+	 * @param regex string The perl-style regular expression to match the
+	 * 		request URL.
+	 * @param cName string The full controller name to call, including the
+	 * 		namespace.
+	 * @param fName function The function name to call within the given
+	 * 		controller.
+	 * @param aIndex array An array of one or many integers, defining
+	 * 		which parenthetical regex matches to use as arguments.  Any indices
+	 * 		that do not exist in the regex matches will be sent into the
+	 * 		function as boolean false.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
 	protected static function dispatchUrlRegexMatch($regex, $cName,
 			$fName, $aIndex) {
 		if (preg_match($regex, statis::getRequestedURL(), $matches)) {
