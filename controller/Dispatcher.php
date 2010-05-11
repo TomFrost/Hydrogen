@@ -929,7 +929,7 @@ class Dispatcher {
 	 */
 	protected static function dispatchUrlRegexMap($regex, $cIndex, $fIndex,
 			$aIndex, $namespace, $suffix) {
-		if (preg_match($regex, statis::getRequestedURL(), $matches)) {
+		if (preg_match($regex, static::getRequestedURL(), $matches)) {
 			return static::dispatchMapFromTokens($matches, $cIndex, $fIndex,
 				$aIndex, $namespace, $suffix);
 		}
