@@ -5,6 +5,57 @@
 ChangeLog
 ---------
 
+### v0.2.0
+- **Hydrogen**
+	- Drastically changed the autoconfig file.  See comments for new instructions on this file.
+	- Added a function in the hydrogen namespace to load specific PHP files outside of a class context.
+	- Paths have changed significantly.  The new basePath variable is the root from which all relative paths should be resolved -- including the cache folder path in the autoconfig.
+
+- **Cache**
+	- Added MemcachedEngine, using the libmemcached-powered Memcached PHP extension.
+		- Supports connection pooling.  Setting the config value [cache]->pool_name enables this feature.
+		- Note that, at the time of this writing, the Memcached extension has a bug preventing pooling to be used if libmemcached > 0.38 is installed.  If this is the case, simply disable pooling.
+	- Fixed errors in MemcacheEngine.
+		- Some versions of the Memcache extension did not properly delete keys.  The fixed engine resolves this issue.
+		- set() now uses the actual set() function in the engine.  This was an add/replace scheme in the past due to a Memcache extension bug that no longer poses an issue.
+
+- **Config**
+	- Added a function to resolve relative paths in reference to the base path.
+	- Added a function to detect whether or not a path is relative.
+	- Split getVal into two functions:
+		- getVal() will get the requested value and return false if it does not exist.
+		- getRequiredVal() will get the requested value and throw an exception if it does not exist.
+	- Added an argument to both getVal and getRequiredVal, allowing a subkey to be specified.  Any given key may now be changed to an array or associative array, and the proper index can be retrieved with this subkey argument.  See hydrogen/config/samples/config_multidb_sample.ini.php for illustration.
+
+- **Controller**
+	- Added initial version of the new library.
+	- Controller class added.  See hydrogen/controller/Controller.php for documentation.
+	- Dispatcher class added.  See hydrogen/controller/Dispatcher.php for documentation.
+
+- **Database**
+	- Significant changes to DatabaseEngineFactory to support multiple databases.
+		- getCustomEngine() is now used to build a custom engine on the fly.
+		- getEngine() is used to build an engine from values specified in Config.
+		- getEngine() may be passed a variable to specify which database configuration to pull from Config.
+	- DatabaseEngine now contains the table prefix setting, so each database connection, whether configured or made custom on-the-fly, may have an attached table prefix.  A function has been added to return this prefix for a particular engine.
+	- Multiple databases may now be defined with a subkey.  See hydrogen/config/samples/config_multidb_sample.ini.php for illustration.  If using a single database, no config change is necessary.
+
+- **ErrorHandler**
+	- Added a function to send a specific error code header.
+	
+- **Log**
+	- TextFileEngine's path in the config file is now relative to the base path in Hydrogen's autoconfig file.
+	
+- **Model**
+	- Database dependency has been removed.  This assists in the new multi-database support, as well as encourages better model design.
+	- Fixed bug causing the default cache time of 300 not to be used if not explicitly specified.
+
+- **SQLBeans**
+	- Fixed bug causing the update() method to not always use the appropriate database connection when multiple databases are in use.
+
+- **View**
+	- New library added!  See hydrogen/view/View.php for documentation.  This can be used completely independently of the new Controller class, or a different view/template library can be used in place.
+
 ### v0.1.2
 - **Hydrogen**
 	- Hydrogen now has an official license file!  See "LICENSE" for details.  It's now fully legal and free to use in most projects, and much more legit.  I retain the right to change this license in future releases.
