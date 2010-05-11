@@ -39,3 +39,4 @@ Use of Hydrogen implies agreement with its software license, available in the **
 Credits
 --------
 Hydrogen was created by [Tom Frost](http://www.frosteddesign.com).
+Code contributions from [Hamador](http://github.com/Hamador) and [magik](http://github.com/magik).
