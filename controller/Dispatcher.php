@@ -997,7 +997,7 @@ class Dispatcher {
 	 */
 	protected static function dispatchUrlRegexMatch($regex, $cName,
 			$fName, $aIndex) {
-		if (preg_match($regex, statis::getRequestedURL(), $matches)) {
+		if (preg_match($regex, static::getRequestedURL(), $matches)) {
 			return static::dispatchMatchFromTokens($matches, $cName,
 				$fName, $aIndex);
 		}
