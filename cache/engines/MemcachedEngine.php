@@ -20,8 +20,9 @@ class MemcachedEngine implements CacheEngine {
 	protected $memcached;
 	
 	public function __construct() {
-		$mc = new Memcached(Config::getVal("cache", "pool_name"));
-		if (count($mc->getServerList()) === 0) {
+		$pool = Config::getVal("cache", "pool_name");
+		$mc = new Memcached($pool);
+		if ($pool === false || count($mc->getServerList()) === 0) {
 			$host = Config::getVal('cache', 'memcache_host') ?: 'localhost';
 			$port = Config::getVal('cache', 'memcache_port') ?: 11211;
 			$mc->addServer($host, $port);
