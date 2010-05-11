@@ -609,7 +609,7 @@ class Dispatcher {
 	 * 		controller.
 	 */
 	public static function addPathInfoMatchRule($match, $cName, $fName) {
-		static::addRule(self::RULE_PATHINFO_REGEX_MATCH,
+		static::addRule(self::RULE_PATHINFO_MATCH,
 			array(
 				"match" => $match,
 				"cName" => $cName,
@@ -820,7 +820,7 @@ class Dispatcher {
 			$fName, $argVars) {
 		static::addRule(self::RULE_GETVAR_REGEX_MATCH,
 			array(
-				"match" => $matchArray,
+				"regex" => $matchArray,
 				"cName" => $cName,
 				"fName" => $fName,
 				"aVar" => $argVars
