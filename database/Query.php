@@ -13,6 +13,15 @@ use hydrogen\database\exceptions\DuplicateAliasException;
 use hydrogen\database\DatabaseEngineFactory;
 use hydrogen\database\statements\QueryStatement;
 
+/**
+ * Query is an object-based query builder, striving to build all queries
+ * possible on most major SQL servers.  Queries built with this class may have
+ * placeholders for prepared queries, while requiring no concatenation, no
+ * strict ordering policy, and no default format.  The query is built as a
+ * complex array, which can be translated into the appropriate SQL format
+ * for many different SQL-based database servers by a
+ * {@link hydrogen\database\QueryFormatter}.
+ */
 class Query {
 	public static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
 	public static $legalTypes = array('int', 'double', 'string', 'blob');
