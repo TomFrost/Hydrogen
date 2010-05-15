@@ -23,9 +23,8 @@ use hydrogen\database\statements\QueryStatement;
  * {@link hydrogen\database\QueryFormatter}.
  */
 class Query {
-	public static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
-	public static $legalTypes = array('int', 'double', 'string', 'blob');
-	public static $methods = array(
+	protected static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
+	protected static $methods = array(
 		'SELECT' => array(
 			'distinct',
 			'field',
