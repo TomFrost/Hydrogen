@@ -90,10 +90,12 @@ abstract class Controller extends MagicCacheable {
 	}
 	
 	/**
-	 * Executes the specified function with the given arguments, intercepting all
-	 * of the stdout output that occurs during the duration of its execution.
+	 * Executes the specified function with the given arguments, intercepting
+	 * all of the stdout output that occurs throughout the duration of its
+	 * execution.
 	 *
-	 * @param callback callback The function to call, in standard PHP callback format.
+	 * @param callback callback The function to call, in standard PHP callback
+	 * 		format.
 	 * @param args array An array of arguments with which to call the specified 
 	 * 		function.
 	 * @return The output sent during the duration of the specified function's
