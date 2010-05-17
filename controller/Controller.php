@@ -7,6 +7,7 @@
 namespace hydrogen\controller;
 
 use hydrogen\common\MagicCacheable;
+use hydrogen\recache\RECacheManager;
 
 /**
  * Controller provides a baseline for how Controller classes should be
@@ -80,7 +81,7 @@ abstract class Controller extends MagicCacheable {
 	 * 		function, or false for no arguments.
 	 * @return boolean true.
 	 */
-	protected function __recache(&$key, &$ttl, &$groups, &$callback, &$args) {
+	protected function __recache(&$key, &$ttl, &$groups, $callback, &$args) {
 		$cm = RECacheManager::getInstance();
 		echo $cm->recache_get($key, $ttl, $groups,
 			array($this, "__getOutput"),
@@ -98,7 +99,7 @@ abstract class Controller extends MagicCacheable {
 	 * @return The output sent during the duration of the specified function's
 	 * 		execution.
 	 */
-	protected function __getOutput(&$callback, &$args) {
+	public function __getOutput($callback, $args) {
 		ob_start();
 		call_user_func_array($callback, $args);
 		$output = ob_get_contents();

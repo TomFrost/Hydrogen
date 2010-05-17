@@ -155,7 +155,7 @@ abstract class MagicCacheable {
 	 * @return mixed The cached value or the result of the callback function,
 	 * 		depending on whether a value was found in the cache.
 	 */
-	protected function __recache(&$key, &$ttl, &$groups, &$callback, &$args) {
+	protected function __recache(&$key, &$ttl, &$groups, $callback, &$args) {
 		$cm = RECacheManager::getInstance();
 		return $cm->recache_get($key, $ttl, $groups, $callback, $args);
 	}
