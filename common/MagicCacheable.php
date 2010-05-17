@@ -77,6 +77,12 @@ use hydrogen\common\exceptions\NoSuchMethodException;
  * can be easily overridden to, instead, cache a transformed version of the
  * data, cache stdout output instead of 'return' data, echo data instead of
  * returning it, etc.
+ *
+ * The cache key used, by default, will include the entire class name (with
+ * namespace) to assure that it is, in fact, unique.  To produce a much
+ * shorter keyname, simply specify the protected static variable $classID --
+ * a few-character string that is unique to any MagicCacheable-extending
+ * class in the webapp.
  */
 abstract class MagicCacheable {
 	
