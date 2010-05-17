@@ -6,18 +6,44 @@
 
 namespace hydrogen\model;
 
-use hydrogen\recache\RECacheManager;
-use hydrogen\model\exceptions\NoSuchMethodException;
-use hydrogen\log\Log;
+use hydrogen\common\MagicCacheable;
 
-abstract class Model {
+/**
+ * Model provides a baseline for how Model classes should be constructed.
+ * It offers no data manipulation functionality of its own, but includes
+ * two patterns that should be used in every extending class: the singleton
+ * pattern (letting only one instance of each Model-extending class exist) and
+ * the MagicCacheable pattern (allowing the return value of functions to be
+ * cached, based on what those functions are named).
+ *
+ * Model-extending classes should never be instantiated with the 'new' keyword.
+ * Rather, an instance should be gotten with the {@link #getInstance} method,
+ * like this:
+ *
+ * <pre>
+ * $userModel = \myapp\UserModel::getInstance();
+ * </pre>
+ *
+ * For instructions on how to name functions within the extended Model to
+ * allow their result to be cached automatically, see
+ * {@link hydrogen\common\MagicCacheable}.
+ */
+abstract class Model extends MagicCacheable {
 	protected static $instances = array();
-	protected $cm;
 	
-	protected function __construct() {
-		$this->cm = RECacheManager::getInstance();
-	}
+	/**
+	 * This class should not be instantiated from the outside.
+	 * Instead, call {@link #getInstance}.
+	 */
+	protected function __construct() { }
 	
+	/**
+	 * Returns an instance of this Model singleton.  If no instance of this
+	 * Model has been created, one will be created and returned.  Otherwise,
+	 * the already created Model will be returned.
+	 *
+	 * @return An instance of this Model.
+	 */
 	public static function getInstance() {
 		$class = get_called_class();
 		if (!isset(static::$instances[$class]))
@@ -25,33 +51,4 @@ abstract class Model {
 		return static::$instances[$class];
 	}
 	
-	public function __call($func, $args) {
-		$methods = get_class_methods($this);
-		$valids = array();
-		$useCache = false;
-		if (strrpos($func, 'Cached') === strlen($func) - 6) {
-			$useCache = true;
-			$func = substr($func, 0, -6);
-		}
-		$func .= '__';
-		foreach($methods as $method) {
-			if (strpos($method, $func) === 0) {
-				if (!$useCache)
-					return call_user_func_array(array($this, $method), $args);
-				else {
-					$data = explode('_', substr($method, strlen($func)));
-					$ttl = $data[0] !== '' ? $data[0] : 300;
-					$groups = array();
-					for ($i = 1; $i < count($data); $i++)
-						$groups[] = &$data[$i];
-					$key = 'M:' . (isset(static::$modelID) ? static::$modelID : get_class($this)) . '_' . substr($func, 0, -2);
-					foreach($args as $arg)
-						$key .= '_' . (is_bool($arg) ? ($arg ? '1' : '0') : $arg);
-					return $this->cm->recache_get($key, $ttl, $groups, array($this, $method), $args);
-				}
-			}
-		}
-		$class = get_class($this);
-		throw new NoSuchMethodException("Method $func does not exist in model $class.");
-	}
 }
