@@ -6,7 +6,7 @@
 
 namespace hydrogen\controller;
 
-use hydrogen\controller\exceptions\NoSuchMethodException;
+use hydrogen\common\exceptions\NoSuchMethodException;
 use hydrogen\controller\exceptions\MissingArgumentException;
 
 /**
@@ -1140,7 +1140,7 @@ class Dispatcher {
 			\hydrogen\loadPath(static::$controllerPaths[$class]);
 			
 		// Call it if everything's there
-		if (@class_exists($class)) {	
+		if (@class_exists($class)) {
 			// Call it, Cap'n.
 			$inst = $class::getInstance();
 			if ($argProtection === true) {
