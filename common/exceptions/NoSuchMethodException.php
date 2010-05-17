@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-namespace hydrogen\model\exceptions;
+namespace hydrogen\common\exceptions;
 
 class NoSuchMethodException extends \Exception {
 	
