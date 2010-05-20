@@ -8,6 +8,7 @@ namespace hydrogen\controller;
 
 use hydrogen\common\MagicCacheable;
 use hydrogen\recache\RECacheManager;
+use hydrogen\log\Log;
 
 /**
  * Controller provides a baseline for how Controller classes should be
@@ -31,17 +32,12 @@ use hydrogen\recache\RECacheManager;
  *
  * When the "Cached" version of a function is called and no cached data is
  * found for that key, Controller executes the function and listens to any
- * output to stdout for its duration.  This output, then, is cached.
+ * output to stdout for its duration.  This output is cached along with the
+ * function's return value.
  *
  * Similarly, when cached data is found, that data is immediately sent to
- * stdout (in most cases, the web browser) rather than being returned.  It
- * will respect all currently active buffering.
- *
- * All functions named with the MagicCacheable naming convention will return
- * true upon completion, whether they're called with "Cached" added or not.
- * For this reason, any controller functions for which the return value
- * is important should not utilize magic-caching.  Consider the Model class
- * for any such functions.
+ * stdout (in most cases, the web browser) and the cached return value
+ * (if any) is returned.  It will respect all currently active buffering.
  */
 abstract class Controller extends MagicCacheable {
 	protected static $instances = array();
@@ -79,14 +75,24 @@ abstract class Controller extends MagicCacheable {
 	 * 		will be cached.
 	 * @param args array|boolean An array of arguments to send to the callback
 	 * 		function, or false for no arguments.
-	 * @return boolean true.
+	 * @return mixed The return value of the callback function.
 	 */
 	protected function __recache(&$key, &$ttl, &$groups, $callback, &$args) {
 		$cm = RECacheManager::getInstance();
-		echo $cm->recache_get($key, $ttl, $groups,
+		$data = $cm->recache_get($key, $ttl, $groups,
 			array($this, "__getOutput"),
 			array($callback, $args));
-		return true;
+		if (count($data) === 2) {
+			echo $data[1];
+			return $data[0];
+		}
+		
+		// In very rare cases, cached data might be wrong.
+		Log::warn("Cached data for controller " . get_class($this) .
+			" was not properly formatted.  Calling " .
+			(isset($callback[1]) ? $callback[1] : "function") .
+			" directly to recover.");
+		return call_user_func_array($callback, $args);
 	}
 	
 	/**
@@ -98,15 +104,16 @@ abstract class Controller extends MagicCacheable {
 	 * 		format.
 	 * @param args array An array of arguments with which to call the specified 
 	 * 		function.
-	 * @return The output sent during the duration of the specified function's
-	 * 		execution.
+	 * @return array An array, in which the first element is the function's
+	 * 		return value, and the second element is the stdout output that was
+	 * 		sent over the duration of the function's execution.
 	 */
 	public function __getOutput($callback, $args) {
 		ob_start();
-		call_user_func_array($callback, $args);
+		$ret = call_user_func_array($callback, $args);
 		$output = ob_get_contents();
 		ob_end_clean();
-		return $output;
+		return array($ret, $output);
 	}
 }
 
