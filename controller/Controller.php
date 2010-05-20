@@ -52,7 +52,7 @@ abstract class Controller extends MagicCacheable {
 	 * Creates an instance of this Controller if one has not yet been created,
 	 * or returns the already-created instance if it has.
 	 *
-	 * @return The singleton instance of this Controller object.
+	 * @return Controller The singleton instance of this Controller object.
 	 */
 	public static function getInstance() {
 		$class = get_called_class();
