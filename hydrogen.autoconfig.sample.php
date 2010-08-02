@@ -22,16 +22,29 @@ use hydrogen\config\Config;
  */
 Config::setBasePath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "..");
 
+/*
+ * Set the cache path for the application.  This directory should allow PHP full
+ * read/write permissions, and any data that PHP must cache in a file will be
+ * stored here.  Log files will also be stored here by default unless the path
+ * is changed in the config.
+ *
+ * If a relative path is given, it will be relative in relation to the base
+ * path.  The following example assumes there is a fully-writable folder called
+ * "cache" in the root of the webapp.
+ */
+Config::setCachePath("cache");
+
 /* 
  * This line loads the application's config file.
  *
  * The first argument is the path to the config file itself.  This may be absolute,
  * or relative to the base path given above.
  *
- * The second argument is the folder in which to cache the processed config file.
- * PHP must have write permissions for this folder -- so when in doubt, chmod it
- * to 777.  Optionally, you can specify false to disable config caching.  This path can
- * also be either absolute or relative to the base path.
+ * The second argument dictates how the config file is cached.  If true, the
+ * processed config will be cached by its filename.  If it's a string, it will
+ * be cached by that string.  If false, it won't be cached at all.  The
+ * recommended value is "true" unless there's a chance you'll be loading
+ * multiple config files with the same name.
  *
  * If the third argument is true, it will check to see if the config file has been 
  * modified every time the page is loaded, and, when a change is detected, update the 
@@ -39,9 +52,9 @@ Config::setBasePath(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR .
  * CPU cycles and stat() calls.  To make config changes take effect in this case, 
  * simply delete the cached config file.
  */
-Config::loadConfig(
+Config::addConfig(
 	'config' . DIRECTORY_SEPARATOR . 'config.ini.php', // Config file path
-	'cache', // Cache folder path
+	true, // Cache this config file?
 	true // Check for config file changes before using cached version?
 	);
 	

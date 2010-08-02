@@ -1,5 +1,5 @@
 <?php
-hydrogen\config\Config::setConfigArray(array(
+$configArray = array(
 	'general' => array(
 		'app_url' => 'http://example.com/app/folder'
 		),
@@ -27,5 +27,5 @@ hydrogen\config\Config::setConfigArray(array(
 		'fileprefix' => 'hydro_',
 		'loglevel' => 1
 		)
-	));
+	);
 ?>
