@@ -70,6 +70,9 @@ Config::setVal("view", "folder", "themes" . DIRECTORY_SEPARATOR . "default");
 // within the web browser.  This is usually the same as the folder above.
 Config::setVal("view", "url_path", "themes/default");
 
+// The extension of view filenames.
+Config::setVal("view", "file_extension", ".tpl.php");
+
 // Alternatively, you can set an entirely new URL as the view root.  This is only
 // needed in special circumstances.  Do not set this unless you know you need it.
 // Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");

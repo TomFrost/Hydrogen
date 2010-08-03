@@ -107,7 +107,8 @@ class View {
 		if (static::$view === false)
 			static::$view = new View();
 		$path = Config::getRequiredVal("view", "folder") .
-			DIRECTORY_SEPARATOR . "$viewName.php";
+			DIRECTORY_SEPARATOR . $viewName .
+			Config::getRequiredVal("view", "file_extension");
 		$path = Config::getAbsolutePath($path);
 		static::$view->display($path);
 	}
