@@ -126,7 +126,8 @@ class View {
 	 * 		include.
 	 */
 	protected function displayTemplate($path) {
-		
+		$template = new TemplateLoader($path);
+		$template->display();
 	}
 	
 	/**
