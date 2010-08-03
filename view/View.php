@@ -110,7 +110,22 @@ class View {
 			DIRECTORY_SEPARATOR . $viewName .
 			Config::getRequiredVal("view", "file_extension");
 		$path = Config::getAbsolutePath($path);
-		static::$view->display($path);
+		if (Config::getVal("view", "use_templates") === "1")
+			static::$view->displayTemplate($path);
+		else
+			static::$view->displayPlain($path);
+	}
+	
+	/**
+	 * Displays the specified view folder by passing it through the Hydrogen
+	 * template engine, either reading a pre-compiled PHP file directly or
+	 * parsing the template file into natively runnable PHP code and then
+	 * reading that.
+	 *
+	 * @param path string The full, absolute path to the PHP file to include.
+	 */
+	protected function displayTemplate($path) {
+		
 	}
 	
 	/**
@@ -119,7 +134,7 @@ class View {
 	 *
 	 * @param path string The full, absolute path to the PHP file to include.
 	 */
-	protected function display($path) {
+	protected function displayPlain($path) {
 		$success = include($path);
 		if (!$success)
 			throw new NoSuchViewException("File $path could not be loaded.");
