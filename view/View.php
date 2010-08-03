@@ -55,6 +55,20 @@ class View {
 	protected static $viewURL = false;
 	
 	/**
+	 * Translates a view name into an absolute path at which the view can
+	 * be found.
+	 *
+	 * @param string viewName The name of the view to be found.
+	 * @return string The absolute path to the requested view.
+	 */
+	public static function getViewPath($viewName) {
+		$path = Config::getRequiredVal("view", "folder") .
+			DIRECTORY_SEPARATOR . $viewName .
+			Config::getRequiredVal("view", "file_extension");
+		return Config::getAbsolutePath($path);
+	}
+	
+	/**
 	 * Sets a variable or array of variables to the specified value(s)
 	 * in the View layer.  Any variables declared with this function
 	 * will be available to any view loaded using the {@link #load}
@@ -106,14 +120,10 @@ class View {
 			static::setVar($varArray);
 		if (static::$view === false)
 			static::$view = new View();
-		$path = Config::getRequiredVal("view", "folder") .
-			DIRECTORY_SEPARATOR . $viewName .
-			Config::getRequiredVal("view", "file_extension");
-		$path = Config::getAbsolutePath($path);
 		if (Config::getVal("view", "use_templates") === "1")
-			static::$view->displayTemplate($path);
+			static::$view->displayTemplate($viewName);
 		else
-			static::$view->displayPlain($path);
+			static::$view->displayPlain($viewName);
 	}
 	
 	/**
@@ -125,8 +135,8 @@ class View {
 	 * @param path string The full, absolute path to the template file to
 	 * 		include.
 	 */
-	protected function displayTemplate($path) {
-		$template = new TemplateLoader($path);
+	protected function displayTemplate($viewName) {
+		$template = new TemplateLoader($viewName);
 		$template->display();
 	}
 	
@@ -136,8 +146,9 @@ class View {
 	 *
 	 * @param path string The full, absolute path to the PHP file to include.
 	 */
-	protected function displayPlain($path) {
-		$success = include($path);
+	protected function displayPlain($viewName) {
+		$path = static::getViewPath($viewName);
+		$success = include(Config::getAbsolutePath($path));
 		if (!$success)
 			throw new NoSuchViewException("File $path could not be loaded.");
 	}
