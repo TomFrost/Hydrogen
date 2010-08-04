@@ -8,22 +8,21 @@ namespace hydrogen\view;
 
 use hydrogen\config\Config;
 use hydrogen\view\exceptions\NoSuchViewException;
+use hydrogen\view\components\Page;
 
-/**
- * TemplateLoader is responsible for the reading, parsing, caching, and
- * rendering of Hdyrogen templates.  Heavily modeled after Django.
- */
-class TemplateLoader {
+class Template {
 	protected $viewName;
+	protected $views;
 	
 	/**
-	 * Creates a new template loader for the given template.
+	 * Creates a new template object for the given template name.
 	 *
 	 * @param string templatePath The absolute path to the template to be
 	 * 		loaded.
 	 */
 	public function __construct($viewName) {
 		$this->viewName = $viewName;
+		$this->views = array();
 	}
 	
 	/**
@@ -32,7 +31,7 @@ class TemplateLoader {
 	 */
 	public function display() {
 		if (!$this->displayCached()) {
-			$this->parsePage($this->viewName);
+			$page = new Page($this->viewName);
 		}
 	}
 	
