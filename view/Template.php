@@ -29,7 +29,7 @@ class Template {
 	 * Shows the rendered view, caching it or reading it from the cache if
 	 * appropriate.
 	 */
-	public function display() {
+	public function render() {
 		if (!$this->displayCached()) {
 			$page = new Page($this->viewName);
 		}

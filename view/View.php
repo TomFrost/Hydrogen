@@ -136,8 +136,8 @@ class View {
 	 * 		include.
 	 */
 	protected function displayTemplate($viewName) {
-		$template = new TemplateLoader($viewName);
-		$template->display();
+		$template = new Template($viewName);
+		$template->render();
 	}
 	
 	/**
