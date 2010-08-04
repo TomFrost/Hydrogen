@@ -6,9 +6,8 @@
 
 namespace hydrogen\view;
 
-use hydrogen\config\Config;
 use hydrogen\view\exceptions\NoSuchViewException;
-use hydrogen\view\components\Page;
+use hydrogen\view\LoaderFactory;
 
 class Template {
 	protected $viewName;
@@ -31,7 +30,9 @@ class Template {
 	 */
 	public function render() {
 		if (!$this->displayCached()) {
-			$page = new Page($this->viewName);
+			$loader = LoaderFactory::getLoader();
+			$page = $loader->load($this->viewName);
+			echo $page;
 		}
 	}
 	
@@ -43,21 +44,6 @@ class Template {
 	 */
 	protected function displayCached() {
 		return false;
-	}
-	
-	/**
-	 * Parses through the supplied View.
-	 */
-	protected function parsePage($viewName) {
-		$path = View::getViewPath($viewName);
-		$page = file_get_contents($path);
-		if ($page === false) {
-			throw new NoSuchViewException("View " . $path .
-				" does not exist.");
-		}
-		$tagSplit = preg_split('/(\{%.+)\s*%\}/U', $page, -1,
-			PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-		print_r($tagSplit);
 	}
 }
 

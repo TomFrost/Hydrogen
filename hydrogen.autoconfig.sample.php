@@ -76,8 +76,12 @@ Config::setVal("view", "file_extension", ".tpl.php");
 // Should we be using the templating engine?
 Config::setVal("view", "use_templates", "1");
 
+// For templates, which loader should we use? (Hint: use "File" unless you are
+// weird and intriguing.  In fact, you don't even have to -- it's the default!)
+//Config::setVal("view", "loader_type", "File");
+
 // Alternatively, you can set an entirely new URL as the view root.  This is only
 // needed in special circumstances.  Do not set this unless you know you need it.
-// Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
+//Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
 
 ?>
