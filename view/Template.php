@@ -10,6 +10,7 @@ use hydrogen\view\exceptions\NoSuchViewException;
 use hydrogen\view\LoaderFactory;
 
 class Template {
+	protected $loader;
 	protected $viewName;
 	protected $views;
 	
@@ -19,9 +20,10 @@ class Template {
 	 * @param string templatePath The absolute path to the template to be
 	 * 		loaded.
 	 */
-	public function __construct($viewName) {
+	public function __construct($viewName, $loader=false) {
 		$this->viewName = $viewName;
 		$this->views = array();
+		$this->loader = $loader ?: LoaderFactory::getLoader();
 	}
 	
 	/**
@@ -30,9 +32,9 @@ class Template {
 	 */
 	public function render() {
 		if (!$this->displayCached()) {
-			$loader = LoaderFactory::getLoader();
-			$page = $loader->load($this->viewName);
-			echo $page;
+			$parser = new Parser($this->viewName, $this->loader);
+			$nodeList = $parser->parse();
+			echo $nodeList->render();
 		}
 	}
 	
