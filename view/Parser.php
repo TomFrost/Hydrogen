@@ -28,6 +28,12 @@ class Parser {
 		$pageTokens = Lexer::tokenize($page);
 		$this->tokens = array_merge($this->tokens, $pageTokens);
 	}
+	
+	public function parse($parseUntil=false) {
+		if ($parseUntil !== false && !is_array($parseUntil))
+			$parseUntil = array($parseUntil);
+		return $this->nodeList;
+	}
 }
 
 ?>

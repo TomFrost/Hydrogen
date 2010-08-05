@@ -19,7 +19,7 @@ class NodeList {
 	
 	public function render() {
 		$rendered = '';
-		foreach ($nodes as $node)
+		foreach ($this->nodes as $node)
 			$rendered .= $node->render();
 		return $rendered;
 	}

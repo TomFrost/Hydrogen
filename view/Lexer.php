@@ -6,7 +6,7 @@
 
 namespace hydrogen\view;
 
-use hydrogen\view\View;
+use hydrogen\view\Token;
 
 class Lexer {
 	const TOKEN_TEXT = 0;
@@ -14,7 +14,8 @@ class Lexer {
 	const TOKEN_TAG = 2;
 	
 	public static function tokenize($data) {
-		
+		$tokens = array();
+		return $tokens;
 	}
 
 	protected function __construct() {}
