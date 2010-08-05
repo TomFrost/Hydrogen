@@ -67,8 +67,8 @@ class Lexer {
 		$sLen = strlen($startsWith);
 		$eLen = strlen($endsWith);
 		if (strlen($haystack) >= $sLen + $eLen) {
-			return @substr_compare($haystack, $startsWith, 0, $sLen) === 0 &&
-				@substr_compare($haystack, $endsWith, -$eLen, $eLen) === 0;
+			return substr_compare($haystack, $startsWith, 0, $sLen) === 0 &&
+				substr_compare($haystack, $endsWith, -$eLen, $eLen) === 0;
 		}
 		return false;
 	}
