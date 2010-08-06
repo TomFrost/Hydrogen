@@ -13,26 +13,47 @@ class Parser {
 	protected $loader;
 	protected $tokens;
 	protected $cursor;
-	protected $nodeList;
 
 	public function __construct($viewName, $loader) {
 		$this->loader = $loader;
 		$this->tokens = array();
 		$this->cursor = 0;
-		$this->nodeList = new NodeList();
 		$this->addPage($viewName);
 	}
 	
 	public function addPage($pageName) {
 		$page = $this->loader->load($pageName);
 		$pageTokens = Lexer::tokenize($page);
-		$this->tokens = array_merge($this->tokens, $pageTokens);
+		array_splice($this->tokens, $this->cursor, 0, $pageTokens);
 	}
 	
-	public function parse($parseUntil=false) {
-		if ($parseUntil !== false && !is_array($parseUntil))
-			$parseUntil = array($parseUntil);
-		return $this->nodeList;
+	public function parse($untilBlock=false) {
+		if ($untilBlock !== false && !is_array($untilBlock))
+			$untilBlock = array($untilBlock);
+		$nodeList = new NodeList();
+		for (; $this->cursor < count($this->tokens); $this->cursor++) {
+			switch ($this->tokens[$this->cursor]->type) {
+				case Lexer::TOKEN_TEXT:
+					$nodeList->addNode(
+						new TextNode($this->tokens[$this->cursor]->data)
+					);
+					break;
+				case Lexer::TOKEN_VARIABLE:
+					$nodeList->addNode(
+						new VariableNode($this->tokens[$this->cursor]->data)
+					);
+					break;
+				case Lexer::TOKEN_BLOCK:
+					$nodeList->addNode(
+						$this->getBlockNode($this->tokens[$this->cursor]->data)
+					);
+			}
+		}
+		return $nodeList;
+	}
+	
+	protected function getBlockNode($data) {
+		
 	}
 }
 
