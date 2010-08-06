@@ -28,17 +28,6 @@ class ContextStack {
 	}
 	
 	public function set($key, $value) {
-		$level = count($this->stack) - 1;
-		for ($i = $level; $i >= 0 ; $i--) {
-			if (array_key_exists($key, $this->stack[$i])) {
-				$level = $i;
-				break;
-			}
-		}
-		$this->stack[$level][$key] = $value;
-	}
-	
-	public function get($key) {
 		$level = false;
 		for ($i = count($this->stack) - 1; $i >= 0 ; $i--) {
 			if (array_key_exists($key, $this->stack[$i])) {
@@ -46,9 +35,17 @@ class ContextStack {
 				break;
 			}
 		}
-		if ($level === false)
+		if ($level === false) {
+			$level = count($this->stack) - 1;
+			$this->stackLevel[$key] = $level;
+		}
+		$this->stack[$level][$key] = $value;
+	}
+	
+	public function get($key) {
+		if (!isset($this->stackLevel[$key]))
 			throw new NoSuchVariableException("Variable does not exist in context: $key");
-		return $this->stack[$level][$key];
+		return $this->stack[$this->stackLevel[$key]][$key];
 	}
 }
 
