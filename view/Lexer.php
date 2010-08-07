@@ -21,7 +21,7 @@ class Lexer {
 	const COMMENT_OPENTAG = "{#";
 	const COMMENT_CLOSETAG = "#}";
 	
-	public static function tokenize($data) {
+	public static function tokenize($origin, $data) {
 		$splitRegex = '/(' .
 			self::VARIABLE_OPENTAG . '.*' . self::VARIABLE_CLOSETAG . '|' .
 			self::BLOCK_OPENTAG . '.*' . self::BLOCK_CLOSETAG . '|' .
@@ -35,7 +35,7 @@ class Lexer {
 			// Check for variable tag
 			if (static::surroundedBy($line, self::VARIABLE_OPENTAG,
 				self::VARIABLE_CLOSETAG)) {
-				$tokens[] = new Token(self::TOKEN_VARIABLE,
+				$tokens[] = new Token(self::TOKEN_VARIABLE, $origin,
 					trim(substr($line, strlen(self::VARIABLE_OPENTAG),
 					strlen($line) - strlen(self::VARIABLE_OPENTAG) -
 					strlen(self::VARIABLE_CLOSETAG))));
@@ -43,7 +43,7 @@ class Lexer {
 			// Check for block tag
 			else if (static::surroundedBy($line, self::BLOCK_OPENTAG,
 				self::BLOCK_CLOSETAG)) {
-				$tokens[] = new Token(self::TOKEN_BLOCK,
+				$tokens[] = new Token(self::TOKEN_BLOCK, $origin,
 					trim(substr($line, strlen(self::BLOCK_OPENTAG),
 					strlen($line) - strlen(self::BLOCK_OPENTAG) -
 					strlen(self::BLOCK_CLOSETAG))));
@@ -51,14 +51,14 @@ class Lexer {
 			// Check for comment tag
 			else if (static::surroundedBy($line, self::COMMENT_OPENTAG,
 				self::COMMENT_CLOSETAG)) {
-				$tokens[] = new Token(self::TOKEN_COMMENT,
+				$tokens[] = new Token(self::TOKEN_COMMENT, $origin,
 					trim(substr($line, strlen(self::COMMENT_OPENTAG),
 					strlen($line) - strlen(self::COMMENT_OPENTAG) -
 					strlen(self::COMMENT_CLOSETAG))));
 			}
 			// It must be text!  But skip it if it's empty.
 			else if (($text = trim($line)) !== '')
-				$tokens[] = new Token(self::TOKEN_TEXT, $text);
+				$tokens[] = new Token(self::TOKEN_TEXT, $origin, $text);
 		}
 		return $tokens;
 	}

@@ -9,10 +9,12 @@ namespace hydrogen\view;
 class Token {
 	public $type;
 	public $data;
+	public $origin;
 	
-	public function __construct($type, $data) {
+	public function __construct($type, $origin, $data) {
 		$this->type = $type;
 		$this->data = $data;
+		$this->origin = $origin;
 	}
 }
 

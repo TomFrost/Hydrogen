@@ -23,7 +23,7 @@ class Parser {
 	
 	public function addPage($pageName) {
 		$page = $this->loader->load($pageName);
-		$pageTokens = Lexer::tokenize($page);
+		$pageTokens = Lexer::tokenize($pageName, $page);
 		array_splice($this->tokens, $this->cursor, 0, $pageTokens);
 	}
 	
