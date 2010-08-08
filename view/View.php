@@ -7,6 +7,8 @@
 namespace hydrogen\view;
 
 use hydrogen\config\Config;
+use hydrogen\view\ContextStack;
+use hydrogen\view\exceptions\NoSuchVariableException;
 use hydrogen\view\exceptions\NoSuchViewException;
 
 /**
@@ -49,10 +51,16 @@ use hydrogen\view\exceptions\NoSuchViewException;
  */
 class View {
 	
-	protected static $vars = array();
 	protected static $view = false;
-	protected static $appURL = false;
-	protected static $viewURL = false;
+	protected $appURL;
+	protected $viewURL;
+	protected $requestContext;
+	
+	protected static function getView() {
+		if (static::$view === false)
+			static::$view = new View();
+		return static::$view;
+	}
 	
 	/**
 	 * Translates a view name into an absolute path at which the view can
@@ -80,12 +88,11 @@ class View {
 	 * 		is an associative array, this value is not used.
 	 */
 	public static function setVar($keyOrArray, $value=false) {
-		if (is_array($keyOrArray)) {
-			foreach ($keyOrArray as $key => $value)
-				static::$vars[$key] = $value;
-		}
+		$view = static::getView();
+		if (is_array($keyOrArray))
+			$view->requestContext->setArray($keyOrArray);
 		else
-			static::$vars[$keyOrArray] = $value;
+			$view->requestContext->set($keyOrArray, $value);
 	}
 	
 	/**
@@ -116,14 +123,10 @@ class View {
 	 * 		the loaded view.
 	 */
 	public static function load($viewName, $varArray=false) {
+		$view = static::getView();
 		if (is_array($varArray))
 			static::setVar($varArray);
-		if (static::$view === false)
-			static::$view = new View();
-		if (Config::getVal("view", "use_templates") === "1")
-			static::$view->displayTemplate($viewName);
-		else
-			static::$view->displayPlain($viewName);
+		$view->loadView($viewName);
 	}
 	
 	/**
@@ -177,7 +180,10 @@ class View {
 	 * @param viewName string The name of the view to display.
 	 */
 	public function loadView($viewName) {
-		static::load($viewName);
+		if (Config::getVal("view", "use_templates") === "1")
+			$this->displayTemplate($viewName);
+		else
+			$this->displayPlain($viewName);
 	}
 	
 	/**
@@ -194,17 +200,12 @@ class View {
 	 * 		if provided.
 	 */
 	public function appURL($path=false) {
-		if (static::$appURL === false) {
-			static::$appURL = Config::getRequiredVal("general", "app_url");
-			if (static::$appURL[strlen(static::$appURL) - 1] == '/')
-				static::$appURL = substr(static::$appURL, 0, -1);
-		}
 		if ($path !== false) {
 			if ($path[0] == '/')
-				return static::$appURL . $path;
-			return static::$appURL . '/' . $path;
+				return $this->appURL . $path;
+			return $this->appURL . '/' . $path;
 		}
-		return static::$appURL;
+		return $this->appURL;
 	}
 	
 	/**
@@ -223,21 +224,12 @@ class View {
 	 * 		if provided.
 	 */
 	public function viewURL($path=false) {
-		if (static::$viewURL === false) {
-			static::$viewURL = Config::getVal("view", "root_url");
-			if (static::$viewURL === false) {
-				static::$viewURL = $this->appURL(Config::getRequiredVal("view", 
-					"url_path"));
-			}
-			if (static::$viewURL[strlen(static::$viewURL) - 1] == '/')
-				static::$viewURL = substr(static::$viewURL, 0, -1);
-		}
 		if ($path !== false) {
 			if ($path[0] == '/')
-				return static::$viewURL . $path;
-			return static::$viewURL . '/' . $path;
+				return $this->viewURL . $path;
+			return $this->viewURL . '/' . $path;
 		}
-		return static::$viewURL;
+		return $this->viewURL;
 	}
 	
 	/**
@@ -250,9 +242,13 @@ class View {
 	 * 		does not.
 	 */
 	public function __get($varName) {
-		if (isset(static::$vars[$varName]))
-			return static::$vars[$varName];
-		return false;
+		try {
+			$val = $this->requestContext->get($varName);
+		}
+		catch (NoSuchVariableException $e) {
+			return false;
+		}
+		return $val;
 	}
 	
 	/**
@@ -265,7 +261,7 @@ class View {
 	 * @param value mixed The value to which the variable should be set.
 	 */
 	public function __set($varName, $value) {
-		static::$vars[$varName] = $value;
+		$this->requestContext->set($varName, $value);
 	}
 	
 	/**
@@ -277,7 +273,7 @@ class View {
 	 * @return boolean true if set, false if not set.
 	 */
 	public function __isset($varName) {
-		return isset(static::$vars[$varName]);
+		return $this->requestContext->keyExists($varName);
 	}
 	
 	/**
@@ -288,13 +284,25 @@ class View {
 	 * @param varName string The name of the variable to unset.
 	 */
 	public function __unset($varName) {
-		unset(static::$vars[$varName]);
+		$this->requestContext->delete($varName);
 	}
 	
 	/**
 	 * This class should not be instantiated outside of View.
 	 */
-	protected function __construct() {}
+	protected function __construct() {
+		$this->requestContext = new ContextStack();
+		$this->$appURL = Config::getRequiredVal("general", "app_url");
+		if ($this->appURL[strlen($this->appURL) - 1] == '/')
+			$this->appURL = substr($this->appURL, 0, -1);
+		$this->viewURL = Config::getVal("view", "root_url");
+		if ($this->viewURL === false) {
+			$this->viewURL = $this->appURL(Config::getRequiredVal("view", 
+				"url_path"));
+		}
+		if ($this->viewURL[strlen($this->viewURL) - 1] == '/')
+			$this->viewURL = substr($this->viewURL, 0, -1);
+	}
 	
 }
 

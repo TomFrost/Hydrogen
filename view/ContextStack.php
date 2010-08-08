@@ -16,7 +16,7 @@ class ContextStack {
 		$this->stack = array(array());
 		$this->stackLevel = array();
 		if (is_array($initialData))
-			$this->setArray($initilData);
+			$this->setArray($initialData);
 	}
 	
 	public function push() {
@@ -42,12 +42,29 @@ class ContextStack {
 		$this->stack[$level][$key] = $value;
 	}
 	
+	public function setArray($kvArray) {
+		foreach ($kvArray as $key => $value)
+			$this->set($key, $value);
+	}
+	
 	public function get($key) {
-		if (!isset($this->stackLevel[$key])) {
+		if (!$this->keyExists($key)) {
 			throw new NoSuchVariableException(
 				"Variable does not exist in context: $key");
 		}
 		return $this->stack[$this->stackLevel[$key]][$key];
+	}
+	
+	public function delete($key) {
+		if (!$this->keyExists($key)) {
+			throw new NoSuchVariableException(
+				"Variable does not exist in context: $key");
+		}
+		unset($this->stack[$this->stackLevel[$key]][$key]);
+	}
+	
+	public function keyExists($key) {
+		return isset($this->stackLevel[$key]);
 	}
 }
 

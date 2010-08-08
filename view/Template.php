@@ -29,11 +29,14 @@ class Template {
 	/**
 	 * Shows the rendered view, caching it or reading it from the cache if
 	 * appropriate.
+	 *
+	 * @param ContextStack context The appropriate context to use for rendering
+	 * 		this template.
 	 */
-	public function render() {
+	public function render($context) {
 		if (!$this->displayCached()) {
 			$parser = new Parser($this->viewName, $this->loader);
-			$nodeList = $parser->parse();
+			$nodeList = $parser->parse($context);
 			echo $nodeList->render();
 		}
 	}

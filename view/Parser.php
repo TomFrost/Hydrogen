@@ -13,8 +13,10 @@ class Parser {
 	protected $loader;
 	protected $tokens;
 	protected $cursor;
+	protected $context;
 
-	public function __construct($viewName, $loader) {
+	public function __construct($viewName, $context, $loader) {
+		$this->context = $context;
 		$this->loader = $loader;
 		$this->tokens = array();
 		$this->cursor = 0;
@@ -40,7 +42,9 @@ class Parser {
 					break;
 				case Lexer::TOKEN_VARIABLE:
 					$nodeList->addNode(
-						new VariableNode($this->tokens[$this->cursor]->data)
+						$this->getVariableNode(
+							$this->tokens[$this->cursor]->data
+						)
 					);
 					break;
 				case Lexer::TOKEN_BLOCK:
@@ -52,7 +56,11 @@ class Parser {
 		return $nodeList;
 	}
 	
-	protected function getBlockNode($data) {
+	protected function getVariableNode($data) {
+		
+	}
+	
+	protected function getBlockNode($origin, $data) {
 		
 	}
 }
