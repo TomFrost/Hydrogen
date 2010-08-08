@@ -49,7 +49,10 @@ class Parser {
 					break;
 				case Lexer::TOKEN_BLOCK:
 					$nodeList->addNode(
-						$this->getBlockNode($this->tokens[$this->cursor]->data)
+						$this->getBlockNode(
+							$this->tokens[$this->cursor]->origin,
+							$this->tokens[$this->cursor]->data
+						)
 					);
 			}
 		}

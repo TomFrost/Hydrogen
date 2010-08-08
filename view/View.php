@@ -140,7 +140,7 @@ class View {
 	 */
 	protected function displayTemplate($viewName) {
 		$template = new Template($viewName);
-		$template->render();
+		$template->render($this->requestContext);
 	}
 	
 	/**
@@ -292,7 +292,7 @@ class View {
 	 */
 	protected function __construct() {
 		$this->requestContext = new ContextStack();
-		$this->$appURL = Config::getRequiredVal("general", "app_url");
+		$this->appURL = Config::getRequiredVal("general", "app_url");
 		if ($this->appURL[strlen($this->appURL) - 1] == '/')
 			$this->appURL = substr($this->appURL, 0, -1);
 		$this->viewURL = Config::getVal("view", "root_url");
