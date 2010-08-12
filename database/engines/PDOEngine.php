@@ -50,7 +50,7 @@ abstract class PDOEngine extends DatabaseEngine {
 	
 	public function exec($statement) {
 		try {
-			return new PDOStatement($this->pdo->execute($statement));
+			return $this->pdo->exec($statement);
 		}
 		catch (PDOException $e) {
 			throw new InvalidSQLException("Invalid SQL. Statement could not be executed.");
