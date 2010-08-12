@@ -74,7 +74,7 @@ class Parser {
 	
 	protected function getVariableNode($origin, $data) {
 		$var = Lexer::getVariable($data, $filters);
-		return new VariableNode($var, $filters, $origin);
+		return new VariableNode($var, $filters, $this->context, $origin);
 	}
 	
 	protected function getBlockNode($origin, $data) {
@@ -82,7 +82,7 @@ class Parser {
 		$class = '\hydrogen\view\tags\\' . $cmd . 'Tag';
 		if (!@class_exists($class))
 			throw new NoSuchTagException("Tag in $origin does not exist: $cmd");
-		return $class::getNode($cmd, $args, $this, $origin);
+		return $class::getNode($cmd, $args, $this, $this->context, $origin);
 	}
 }
 
