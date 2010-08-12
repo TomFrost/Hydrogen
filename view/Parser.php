@@ -8,6 +8,7 @@ namespace hydrogen\view;
 
 use hydrogen\view\Lexer;
 use hydrogen\view\NodeList;
+use hydrogen\view\exceptions\NoSuchTagException;
 
 class Parser {
 	protected $loader;
@@ -43,11 +44,15 @@ class Parser {
 				case Lexer::TOKEN_VARIABLE:
 					$nodeList->addNode(
 						$this->getVariableNode(
+							$this->tokens[$this->cursor]->origin,
 							$this->tokens[$this->cursor]->data
 						)
 					);
 					break;
 				case Lexer::TOKEN_BLOCK:
+					if (in_array($this->tokens[$this->cursor]->data,
+							$untilBlock))
+						break;
 					$nodeList->addNode(
 						$this->getBlockNode(
 							$this->tokens[$this->cursor]->origin,
@@ -59,12 +64,25 @@ class Parser {
 		return $nodeList;
 	}
 	
-	protected function getVariableNode($data) {
-		
+	public function incrementCursor($incBy=1) {
+		$this->cursor += $incBy;
+	}
+	
+	public function getTokenAtCurson() {
+		return $this->tokens[$this->cursor];
+	}
+	
+	protected function getVariableNode($origin, $data) {
+		$var = Lexer::getVariable($data, $filters);
+		return new VariableNode($var, $filters, $origin);
 	}
 	
 	protected function getBlockNode($origin, $data) {
-		
+		$cmd = Lexer::getBlockCommand($data, $args);
+		$class = '\hydrogen\view\tags\\' . $cmd . 'Tag';
+		if (!@class_exists($class))
+			throw new NoSuchTagException("Tag in $origin does not exist: $cmd");
+		return $class::getNode($cmd, $args, $this, $origin);
 	}
 }
 
