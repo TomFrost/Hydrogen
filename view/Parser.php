@@ -68,7 +68,7 @@ class Parser {
 		$this->cursor += $incBy;
 	}
 	
-	public function getTokenAtCurson() {
+	public function getTokenAtCursor() {
 		return $this->tokens[$this->cursor];
 	}
 	
