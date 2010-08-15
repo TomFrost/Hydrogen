@@ -101,7 +101,7 @@ class Parser {
 	
 	protected function getVariableNode($origin, $data) {
 		$var = Lexer::getVariable($data, $filters);
-		return new VariableNode($var, $filters, $this->context, $origin);
+		return new VariableNode($var, $filters, $origin);
 	}
 	
 	protected function getBlockNode($origin, $data) {
@@ -111,7 +111,7 @@ class Parser {
 			throw new NoSuchTagException("Tag in $origin does not exist: $cmd");
 		if ($class::MUST_BE_FIRST && $this->originHasNodes($origin))
 			throw new TemplateSyntaxException("Tag must be first in template: $cmd");
-		return $class::getNode($cmd, $args, $this, $this->context, $origin);
+		return $class::getNode($cmd, $args, $this, $origin);
 	}
 }
 
