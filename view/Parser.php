@@ -56,7 +56,8 @@ class Parser {
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_BLOCK:
-					if (in_array($token->data, $untilBlock)) {
+					if ($untilBlock !== false &&
+							in_array($token->data, $untilBlock)) {
 						$reachedUntil = true;
 						break;
 					}
