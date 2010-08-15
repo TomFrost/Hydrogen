@@ -58,10 +58,11 @@ class Parser {
 						$reachedUntil = true;
 						break;
 					}
-					$nodeList->addNode(
-						$this->getBlockNode($token->origin, $token->data)
-					);
-					$this->originNodes[$token->origin] = true;
+					$node = $this->getBlockNode($token->origin, $token->data);
+					if ($node) {
+						$nodeList->addNode($node);
+						$this->originNodes[$token->origin] = true;
+					}
 			}
 		}
 		if (is_array($untilBlock) && !$reachedUntil) {
