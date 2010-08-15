@@ -135,7 +135,7 @@ class ErrorHandler {
 	}
 	
 	public static function handleError($errno, $errstr, $errfile, $errline) {
-		if (Config::getVal("errorhandler", "log_errors", 1) == 1)
+		if (Config::getVal("errorhandler", "log_errors") == "1")
 			Log::error($errstr, $errfile, $errline);
 		ob_end_clean();
 		$ad = static::$handlerStack[count(static::$handlerStack) - 1];
