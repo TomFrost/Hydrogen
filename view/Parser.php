@@ -17,6 +17,7 @@ class Parser {
 	protected $cursor;
 	protected $context;
 	protected $originNodes;
+	protected $originParent;
 
 	public function __construct($viewName, $context, $loader) {
 		$this->context = $context;
@@ -24,6 +25,7 @@ class Parser {
 		$this->tokens = array();
 		$this->cursor = 0;
 		$this->originNodes = array();
+		$this->originParent = array();
 		$this->addPage($viewName);
 	}
 	
@@ -84,6 +86,16 @@ class Parser {
 	
 	public function originHasNodes($origin) {
 		return isset($this->originNodes[$origin]);
+	}
+	
+	public function getParent($origin) {
+		if (!isset($this->originParent[$origin]))
+			return false;
+		return $this->originParent[$origin];
+	}
+	
+	public function setOriginParent($origin, $parent) {
+		$this->originParent[$origin] = $parent;
 	}
 	
 	protected function getVariableNode($origin, $data) {
