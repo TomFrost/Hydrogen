@@ -6,15 +6,15 @@
 
 namespace hydrogen\view;
 
-class Token {
-	public $type;
-	public $data;
-	public $origin;
+abstract class Token {
+	const TOKEN_TYPE = 0;
 	
-	public function __construct($type, $origin, $data) {
-		$this->type = $type;
-		$this->data = $data;
-		$this->origin = $origin;
+	public $origin;
+	public $raw;
+	
+	public function __construct($origin, $raw) {
+		$this->origin = &$origin;
+		$this->raw = &$raw;
 	}
 }
 
