@@ -146,15 +146,18 @@ class Lexer {
 	}
 	
 	protected static function getVariableToken($origin, $data) {
-		$tokens = static::quoteSafeExplode($data, VARIABLE_FILTER_SEPARATOR);
+		$tokens = static::quoteSafeExplode($data,
+			self::VARIABLE_FILTER_SEPARATOR);
 		$varStr = array_shift($tokens);
-		$drillDowns = explode(VARIABLE_LEVEL_SEPARATOR, $varStr);
-		$var = array_shift($varStack);
+		$drillDowns = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
+		$var = array_shift($drillDowns);
 		$filters = array();
 		foreach ($tokens as $token) {
 			$fArgs = static::quoteSafeExplode($token,
-				VARIABLE_FILTER_ARGUMENT_SEPARATOR);
+				self::VARIABLE_FILTER_ARGUMENT_SEPARATOR);
 			$filter = array_shift($fArgs);
+			for ($i = 0; $i < count($fArgs); $i++)
+				$fArgs[$i] = stripslashes($fArgs[$i]);
 			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
 		}
 		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
