@@ -74,6 +74,32 @@ class Lexer {
 		return $tokens;
 	}
 	
+	public static function getBlockToken($origin, $data) {
+		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
+		if (!$split)
+			throw new TemplateSyntaxException("Empty block tag in $origin");
+		return new BlockToken($origin, $raw, $split[0],
+			isset($split[1]) ? $split[1] : false);
+	}
+	
+	public static function getVariableToken($origin, $data) {
+		$tokens = static::quoteSafeExplode($data,
+			self::VARIABLE_FILTER_SEPARATOR);
+		$varStr = array_shift($tokens);
+		$drillDowns = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
+		$var = array_shift($drillDowns);
+		$filters = array();
+		foreach ($tokens as $token) {
+			$fArgs = static::quoteSafeExplode($token,
+				self::VARIABLE_FILTER_ARGUMENT_SEPARATOR);
+			$filter = array_shift($fArgs);
+			for ($i = 0; $i < count($fArgs); $i++)
+				$fArgs[$i] = stripslashes($fArgs[$i]);
+			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
+		}
+		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
+	}
+	
 	public static function quoteSafeExplode($str, $delim,
 			$enclosure='"', $esc='\\', $limit=false) {
 		$exploded = array();
@@ -135,32 +161,6 @@ class Lexer {
 				$min = $num;
 		}
 		return $min;
-	}
-	
-	protected static function getBlockToken($origin, $data) {
-		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
-		if (!$split)
-			throw new TemplateSyntaxException("Empty block tag in $origin");
-		return new BlockToken($origin, $raw, $split[0],
-			isset($split[1]) ? $split[1] : false);
-	}
-	
-	protected static function getVariableToken($origin, $data) {
-		$tokens = static::quoteSafeExplode($data,
-			self::VARIABLE_FILTER_SEPARATOR);
-		$varStr = array_shift($tokens);
-		$drillDowns = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
-		$var = array_shift($drillDowns);
-		$filters = array();
-		foreach ($tokens as $token) {
-			$fArgs = static::quoteSafeExplode($token,
-				self::VARIABLE_FILTER_ARGUMENT_SEPARATOR);
-			$filter = array_shift($fArgs);
-			for ($i = 0; $i < count($fArgs); $i++)
-				$fArgs[$i] = stripslashes($fArgs[$i]);
-			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
-		}
-		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
 	}
 	
 	protected static function surroundedBy($haystack, $startsWith, $endsWith) {
