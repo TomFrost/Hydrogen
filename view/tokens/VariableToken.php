@@ -19,8 +19,8 @@ class VariableToken extends Token {
 	public $drillDowns;
 	public $filters;
 	
-	public function __construct($origin, $raw, $variable, $drillDowns=false,
-			$filters=false) {
+	public function __construct($origin, $raw, $variable, $drillDowns,
+			$filters) {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
 		$this->variable = &$variable;

@@ -74,6 +74,62 @@ class Lexer {
 		return $tokens;
 	}
 	
+	public static function quoteSafeExplode($str, $delim,
+			$enclosure='"', $esc='\\', $limit=false) {
+		$exploded = array();
+		$inQuotes = false;
+		$escaping = false;
+		$cursor = 0;
+		if ($limit !== false && $limit < 1)
+			$limit = 1;
+		while (true) {
+			// Get the first artefact
+			$dPos = strpos($str, $delim, $cursor);
+			$qPos = strpos($str, $enclosure, $cursor);
+			$ePos = strpos($str, $esc, $cursor);
+			$cursor = static::minIgnoreFalse(array($dPos, $qPos, $ePos));
+			
+			// Are we done?
+			if ($cursor === false ||
+					($limit !== false && count($exploded) == $limit - 1)) {
+				$exploded[] = $str;
+				break;
+			}
+			
+			// Start the state machine
+			if ($cursor === $dPos) {
+				if (!$inQuotes) {
+					$exploded[] = substr($str, 0, $cursor);
+					$str = substr($str, $cursor + 1);
+					$cursor = 0;
+				}
+				else
+					$cursor++;
+			}
+			else if ($cursor === $qPos) {
+				if ($escaping)
+					$escaping = false;
+				else
+					$inQuotes = !$inQuotes;
+				$cursor++;
+			}
+			else if ($cursor === $ePos) {
+				$escaping = !$escaping;
+				$cursor++;
+			}
+		}
+		return $exploded;
+	}
+	
+	protected static function minIgnoreFalse($nums) {
+		$min = false;
+		foreach ($nums as $num) {
+			if ($num !== false && ($min === false || $num < $min))
+				$min = $num;
+		}
+		return $min;
+	}
+	
 	protected static function getBlockToken($origin, $data) {
 		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
 		if (!$split)
@@ -83,7 +139,18 @@ class Lexer {
 	}
 	
 	protected static function getVariableToken($origin, $data) {
-		
+		$tokens = static::quoteSafeExplode($data, VARIABLE_FILTER_SEPARATOR);
+		$varStr = array_shift($tokens);
+		$drillDowns = explode(VARIABLE_LEVEL_SEPARATOR, $varStr);
+		$var = array_shift($varStack);
+		$filters = array();
+		foreach ($tokens as $token) {
+			$fArgs = static::quoteSafeExplode($token,
+				VARIABLE_FILTER_ARGUMENT_SEPARATOR);
+			$filter = array_shift($fArgs);
+			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
+		}
+		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
 	}
 	
 	protected static function surroundedBy($haystack, $startsWith, $endsWith) {

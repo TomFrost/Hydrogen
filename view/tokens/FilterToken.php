@@ -18,7 +18,7 @@ class FilterToken extends Token {
 	public $filter;
 	public $args;
 	
-	public function __construct($origin, $raw, $filter, $args=false) {
+	public function __construct($origin, $raw, $filter, $args) {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
 		$this->filter = &$filter;
