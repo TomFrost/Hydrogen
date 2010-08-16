@@ -22,7 +22,7 @@ class FilterToken extends Token {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
 		$this->filter = &$filter;
-		$this->args = $args ?: array();
+		$this->args = &$args;
 	}
 }
 

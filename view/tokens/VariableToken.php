@@ -15,13 +15,16 @@ class VariableToken extends Token {
 	
 	public $origin;
 	public $raw;
-	public $varStack;
+	public $variable;
+	public $drillDowns;
 	public $filters;
 	
-	public function __construct($origin, $raw, $varStack, $filters=false) {
+	public function __construct($origin, $raw, $variable, $drillDowns=false,
+			$filters=false) {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
-		$this->varStack = is_array($varStack) ? $varStack : array($varStack);
+		$this->variable = &$variable;
+		$this->drillDowns = &$drillDowns;
 		$this->filters = &$filters;
 	}
 }
