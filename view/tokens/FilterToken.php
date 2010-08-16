@@ -13,8 +13,6 @@ class FilterToken extends Token {
 	// Reflection to get the class name is slow, but constants are fast :)
 	const TOKEN_TYPE = Lexer::TOKEN_FILTER;
 	
-	public $origin;
-	public $raw;
 	public $filter;
 	public $args;
 	

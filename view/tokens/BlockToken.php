@@ -13,8 +13,6 @@ class BlockToken extends Token {
 	// Reflection to get the class name is slow, but constants are fast :)
 	const TOKEN_TYPE = Lexer::TOKEN_BLOCK;
 	
-	public $origin;
-	public $raw;
 	public $cmd;
 	public $args;
 	
