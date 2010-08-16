@@ -79,6 +79,7 @@ class Lexer {
 		$exploded = array();
 		$inQuotes = false;
 		$escaping = false;
+		$lastEscape = false;
 		$cursor = 0;
 		if ($limit !== false && $limit < 1)
 			$limit = 1;
@@ -95,6 +96,10 @@ class Lexer {
 				$exploded[] = $str;
 				break;
 			}
+			
+			// Should we kill the escape?
+			if ($escaping && $lastEscape !== false && $lastEscape < $cursor - 1)
+				$escaping = false;
 			
 			// Start the state machine
 			if ($cursor === $dPos) {
@@ -115,6 +120,8 @@ class Lexer {
 			}
 			else if ($cursor === $ePos) {
 				$escaping = !$escaping;
+				if ($escaping)
+					$lastEscape = $cursor;
 				$cursor++;
 			}
 		}
