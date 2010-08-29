@@ -104,7 +104,7 @@ class Parser {
 	protected function getBlockNode($origin, $cmd, $args) {
 		$class = '\hydrogen\view\tags\\' . $cmd . 'Tag';
 		if (!@class_exists($class))
-			throw new NoSuchTagException("Tag in $origin does not exist: $cmd");
+			throw new NoSuchTagException("Tag in template \"$origin\" does not exist: $cmd");
 		if ($class::MUST_BE_FIRST && $this->originHasNodes($origin))
 			throw new TemplateSyntaxException("Tag must be first in template: $cmd");
 		return $class::getNode($cmd, $args, $this, $origin);
