@@ -80,7 +80,7 @@ class Lexer {
 		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
 		if (!$split)
 			throw new TemplateSyntaxException("Empty block tag in $origin");
-		return new BlockToken($origin, $raw, $split[0],
+		return new BlockToken($origin, $data, $split[0],
 			isset($split[1]) ? $split[1] : false);
 	}
 	
