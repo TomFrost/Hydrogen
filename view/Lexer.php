@@ -12,6 +12,7 @@ use hydrogen\view\tokens\CommentToken;
 use hydrogen\view\tokens\FilterToken;
 use hydrogen\view\tokens\TextToken;
 use hydrogen\view\tokens\VariableToken;
+use hydrogen\view\tokens\ArgumentToken;
 use hydrogen\view\exceptions\TemplateSyntaxException;
 
 class Lexer {
@@ -20,6 +21,7 @@ class Lexer {
 	const TOKEN_FILTER = 3;
 	const TOKEN_TEXT = 4;
 	const TOKEN_VARIABLE = 5;
+	const TOKEN_ARGUMENT = 6;
 	
 	const BLOCK_OPENTAG = "{%";
 	const BLOCK_CLOSETAG = "%}";
@@ -93,8 +95,18 @@ class Lexer {
 			$fArgs = static::quoteSafeExplode($token,
 				self::VARIABLE_FILTER_ARGUMENT_SEPARATOR);
 			$filter = array_shift($fArgs);
-			for ($i = 0; $i < count($fArgs); $i++)
-				$fArgs[$i] = stripslashes($fArgs[$i]);
+			for ($i = 0; $i < count($fArgs); $i++) {
+				if (static::surroundedby($fArgs[$i], '"', '"')) {
+					$fArgs[$i] = stripslashes($fArgs[$i]);
+					$fArgs[$i] = new ArgumentToken($origin, $fArgs[$i],
+						ArgumentToken::ARG_NATIVE, substr($fArgs[$i], 1, -1));
+				}
+				else {
+					$fArgs[$i] = new ArgumentToken($origin, $fArgs[$i],
+						ArgumentToken::ARG_VARIABLE,
+						static::getVariableToken($origin, $fArgs[$i]));
+				}
+			}
 			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
 		}
 		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
