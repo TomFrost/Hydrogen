@@ -42,26 +42,28 @@ class Parser {
 		$nodeList = new NodeList();
 		for (; $this->cursor < count($this->tokens); $this->cursor++) {
 			$token = $this->tokens[$this->cursor];
-			switch ($token->type) {
+			switch ($token::TOKEN_TYPE) {
 				case Lexer::TOKEN_TEXT:
 					$nodeList->addNode(
-						new TextNode($token->data)
+						new TextNode($token->raw)
 					);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_VARIABLE:
 					$nodeList->addNode(
-						$this->getVariableNode($token->origin, $token->data)
+						new VariableNode($token->variable, $token->drilldowns,
+							$token->filters, $token->origin)
 					);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_BLOCK:
 					if ($untilBlock !== false &&
-							in_array($token->data, $untilBlock)) {
+							in_array($token->raw, $untilBlock)) {
 						$reachedUntil = true;
 						break;
 					}
-					$node = $this->getBlockNode($token->origin, $token->data);
+					$node = $this->getBlockNode($token->origin, $token->cmd,
+						$token->args);
 					if ($node) {
 						$nodeList->addNode($node);
 						$this->originNodes[$token->origin] = true;
@@ -99,13 +101,7 @@ class Parser {
 		$this->originParent[$origin] = $parent;
 	}
 	
-	protected function getVariableNode($origin, $data) {
-		$var = Lexer::getVariable($data, $filters);
-		return new VariableNode($var, $filters, $origin);
-	}
-	
-	protected function getBlockNode($origin, $data) {
-		$cmd = Lexer::getBlockCommand($data, $args);
+	protected function getBlockNode($origin, $cmd, $args) {
 		$class = '\hydrogen\view\tags\\' . $cmd . 'Tag';
 		if (!@class_exists($class))
 			throw new NoSuchTagException("Tag in $origin does not exist: $cmd");
