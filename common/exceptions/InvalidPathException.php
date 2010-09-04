@@ -4,7 +4,7 @@
 * All rights reserved.
 */
 
-namespace hydrogen\config\exceptions;
+namespace hydrogen\common\exceptions;
 
 class InvalidPathException extends \Exception {
 	

@@ -12,8 +12,7 @@ use hydrogen\config\exceptions\ConfigFileNotFoundException;
 use hydrogen\config\exceptions\InvalidConfigFileException;
 use hydrogen\config\exceptions\ConfigCacheDirNotWritableException;
 use hydrogen\config\exceptions\ConfigCacheDirNotFoundException;
-use hydrogen\config\exceptions\InvalidPathException;
-use hydrogen\config\exceptions\IllegalBasePathException;
+use hydrogen\common\exceptions\InvalidPathException;
 use hydrogen\semaphore\SemaphoreEngineFactory;
 
 /**
