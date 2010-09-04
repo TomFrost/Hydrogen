@@ -9,6 +9,7 @@ namespace hydrogen\log\engines;
 use hydrogen\log\Log;
 use hydrogen\log\LogEngine;
 use hydrogen\config\Config;
+use hydrogen\common\exceptions\InvalidPathException;
 
 class TextFileEngine implements LogEngine {
 	
