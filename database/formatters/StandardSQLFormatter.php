@@ -237,7 +237,7 @@ class StandardSQLFormatter extends QueryFormatter {
 					$str .= $mod . ' ';
 			}
 			if (!isset($clause['fields']))
-				throw new InvalidSQLExcpetion('SELECT has no fields.');
+				throw new InvalidSQLException('SELECT has no fields.');
 			foreach ($clause['fields'] as $field) {
 				if (!isset($field['field']))
 					throw new InvalidSQLException('Field name not set in SELECT statement.');
