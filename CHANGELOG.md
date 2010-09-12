@@ -5,6 +5,41 @@
 ChangeLog
 ---------
 
+### v0.2.5
+- **Hydrogen**
+	- Added 'common' library to store classes used across multiple Hydrogen libraries.
+	- Important changes to the autoconfig file to support new Config library features.  Current Hydrogen users will need to update their autoconfigs to use the new sample template.
+
+- **Common**
+	- Created abstract class "MagicCacheable" making it easy to implement and hook Hydrogen's Magic Cache pattern across other classes.  Detailed documentation included.
+	- Added NoSuchMethodException for use with MagicCacheable.
+	- Added InvalidPathException, used by both Config and Log.
+
+- **Config**
+	- Changed ALL SAMPLE CONFIG FILES with completely new structure.  Current Hydrogen users MUST update their config files to be compatible with the new formats.
+	- Rewrote config loader to support the new config file templates, allowing the use of multiple config files, cacheing with file-based semaphores instead of config file-controlled semaphores, and support for caching multiple like-named config files.
+	- New Config library API to support cache path/base path getters and setters, addConfig instead of loadConfig (now possible to load additional configurations without replacing what was already loaded), replaceConfig (for when you do want to replace), and addConfigArray (for adding raw, already-processed config values)
+	- New format for cached config files.  For people upgrading, Config will detect when an old cached config is present and update it with the new format automatically.  No code changes necessary.
+	- InvalidPathException is now in the 'common' namespace.
+
+- **Controller**
+	- Rewritten to extend the new MagicCacheable class.
+	- Controller now caches both the function output _and_ its return value.  This is helpful for controllers that call cached versions of other controllers.
+
+- **Database**
+	- Verb and method arrays in Query have been moved to the protected scope
+	- Bugfix: Changed reference to PDO::execute() to PDO::exec() in PDOEngine.
+	- Bugfix: InvalidSQLException had a typo and would generate an error instead of properly throwing the exception ([Issue #2](http://github.com/TomFrost/Hydrogen/issues/closed#issue/2)). Resolved.
+
+- **ErrorHandler**
+	- Bugfix: ErrorHandler was never updated to use the new getVal/getRequiredVal Config API changes, and as a result, would not log errors even when error logging was turned on.  Resolved.
+
+- **Log**
+	- Bugfix: InvalidPathException reference was invalid.  Log now throws the InvalidPathException added to the new Common namespace.
+
+- **Model**
+	- Rewritten to extend the new MagicCacheable class.
+
 ### v0.2.0
 - **Hydrogen**
 	- Drastically changed the autoconfig file.  See comments for new instructions on this file.
