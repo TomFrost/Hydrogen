@@ -8,6 +8,8 @@ namespace hydrogen\view;
 
 use hydrogen\view\Lexer;
 use hydrogen\view\NodeArray;
+use hydrogen\view\nodes\TextNode;
+use hydrogen\view\nodes\VariableNode;
 use hydrogen\view\exceptions\NoSuchTagException;
 use hydrogen\view\exceptions\TemplateSyntaxException;
 
@@ -17,6 +19,7 @@ class Parser {
 	protected $context;
 	protected $originNodes;
 	protected $originParent;
+	protected $objs;
 
 	public function __construct($viewName, $context, $loader) {
 		$this->context = $context;
@@ -82,6 +85,8 @@ class Parser {
 						$this->originNodes[$token->origin] = true;
 					}
 			}
+			if ($reachedUntil === true)
+				break;
 		}
 		if ($untilBlock !== false && !$reachedUntil) {
 			throw new NoSuchBlockException("Block(s) not found: " .
@@ -95,7 +100,7 @@ class Parser {
 	}
 	
 	public function peekNextToken() {
-		return $this->tokens[0] ?: false;
+		return isset($this->tokens[0]) ? $this->tokens[0] : false;
 	}
 	
 	public function originHasNodes($origin) {
@@ -110,6 +115,14 @@ class Parser {
 	
 	public function setOriginParent($origin, $parent) {
 		$this->originParent[$origin] = $parent;
+	}
+	
+	public function registerObject($key, $val) {
+		$this->objs[$key] = $val;
+	}
+	
+	public function getObject($key) {
+		return isset($this->objs[$key]) ? $this->objs[$key] : false;
 	}
 	
 	protected function getBlockNode($origin, $cmd, $args) {
