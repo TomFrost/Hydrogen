@@ -9,7 +9,7 @@ namespace hydrogen\view;
 interface Tag {
 	const MUST_BE_FIRST = false;
 	
-	public function getNode($origin, $data, $parser);
+	public static function getNode($origin, $data, $parser);
 }
 
 ?>

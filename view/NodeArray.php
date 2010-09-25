@@ -6,20 +6,10 @@
 
 namespace hydrogen\view;
 
-class NodeList {
-	protected $nodes;
-	
-	public function __construct() {
-		$this->nodes = array();
-	}
-	
-	public function addNode($node) {
-		$this->nodes[] = $node;
-	}
-	
+class NodeArray extends \ArrayObject {
 	public function render() {
 		$rendered = '';
-		foreach ($this->nodes as $node)
+		foreach ($this as $node)
 			$rendered .= $node->render();
 		return $rendered;
 	}

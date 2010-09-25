@@ -7,7 +7,7 @@
 namespace hydrogen\view;
 
 use hydrogen\view\Lexer;
-use hydrogen\view\NodeList;
+use hydrogen\view\NodeArray;
 use hydrogen\view\exceptions\NoSuchTagException;
 use hydrogen\view\exceptions\TemplateSyntaxException;
 
@@ -39,21 +39,18 @@ class Parser {
 		if ($untilBlock !== false && !is_array($untilBlock))
 			$untilBlock = array($untilBlock);
 		$reachedUntil = false;
-		$nodeList = new NodeList();
+		$nodes = new NodeArray();
 		for (; $this->cursor < count($this->tokens); $this->cursor++) {
 			$token = $this->tokens[$this->cursor];
 			switch ($token::TOKEN_TYPE) {
 				case Lexer::TOKEN_TEXT:
-					$nodeList->addNode(
-						new TextNode($token->raw)
-					);
+					$nodes[] = new TextNode($token->raw);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_VARIABLE:
-					$nodeList->addNode(
-						new VariableNode($token->variable, $token->drilldowns,
-							$token->filters, $token->origin)
-					);
+					$nodes[] = new VariableNode($token->variable,
+							$token->drilldowns, $token->filters,
+							$token->origin);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_BLOCK:
@@ -65,7 +62,7 @@ class Parser {
 					$node = $this->getBlockNode($token->origin, $token->cmd,
 						$token->args);
 					if ($node) {
-						$nodeList->addNode($node);
+						$nodes[] = $node;
 						$this->originNodes[$token->origin] = true;
 					}
 			}
@@ -74,7 +71,7 @@ class Parser {
 			throw new NoSuchBlockException("Block(s) not found: " .
 				implode(", ", $untilBlock));
 		}
-		return $nodeList;
+		return $nodes;
 	}
 	
 	public function incrementCursor($incBy=1) {

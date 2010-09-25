@@ -36,8 +36,8 @@ class Template {
 	public function render($context) {
 		if (!$this->displayCached()) {
 			$parser = new Parser($this->viewName, $context, $this->loader);
-			$nodeList = $parser->parse();
-			echo $nodeList->render();
+			$nodes = $parser->parse();
+			echo $nodes->render();
 		}
 	}
 	
