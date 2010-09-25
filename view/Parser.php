@@ -14,7 +14,6 @@ use hydrogen\view\exceptions\TemplateSyntaxException;
 class Parser {
 	protected $loader;
 	protected $tokens;
-	protected $cursor;
 	protected $context;
 	protected $originNodes;
 	protected $originParent;
@@ -22,17 +21,34 @@ class Parser {
 	public function __construct($viewName, $context, $loader) {
 		$this->context = $context;
 		$this->loader = $loader;
-		$this->tokens = array();
-		$this->cursor = 0;
 		$this->originNodes = array();
 		$this->originParent = array();
-		$this->addPage($viewName);
+		$this->tokens = $this->getTokensForPage($viewName);
 	}
 	
-	public function addPage($pageName) {
+	protected function getTokensForPage(&$pageName) {
 		$page = $this->loader->load($pageName);
-		$pageTokens = Lexer::tokenize($pageName, $page);
-		array_splice($this->tokens, $this->cursor, 0, $pageTokens);
+		return Lexer::tokenize($pageName, $page);
+	}
+	
+	public function appendPage(&$pageName) {
+		$pageTokens = $this->getTokensForPage($pageName);
+		
+		// array_merge and array_splice take too much ram due to the
+		// duplication of array data.  Combining array_shift with array_push
+		// maintains current RAM usage.
+		while ($val = array_shift($pageTokens))
+			array_push($this->tokens, $val);
+	}
+	
+	public function prependPage(&$pageName) {
+		$pageTokens = $this->getTokensForPage($pageName);
+		
+		// array_merge and array_splice take too much ram due to the
+		// duplication of array data.  Combining array_pop with array_unshift
+		// maintains current RAM usage.
+		while ($val = array_pop($pageTokens))
+			array_unshift($this->tokens, $val);
 	}
 	
 	public function parse($untilBlock=false) {
@@ -40,8 +56,7 @@ class Parser {
 			$untilBlock = array($untilBlock);
 		$reachedUntil = false;
 		$nodes = new NodeArray();
-		for (; $this->cursor < count($this->tokens); $this->cursor++) {
-			$token = $this->tokens[$this->cursor];
+		while ($token = array_shift($this->tokens)) {
 			switch ($token::TOKEN_TYPE) {
 				case Lexer::TOKEN_TEXT:
 					$nodes[] = new TextNode($token->raw);
@@ -57,6 +72,7 @@ class Parser {
 					if ($untilBlock !== false &&
 							in_array($token->raw, $untilBlock)) {
 						$reachedUntil = true;
+						array_unshift($this->tokens, $token);
 						break;
 					}
 					$node = $this->getBlockNode($token->origin, $token->cmd,
@@ -67,21 +83,19 @@ class Parser {
 					}
 			}
 		}
-		if (is_array($untilBlock) && !$reachedUntil) {
+		if ($untilBlock !== false && !$reachedUntil) {
 			throw new NoSuchBlockException("Block(s) not found: " .
 				implode(", ", $untilBlock));
 		}
 		return $nodes;
 	}
 	
-	public function incrementCursor($incBy=1) {
-		$this->cursor += $incBy;
+	public function skipNextToken() {
+		array_shift($this->tokens);
 	}
 	
-	public function getTokenAtCursor() {
-		if (isset($this->tokens[$this->cursor]))
-			return $this->tokens[$this->cursor];
-		return false;
+	public function peekNextToken() {
+		return $this->tokens[0] ?: false;
 	}
 	
 	public function originHasNodes($origin) {
