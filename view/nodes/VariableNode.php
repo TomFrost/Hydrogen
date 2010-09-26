@@ -37,6 +37,14 @@ class VariableNode implements Node {
 				$var = $var[$dd];
 			else if (isset($var->$dd))
 				$var = $var->$dd;
+			else if (is_object($var)) {
+				$methods = get_class_methods($var);
+				if (in_array(($func = "get" . ucfirst($dd)), $methods) ||
+						in_array(($func = "is" . ucfirst($dd)), $methods) ||
+						in_array(($func = "get_" . $dd), $methods) ||
+						in_array(($func = "is_" . $dd), $methods))
+					$var = call_user_func(array($var, $func));
+			}
 			else {
 				$varName = $this->variable;
 				for ($i = 0; $i <= $level; $i++)
