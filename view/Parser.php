@@ -60,10 +60,16 @@ class Parser {
 		while ($token = array_shift($this->tokens)) {
 			switch ($token::TOKEN_TYPE) {
 				case Lexer::TOKEN_TEXT:
+					if ($this->getParent($token->origin) !== false)
+						throw new TemplateSyntaxException('Template "' .
+							$token->origin . '" is extendend and cannot contain plain text outside of a block.');
 					$nodes[] = new TextNode($token->raw);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_VARIABLE:
+					if ($this->getParent($token->origin) !== false)
+						throw new TemplateSyntaxException('Template "' .
+							$token->origin . '" is extendend and cannot variables outside of a block.');
 					$nodes[] = new VariableNode($token->variable,
 							$token->drillDowns, $token->filters,
 							$token->origin);

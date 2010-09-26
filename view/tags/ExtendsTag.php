@@ -10,9 +10,9 @@ use hydrogen\view\Tag;
 
 class ExtendsTag extends Tag {
 	
-	public static function getNode($origin, $data, $parser) {
-		$parser->setOriginParent($origin, $data);
-		$parser->prependPage($data);
+	public static function getNode($cmd, $args, $parser, $origin) {
+		$parser->setOriginParent($origin, $args);
+		$parser->prependPage($args);
 		return false;
 	}
 	

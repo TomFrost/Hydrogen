@@ -11,17 +11,17 @@ use hydrogen\view\nodes\BlockNode;
 
 class BlockTag extends Tag {
 	
-	public static function getNode($origin, $data, $parser) {
+	public static function getNode($cmd, $args, $parser, $origin) {
 		$nodes = $parser->parse("endblock");
 		$parser->skipNextToken();
-		$block = $parser->getObject($data);
+		$block = $parser->getObject($args);
 		if ($block) {
 			$block->setNodes($nodes);
 			return false;
 		}
 		else {
 			$block = new BlockNode($nodes);
-			$parser->registerObject($data, $block);
+			$parser->registerObject($args, $block);
 			return $block;
 		}
 	}
