@@ -7,7 +7,7 @@
 namespace hydrogen\view;
 
 interface Filter {
-	public function applyTo($string);
+	public function applyTo($string, $args);
 }
 
 ?>
