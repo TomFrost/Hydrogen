@@ -16,13 +16,11 @@ use hydrogen\view\exceptions\TemplateSyntaxException;
 class Parser {
 	protected $loader;
 	protected $tokens;
-	protected $context;
 	protected $originNodes;
 	protected $originParent;
 	protected $objs;
 
-	public function __construct($viewName, $context, $loader) {
-		$this->context = $context;
+	public function __construct($viewName, $loader) {
 		$this->loader = $loader;
 		$this->originNodes = array();
 		$this->originParent = array();
