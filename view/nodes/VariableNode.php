@@ -53,6 +53,14 @@ class VariableNode implements Node {
 			}
 			$level++;
 		}
+		foreach ($this->filters as $filter) {
+			$class = '\hydrogen\view\filters\\' .
+				ucfirst(strtolower($filter->filter)) . 'Filter';
+			if (!@class_exists($class))
+				throw new NoSuchFilterException('Filter "' . $filter->filter .
+					'" not found in template "' . $this->origin . '".');
+			$var = $class::applyTo($var, $filter->args);
+		}
 		echo $var;
 	}
 	
