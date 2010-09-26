@@ -70,6 +70,10 @@ Config::setVal("view", "folder", "themes" . DIRECTORY_SEPARATOR . "default");
 // within the web browser.  This is usually the same as the folder above.
 Config::setVal("view", "url_path", "themes/default");
 
+// Alternatively, you can set an entirely new URL as the view root.  This is only
+// needed in special circumstances.  Do not set this unless you know you need it.
+//Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
+
 // The extension of view filenames.
 Config::setVal("view", "file_extension", ".tpl.php");
 
@@ -80,8 +84,10 @@ Config::setVal("view", "use_templates", "1");
 // weird and intriguing.  In fact, you don't even have to -- it's the default!)
 //Config::setVal("view", "loader_type", "File");
 
-// Alternatively, you can set an entirely new URL as the view root.  This is only
-// needed in special circumstances.  Do not set this unless you know you need it.
-//Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
+// In a template, if a variable is requested but is missing, should we
+// print it out like this: ?? varname ??  in the page output?  If false,
+// an exception will be thrown instead.  Leave this on for development, but
+// the default is false.
+Config::setVal("view", "print_missing_var", true);
 
 ?>
