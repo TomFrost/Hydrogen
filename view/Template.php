@@ -37,7 +37,7 @@ class Template {
 		if (!$this->displayCached()) {
 			$parser = new Parser($this->viewName, $this->loader);
 			$nodes = $parser->parse();
-			echo $nodes->render();
+			echo $nodes->render($context);
 		}
 	}
 	

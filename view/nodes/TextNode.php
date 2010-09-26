@@ -15,7 +15,7 @@ class TextNode implements Node {
 		$this->text = $text;
 	}
 	
-	public function render() {
+	public function render($context) {
 		echo $this->text;
 	}
 }

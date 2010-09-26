@@ -7,10 +7,11 @@
 namespace hydrogen\view;
 
 class NodeArray extends \ArrayObject {
-	public function render() {
+	
+	public function render($context) {
 		$rendered = '';
 		foreach ($this as $node)
-			$rendered .= $node->render();
+			$rendered .= $node->render($context);
 		return $rendered;
 	}
 }

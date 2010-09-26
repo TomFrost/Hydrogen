@@ -65,7 +65,7 @@ class Parser {
 					break;
 				case Lexer::TOKEN_VARIABLE:
 					$nodes[] = new VariableNode($token->variable,
-							$token->drilldowns, $token->filters,
+							$token->drillDowns, $token->filters,
 							$token->origin);
 					$this->originNodes[$token->origin] = true;
 					break;

@@ -7,7 +7,7 @@
 namespace hydrogen\view;
 
 interface Node {
-	public function render();
+	public function render($context);
 }
 
 ?>
