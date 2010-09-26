@@ -9,7 +9,7 @@ namespace hydrogen\view\tags;
 use hydrogen\view\Tag;
 use hydrogen\view\nodes\BlockNode;
 
-class BlockTag implements Tag {
+class BlockTag extends Tag {
 	
 	public static function getNode($origin, $data, $parser) {
 		$nodes = $parser->parse("endblock");

@@ -127,7 +127,7 @@ class Parser {
 		$class = '\hydrogen\view\tags\\' . ucfirst(strtolower($cmd)) . 'Tag';
 		if (!@class_exists($class))
 			throw new NoSuchTagException("Tag in template \"$origin\" does not exist: $cmd");
-		if ($class::MUST_BE_FIRST && $this->originHasNodes($origin))
+		if ($class::mustBeFirst() && $this->originHasNodes($origin))
 			throw new TemplateSyntaxException("Tag must be first in template: $cmd");
 		return $class::getNode($cmd, $args, $this, $origin);
 	}

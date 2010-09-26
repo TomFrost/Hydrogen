@@ -6,10 +6,12 @@
 
 namespace hydrogen\view;
 
-interface Tag {
-	const MUST_BE_FIRST = false;
+abstract class Tag {
+	public abstract static function getNode($origin, $data, $parser);
 	
-	public static function getNode($origin, $data, $parser);
+	public static function mustBeFirst() {
+		return false;
+	}
 }
 
 ?>
