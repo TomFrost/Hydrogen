@@ -70,8 +70,8 @@ class Lexer {
 					strlen(self::COMMENT_CLOSETAG))));
 			}
 			// It must be text!  But skip it if it's empty.
-			else if (($text = trim($line)) !== '')
-				$tokens[] = new TextToken($origin, $text);
+			else
+				$tokens[] = new TextToken($origin, $line);
 		}
 		return $tokens;
 	}
