@@ -11,22 +11,22 @@ use hydrogen\view\exceptions\NoSuchVariableException;
 class ContextStack {
 	protected $stack;
 	protected $stackLevel;
-	
+
 	public function __construct($initialData=false) {
 		$this->stack = array(array());
 		$this->stackLevel = array();
 		if (is_array($initialData))
 			$this->setArray($initialData);
 	}
-	
+
 	public function push() {
 		array_push($this->stack, array());
 	}
-	
+
 	public function pop() {
 		return new ContextStack(array_pop($this->stack));
 	}
-	
+
 	public function set($key, $value) {
 		$level = false;
 		for ($i = count($this->stack) - 1; $i >= 0 ; $i--) {
@@ -41,28 +41,32 @@ class ContextStack {
 		}
 		$this->stack[$level][$key] = $value;
 	}
-	
+
 	public function setArray($kvArray) {
 		foreach ($kvArray as $key => $value)
 			$this->set($key, $value);
 	}
-	
+
 	public function get($key) {
 		if (!$this->keyExists($key)) {
-			throw new NoSuchVariableException(
+			$e = new NoSuchVariableException(
 				"Variable does not exist in context: $key");
+			$e->variable = $key;
+			throw $e;
 		}
 		return $this->stack[$this->stackLevel[$key]][$key];
 	}
-	
+
 	public function delete($key) {
 		if (!$this->keyExists($key)) {
-			throw new NoSuchVariableException(
+			$e = new NoSuchVariableException(
 				"Variable does not exist in context: $key");
+			$e->variable = $key;
+			throw $e;
 		}
 		unset($this->stack[$this->stackLevel[$key]][$key]);
 	}
-	
+
 	public function keyExists($key) {
 		return isset($this->stackLevel[$key]);
 	}
