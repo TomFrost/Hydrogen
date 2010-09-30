@@ -6,13 +6,13 @@
 
 namespace hydrogen\view;
 
+use hydrogen\view\FilterArgument;
 use hydrogen\view\Token;
 use hydrogen\view\tokens\BlockToken;
 use hydrogen\view\tokens\CommentToken;
 use hydrogen\view\tokens\FilterToken;
 use hydrogen\view\tokens\TextToken;
 use hydrogen\view\tokens\VariableToken;
-use hydrogen\view\tokens\ArgumentToken;
 use hydrogen\view\exceptions\TemplateSyntaxException;
 
 class Lexer {
@@ -21,8 +21,7 @@ class Lexer {
 	const TOKEN_FILTER = 3;
 	const TOKEN_TEXT = 4;
 	const TOKEN_VARIABLE = 5;
-	const TOKEN_ARGUMENT = 6;
-	
+
 	const BLOCK_OPENTAG = "{%";
 	const BLOCK_CLOSETAG = "%}";
 	const BLOCK_COMMAND_ARG_SEPARATOR = " ";
@@ -33,7 +32,7 @@ class Lexer {
 	const VARIABLE_LEVEL_SEPARATOR = ".";
 	const VARIABLE_FILTER_SEPARATOR = "|";
 	const VARIABLE_FILTER_ARGUMENT_SEPARATOR = ":";
-	
+
 	public static function tokenize($origin, $data) {
 		$splitRegex = '/(' .
 			self::VARIABLE_OPENTAG . '.*' . self::VARIABLE_CLOSETAG . '|' .
@@ -42,7 +41,7 @@ class Lexer {
 			')/U';
 		$lines = preg_split($splitRegex, $data, null,
 			PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-		
+
 		$tokens = array();
 		foreach ($lines as $line) {
 			// Check for variable tag
@@ -75,7 +74,7 @@ class Lexer {
 		}
 		return $tokens;
 	}
-	
+
 	public static function getBlockToken($origin, $data) {
 		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
 		if (!$split)
@@ -83,7 +82,7 @@ class Lexer {
 		return new BlockToken($origin, $data, $split[0],
 			isset($split[1]) ? $split[1] : false);
 	}
-	
+
 	public static function getVariableToken($origin, $data) {
 		$tokens = static::quoteSafeExplode($data,
 			self::VARIABLE_FILTER_SEPARATOR);
@@ -98,20 +97,23 @@ class Lexer {
 			for ($i = 0; $i < count($fArgs); $i++) {
 				if (static::surroundedby($fArgs[$i], '"', '"')) {
 					$fArgs[$i] = stripslashes($fArgs[$i]);
-					$fArgs[$i] = new ArgumentToken($origin, $fArgs[$i],
-						ArgumentToken::ARG_NATIVE, substr($fArgs[$i], 1, -1));
+					$fArgs[$i] = new FilterArgument(
+						FilterArgument::TYPE_NATIVE,
+						substr($fArgs[$i], 1, -1)
+					);
 				}
 				else {
-					$fArgs[$i] = new ArgumentToken($origin, $fArgs[$i],
-						ArgumentToken::ARG_VARIABLE,
-						static::getVariableToken($origin, $fArgs[$i]));
+					$fArgs[$i] = new FilterArgument(
+						FilterArgument::TYPE_VARIABLE,
+						$fArgs[$i]
+					);
 				}
 			}
 			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
 		}
 		return new VariableToken($origin, $data, $var, $drilldowns, $filters);
 	}
-	
+
 	public static function quoteSafeExplode($str, $delim,
 			$enclosure='"', $esc='\\', $limit=false) {
 		$exploded = array();
@@ -127,18 +129,18 @@ class Lexer {
 			$qPos = strpos($str, $enclosure, $cursor);
 			$ePos = strpos($str, $esc, $cursor);
 			$cursor = static::minIgnoreFalse(array($dPos, $qPos, $ePos));
-			
+
 			// Are we done?
 			if ($cursor === false ||
 					($limit !== false && count($exploded) == $limit - 1)) {
 				$exploded[] = $str;
 				break;
 			}
-			
+
 			// Should we kill the escape?
 			if ($escaping && $lastEscape !== false && $lastEscape < $cursor - 1)
 				$escaping = false;
-			
+
 			// Start the state machine
 			if ($cursor === $dPos) {
 				if (!$inQuotes) {
@@ -165,7 +167,7 @@ class Lexer {
 		}
 		return $exploded;
 	}
-	
+
 	protected static function minIgnoreFalse($nums) {
 		$min = false;
 		foreach ($nums as $num) {
@@ -174,7 +176,7 @@ class Lexer {
 		}
 		return $min;
 	}
-	
+
 	protected static function surroundedBy($haystack, $startsWith, $endsWith) {
 		$sLen = strlen($startsWith);
 		$eLen = strlen($endsWith);
