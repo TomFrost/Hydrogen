@@ -14,15 +14,15 @@ class VariableToken extends Token {
 	const TOKEN_TYPE = Lexer::TOKEN_VARIABLE;
 	
 	public $variable;
-	public $drillDowns;
+	public $drilldowns;
 	public $filters;
 	
-	public function __construct($origin, $raw, $variable, $drillDowns,
+	public function __construct($origin, $raw, $variable, $drilldowns,
 			$filters) {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
 		$this->variable = &$variable;
-		$this->drillDowns = &$drillDowns;
+		$this->drilldowns = &$drilldowns;
 		$this->filters = &$filters;
 	}
 }

@@ -88,8 +88,8 @@ class Lexer {
 		$tokens = static::quoteSafeExplode($data,
 			self::VARIABLE_FILTER_SEPARATOR);
 		$varStr = array_shift($tokens);
-		$drillDowns = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
-		$var = array_shift($drillDowns);
+		$drilldowns = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
+		$var = array_shift($drilldowns);
 		$filters = array();
 		foreach ($tokens as $token) {
 			$fArgs = static::quoteSafeExplode($token,
@@ -109,7 +109,7 @@ class Lexer {
 			}
 			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
 		}
-		return new VariableToken($origin, $data, $var, $drillDowns, $filters);
+		return new VariableToken($origin, $data, $var, $drilldowns, $filters);
 	}
 	
 	public static function quoteSafeExplode($str, $delim,
