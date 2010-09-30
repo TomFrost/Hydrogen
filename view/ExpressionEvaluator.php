@@ -7,6 +7,7 @@
 namespace hydrogen\view;
 
 use hydrogen\view\exceptions\NoSuchVariableException;
+use hydrogen\view\exceptions\NoSuchFilterException;
 
 class ExpressionEvaluator {
 
