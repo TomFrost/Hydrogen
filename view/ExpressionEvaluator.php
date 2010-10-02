@@ -11,6 +11,20 @@ use hydrogen\view\exceptions\NoSuchFilterException;
 
 class ExpressionEvaluator {
 
+	const STATE_NONE = 0;
+	const STATE_OP = 1;
+	const STATE_NUM = 2;
+	const STATE_VAR = 3;
+
+	protected static $operators = array('-', '+', '/', '*', '%', '(', ')',
+		'<', '>', '==', '<=', '>=', '&&', '||');
+
+	protected static $translations = array(
+		"and" => "&&",
+		"or" => "||",
+		"=" => "=="
+	);
+
 	// This is a statically accessed class
 	protected function __construct() {}
 
@@ -19,8 +33,15 @@ class ExpressionEvaluator {
 		return eval("return $php;");
 	}
 
-	public static function exprToPHP($expr) {
-		return $expr;
+	public static function exprToPHP(&$expr) {
+		$state = self::STATE_NONE;
+		$token = '';
+		$php = '';
+		$len = strlen($expr);
+		for ($i = 0; $i < $len; $i++) {
+			$php .= $expr[$i];
+		}
+		return $php;
 	}
 
 	public static function evalVariableTokens($variable, $drilldowns, $filters,
