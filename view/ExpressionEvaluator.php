@@ -14,6 +14,15 @@ class ExpressionEvaluator {
 	// This is a statically accessed class
 	protected function __construct() {}
 
+	public static function evaluate($expr, $context) {
+		$php = static::exprToPHP($expr);
+		return eval("return $php;");
+	}
+
+	public static function exprToPHP($expr) {
+		return $expr;
+	}
+
 	public static function evalVariableTokens($variable, $drilldowns, $filters,
 			$context) {
 		$var = $context->get($variable);
