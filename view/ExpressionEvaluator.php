@@ -58,7 +58,6 @@ class ExpressionEvaluator {
 		$alphaInQuotes = false;
 		$alphaEscaping = false;
 		$alphaInFilter = false;
-		$alphaInArgument = false;
 		$groupRatio = 0;
 		for ($i = 0; $i <= $len; $i++) {
 			if ($i === $len)
@@ -146,12 +145,8 @@ class ExpressionEvaluator {
 								Lexer::VARIABLE_FINTER_SEPARATOR &&
 								(ctype_alnum($char) || $char === '_' ||
 								$char ===
-								Lexer::VARIABLE_FILTER_ARGUMENT_SEPARATOR))) {
-							if ($char ===
-									Lexer::VARIABLE_FILTER_ARGUMENT_SEPARATOR)
-								$alphaInArgument = true;
+								Lexer::VARIABLE_FILTER_ARGUMENT_SEPARATOR)))
 							$token .= $char;
-						}
 						else if ($lastChar ===
 								Lexer::VARIABLE_FILTER_SEPARATOR ||
 								$lastChar ===
@@ -185,6 +180,9 @@ class ExpressionEvaluator {
 								$token . '", $context) ';
 							$state = self::TOKEN_NONE;
 							$lastToken = self::TOKEN_ALPHA;
+							$alphaInFilter = false;
+							$alphaEscaping = false;
+							$alphaInQuotes = false;
 							$i--;
 						}
 						else
