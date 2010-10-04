@@ -356,13 +356,13 @@ class ExpressionEvaluator {
 			}
 			$var = $class::applyTo($var, $filter->args);
 		}
-		echo $var;
+		return $var;
 	}
 
 	public static function evalVariableString($varString, $context) {
 		$token = Lexer::getVariableToken("expr", $varString);
 		return static::evalVariableTokens($token->variable, $token->drilldowns,
-			$token->filters);
+			$token->filters, $context);
 	}
 }
 
