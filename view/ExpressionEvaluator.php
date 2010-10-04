@@ -84,7 +84,7 @@ class ExpressionEvaluator {
 							$char, static::$comparators)) > 0)
 						$state = self::TOKEN_COMP;
 					// Test for joining char
-					else if (count($pass = static::filterArrayStartsWith(
+					else if (count($poss = static::filterArrayStartsWith(
 							$char, static::$joiners)) > 0)
 						$state = self::TOKEN_JOIN;
 					// Test for open group
@@ -240,7 +240,7 @@ class ExpressionEvaluator {
 							$lastToken === self::TOKEN_CLOSEGROUP) {
 						$php .= $token;
 						$state = self::TOKEN_NONE;
-						$lastToken = self::TOKEN_COMP;
+						$lastToken = self::TOKEN_JOIN;
 						$i--;
 					}
 					else
