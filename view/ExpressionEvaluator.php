@@ -354,7 +354,7 @@ class ExpressionEvaluator {
 				$e->filter = $filter;
 				throw $e;
 			}
-			$var = $class::applyTo($var, $filter->args);
+			$var = $class::applyTo($var, $filter->args, $context);
 		}
 		return $var;
 	}

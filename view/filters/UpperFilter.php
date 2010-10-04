@@ -9,9 +9,9 @@ namespace hydrogen\view\filters;
 use hydrogen\view\Filter;
 
 class UpperFilter implements Filter {
-	
-	public static function applyTo($string, $args) {
+
+	public static function applyTo($string, $args, $context) {
 		return strtoupper($string);
 	}
-	
+
 }

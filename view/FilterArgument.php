@@ -6,16 +6,25 @@
 
 namespace hydrogen\view;
 
+use hydrogen\view\ExpressionEvaluator;
+
 class FilterArgument {
 	const TYPE_VARIABLE = 0;
 	const TYPE_NATIVE = 1;
 
-	public $data;
-	public $type;
+	protected $data;
+	protected $type;
 
 	public function __construct($type, $data) {
 		$this->type = &$type;
 		$this->data = &$data;
+	}
+
+	public function getValue($context) {
+		if ($this->type === self::TYPE_VARIABLE)
+			return ExpressionEvaluator::evalVariableString($this->data,
+				$context);
+		return $this->data;
 	}
 }
 
