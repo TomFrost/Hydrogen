@@ -45,7 +45,7 @@ class ExpressionEvaluator {
 
 	public static function evaluate($expr, $context) {
 		$php = static::exprToPHP($expr);
-		return eval("return $php;");
+		return "[[$php]] " . eval("return $php;");
 	}
 
 	public static function exprToPHP(&$expr) {
@@ -63,7 +63,7 @@ class ExpressionEvaluator {
 			if ($i === $len)
 				$char = ' ';
 			else
-				$char = &$expr[$i];
+				$char = $expr[$i];
 			switch ($state) {
 				case self::TOKEN_NONE:
 					// Determine what state we should be in
@@ -94,12 +94,13 @@ class ExpressionEvaluator {
 					else if ($char === ')')
 						$state = self::TOKEN_CLOSEGROUP;
 					// Test for space
-					else if ($char === ' ' && $i < $len)
+					else if ($char == ' ')
 						$php .= $char;
 					else
 						throw new TemplateSyntaxException(
 							"Illegal character '" . $char .
-							"' in expression: '" . $expr . "'");
+							"' (ASCII " . ord($char) . ") in expression: '" .
+							$expr . "'");
 					// TODO: Allow exclamation point
 					break;
 				case self::TOKEN_NUM:
@@ -299,10 +300,10 @@ class ExpressionEvaluator {
 		return trim($php);
 	}
 
-	protected static function filterArrayStartsWith(&$needle, $haystack) {
+	protected static function filterArrayStartsWith($needle, $haystack) {
 		$num = count($haystack);
-		for ($i = $num; $i >= 0; $i--) {
-			$len = strlen($needle);
+		$len = strlen($needle);
+		for ($i = $num - 1; $i >= 0; $i--) {
 			if ($len > strlen($haystack[$i]))
 				array_splice($haystack, $i, 1);
 			else {
