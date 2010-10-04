@@ -17,6 +17,12 @@ class EvalNode implements Node {
 	}
 
 	public function render($context) {
-		echo ExpressionEvaluator::evaluate($this->expr, $context);
+		$php = ExpressionEvaluator::exprToPHP($this->expr);
+		$result = ExpressionEvaluator::evaluate($this->expr, $context);
+		echo "[[$php]] ";
+		if (is_bool($result))
+			echo $result ? 'true' : 'false';
+		else
+			echo $result;
 	}
 }

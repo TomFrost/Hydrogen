@@ -45,7 +45,7 @@ class ExpressionEvaluator {
 
 	public static function evaluate($expr, $context) {
 		$php = static::exprToPHP($expr);
-		return "[[$php]] " . eval("return $php;");
+		return eval("return $php;");
 	}
 
 	public static function exprToPHP(&$expr) {
