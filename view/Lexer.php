@@ -94,7 +94,8 @@ class Lexer {
 			$fArgs = static::quoteSafeExplode($token,
 				self::VARIABLE_FILTER_ARGUMENT_SEPARATOR);
 			$filter = array_shift($fArgs);
-			for ($i = 0; $i < count($fArgs); $i++) {
+			$numArgs = count($fArgs);
+			for ($i = 0; $i < $numArgs; $i++) {
 				if (static::surroundedby($fArgs[$i], '"', '"')) {
 					$fArgs[$i] = stripslashes($fArgs[$i]);
 					$fArgs[$i] = new FilterArgument(
@@ -102,12 +103,29 @@ class Lexer {
 						substr($fArgs[$i], 1, -1)
 					);
 				}
-				else {
+				else if (is_numeric($fArgs[$i])) {
+					$fArgs[$i] = new FilterArgument(
+						FilterArgument::TYPE_NATIVE,
+						ctype_digit($fArgs[$i]) ? (int)$fArgs[$i] :
+							(float)$fArgs[$i]
+					);
+				}
+				else if (($bool = strtolower($fArgs[$i]) === 'true') ||
+						$bool === 'false') {
+					$fArgs[$i] = new FilterArgument(
+						FilterArgument::TYPE_NATIVE,
+						$fArgs[$i] === 'true' ? true : false
+					);
+				}
+				else if (ctype_alpha($fArgs[$i][0])) {
 					$fArgs[$i] = new FilterArgument(
 						FilterArgument::TYPE_VARIABLE,
 						$fArgs[$i]
 					);
 				}
+				else
+					throw new TemplateSyntaxException(
+						"Illegal filter argument in $origin: " . $fArgs[$i]);
 			}
 			$filters[] = new FilterToken($origin, $token, $filter, $fArgs);
 		}
