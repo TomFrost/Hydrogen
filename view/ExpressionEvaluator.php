@@ -193,25 +193,8 @@ class ExpressionEvaluator {
 					}
 					break;
 				case self::TOKEN_OP:
-					$poss = static::filterArrayStartsWith($token . $char,
-						$poss);
-					if (count($poss) > 0)
-						$token .= $char;
-					else if ($lastToken === self::TOKEN_ALPHA ||
-							$lastToken === self::TOKEN_NUM ||
-							$lastToken === self::TOKEN_CLOSEGROUP) {
-						$php .= $token;
-						$state = self::TOKEN_NONE;
-						$lastToken = self::TOKEN_OP;
-						$i--;
-					}
-					else
-						throw new TemplateSyntaxException(
-							"Misplaced '" . $token .
-							"' operator in expression: '" . $expr . "'");
-					break;
 				case self::TOKEN_COMP:
-					// TODO: Restrict comparators to one per joiner.
+				case self::TOKEN_JOIN:
 					$poss = static::filterArrayStartsWith($token . $char,
 						$poss);
 					if (count($poss) > 0)
@@ -220,33 +203,14 @@ class ExpressionEvaluator {
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) {
 						$php .= $token;
+						$lastToken = $state;
 						$state = self::TOKEN_NONE;
-						$lastToken = self::TOKEN_COMP;
 						$i--;
 					}
 					else
 						throw new TemplateSyntaxException(
 							"Misplaced '" . $token .
-							"' comparison in expression: '" . $expr . "'");
-					break;
-				case self::TOKEN_JOIN:
-					// TODO: Restrict joiners to one per comparator
-					$poss = static::filterArrayStartsWith($token . $char,
-						$poss);
-					if (count($poss) > 0)
-						$token .= $char;
-					else if ($lastToken === self::TOKEN_ALPHA ||
-							$lastToken === self::TOKEN_NUM ||
-							$lastToken === self::TOKEN_CLOSEGROUP) {
-						$php .= $token;
-						$state = self::TOKEN_NONE;
-						$lastToken = self::TOKEN_JOIN;
-						$i--;
-					}
-					else
-						throw new TemplateSyntaxException(
-							"Misplaced '" . $token . "' in expression: '" .
-							$expr . "'");
+							"' in expression: '" . $expr . "'");
 					break;
 				case self::TOKEN_OPENGROUP:
 					if ($lastToken !== self::TOKEN_ALPHA &&
