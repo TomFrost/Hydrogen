@@ -143,7 +143,7 @@ class ExpressionEvaluator {
 						$lastChar = $token[strlen($token) - 1];
 						if (($lastChar === Lexer::VARIABLE_FILTER_SEPARATOR &&
 								ctype_alpha($char)) || ($lastChar !==
-								Lexer::VARIABLE_FINTER_SEPARATOR &&
+								Lexer::VARIABLE_FILTER_SEPARATOR &&
 								(ctype_alnum($char) || $char === '_' ||
 								$char ===
 								Lexer::VARIABLE_FILTER_ARGUMENT_SEPARATOR)))
