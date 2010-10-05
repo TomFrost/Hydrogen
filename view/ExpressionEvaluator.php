@@ -69,7 +69,6 @@ class ExpressionEvaluator {
 					// Determine what state we should be in
 					$token = $char;
 					// Test for digit or decimal
-					// TODO: Allow negative numbers
 					if (ctype_digit($char) || $char === '.')
 						$state = self::TOKEN_NUM;
 					// Test for alphabetical char
