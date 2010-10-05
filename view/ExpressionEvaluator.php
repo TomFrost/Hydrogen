@@ -203,12 +203,25 @@ class ExpressionEvaluator {
 						$poss);
 					if (count($poss) > 0)
 						$token .= $char;
+					// Check to see if this should be translated
 					else if ($state === self::TOKEN_COMP &&
 							isset(static::$comparatorTranslations[$token])) {
 						$state = static::$comparatorTranslations[$token][0];
 						$token = static::$comparatorTranslations[$token][1];
 						$i--;
 					}
+					// If the token's a minus, see if this should be a number
+					else if ($state === self::TOKEN_OP &&
+							$token === '-' && ctype_digit($char) &&
+							($lastToken === self::TOKEN_NONE ||
+							$lastToken === self::TOKEN_COMP ||
+							$lastToken === self::TOKEN_JOIN ||
+							$lastToken === self::TOKEN_OP ||
+							$lastToken === self::TOKEN_OPENGROUP)) {
+						$state = self::TOKEN_NUM;
+						$i--;
+					}
+					// We're all set!  It's whatever the state is.
 					else if ($lastToken === self::TOKEN_ALPHA ||
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) {
