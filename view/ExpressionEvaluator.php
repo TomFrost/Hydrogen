@@ -6,6 +6,7 @@
 
 namespace hydrogen\view;
 
+use hydrogen\common\TypedValue;
 use hydrogen\view\Lexer;
 use hydrogen\view\exceptions\NoSuchVariableException;
 use hydrogen\view\exceptions\NoSuchFilterException;
@@ -22,12 +23,15 @@ class ExpressionEvaluator {
 	const TOKEN_OPENGROUP = 6;
 	const TOKEN_CLOSEGROUP = 7;
 	const TOKEN_INVERT = 8;
+	const TOKEN_FUNC = 9;
 
 	protected static $operators = array('-', '+', '/', '*', '%');
 
 	protected static $comparators = array('<', '>', '==', '!=', '<=', '>=');
 
 	protected static $joiners = array('&&', '||');
+
+	protected static $functions = array("in", "empty");
 
 	protected static $varTranslations = array(
 		"and" => array(self::TOKEN_JOIN, '&&'),
@@ -51,7 +55,7 @@ class ExpressionEvaluator {
 	public static function exprToPHP(&$expr) {
 		$state = self::TOKEN_NONE;
 		$token = '';
-		$php = '';
+		$tokens = array();
 		$len = strlen($expr);
 		$poss = array();
 		$lastToken = self::TOKEN_NONE;
@@ -93,10 +97,8 @@ class ExpressionEvaluator {
 					// Test for close group
 					else if ($char === ')')
 						$state = self::TOKEN_CLOSEGROUP;
-					// Test for space
-					else if ($char == ' ')
-						$php .= $char;
-					else
+					// Spaces are legal, but nothing else
+					else if ($char !== ' ')
 						throw new TemplateSyntaxException(
 							"Illegal character '" . $char .
 							"' (ASCII " . ord($char) . ") in expression: '" .
@@ -124,7 +126,7 @@ class ExpressionEvaluator {
 							$lastToken === self::TOKEN_JOIN ||
 							$lastToken === self::TOKEN_OP ||
 							$lastToken === self::TOKEN_OPENGROUP) {
-						$php .= $token;
+						$tokens[] = new TypedValue(self::TOKEN_NUM, $token);
 						$lastToken = self::TOKEN_NUM;
 						$state = self::TOKEN_NONE;
 						$numHasDot = false;
@@ -187,15 +189,23 @@ class ExpressionEvaluator {
 							$token = static::$varTranslations[$token][1];
 							$i--;
 						}
+						// Are we looking at a function instead of a variable?
+						if (in_array($token, static::$functions)) {
+							$state = self::TOKEN_NONE;
+							$lastToken = self::TOKEN_FUNC;
+							$tokens[] = new TypedValue(self::TOKEN_FUNC,
+								$token);
+							$i--;
+						}
+						// It's a variable! Bag it and tag it.
 						else if ($lastToken === self::TOKEN_NONE ||
 								$lastToken === self::TOKEN_COMP ||
 								$lastToken === self::TOKEN_INVERT ||
 								$lastToken === self::TOKEN_JOIN ||
 								$lastToken === self::TOKEN_OP ||
 								$lastToken === self::TOKEN_OPENGROUP) {
-							$php .= ' \\' . __NAMESPACE__ .
-								'\ExpressionEvaluator::evalVariableString("' .
-								$token . '", $context) ';
+							$tokens[] = new TypedValue(self::TOKEN_VAR,
+								$token);
 							$state = self::TOKEN_NONE;
 							$lastToken = self::TOKEN_VAR;
 							$varInFilter = false;
@@ -238,7 +248,7 @@ class ExpressionEvaluator {
 					else if ($lastToken === self::TOKEN_VAR ||
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) {
-						$php .= $token;
+						$tokens[] = new TypedValue($state, $token);
 						$lastToken = $state;
 						$state = self::TOKEN_NONE;
 						$i--;
@@ -251,7 +261,8 @@ class ExpressionEvaluator {
 				case self::TOKEN_OPENGROUP:
 					if ($lastToken !== self::TOKEN_VAR &&
 							$lastToken !== self::TOKEN_NUM) {
-						$php .= $token;
+						$tokens[] = new TypedValue(self::TOKEN_OPENGROUP,
+							$token);
 						$groupRatio++;
 						$state = self::TOKEN_NONE;
 						$lastToken = self::TOKEN_OPENGROUP;
@@ -267,7 +278,8 @@ class ExpressionEvaluator {
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) &&
 							$groupRatio > 0) {
-						$php .= $token;
+						$tokens[] = new TypedValue(self::TOKEN_CLOSEGROUP,
+							$token);
 						$groupRatio--;
 						$state = self::TOKEN_NONE;
 						$lastToken = self::TOKEN_CLOSEGROUP;
@@ -283,7 +295,7 @@ class ExpressionEvaluator {
 							$lastToken === self::TOKEN_COMP ||
 							$lastToken === self::TOKEN_JOIN ||
 							$lastToken === self::TOKEN_OPENGROUP) {
-						$php .= $token;
+						$tokens[] = new TypedValue(self::TOKEN_INVERT, $token);
 						$state = self::TOKEN_NONE;
 						$lastToken = self::TOKEN_INVERT;
 						$i--;
@@ -297,7 +309,16 @@ class ExpressionEvaluator {
 		if ($groupRatio !== 0)
 			throw new TemplateSyntaxException("Missing ')' in expression: '" .
 				$expr . "'.");
-		return trim($php);
+
+		// Parse the tokens
+		$len = count($tokens);
+		for ($i = 0; $i < $len; $i++) {
+			if ($tokens[$i]->type === self::TOKEN_VAR)
+				$tokens[$i]->value = '\\' . __NAMESPACE__ .
+					'\ExpressionEvaluator::evalVariableString("' .
+					$tokens[$i]->value . '", $context)';
+		}
+		return implode(' ', $tokens);
 	}
 
 	protected static function filterArrayStartsWith($needle, $haystack) {
