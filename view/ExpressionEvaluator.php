@@ -101,7 +101,6 @@ class ExpressionEvaluator {
 							"Illegal character '" . $char .
 							"' (ASCII " . ord($char) . ") in expression: '" .
 							$expr . "'");
-					// TODO: Allow exclamation point
 					break;
 				case self::TOKEN_NUM:
 					// Current char must be numeric or decimal
@@ -169,8 +168,13 @@ class ExpressionEvaluator {
 							$endClean = true;
 					}
 					if ($endClean) {
-						// TODO: Oh shit, what about the translations?
-						if ($lastToken === self::TOKEN_NONE ||
+						// Do we need to translate the result?
+						if (isset(static::$alphaTranslations[$token])) {
+							$state = static::$alphaTranslations[$token][0];
+							$token = static::$alphaTranslations[$token][1];
+							$i--;
+						}
+						else if ($lastToken === self::TOKEN_NONE ||
 								$lastToken === self::TOKEN_COMP ||
 								$lastToken === self::TOKEN_INVERT ||
 								$lastToken === self::TOKEN_JOIN ||
@@ -199,6 +203,12 @@ class ExpressionEvaluator {
 						$poss);
 					if (count($poss) > 0)
 						$token .= $char;
+					else if ($state === self::TOKEN_COMP &&
+							isset(static::$comparatorTranslations[$token])) {
+						$state = static::$comparatorTranslations[$token][0];
+						$token = static::$comparatorTranslations[$token][1];
+						$i--;
+					}
 					else if ($lastToken === self::TOKEN_ALPHA ||
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) {
