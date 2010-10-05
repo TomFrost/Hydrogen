@@ -18,7 +18,7 @@ class ExpressionEvaluator {
 	const TOKEN_COMP = 2;
 	const TOKEN_JOIN = 3;
 	const TOKEN_NUM = 4;
-	const TOKEN_ALPHA = 5;
+	const TOKEN_VAR = 5;
 	const TOKEN_OPENGROUP = 6;
 	const TOKEN_CLOSEGROUP = 7;
 	const TOKEN_INVERT = 8;
@@ -29,7 +29,7 @@ class ExpressionEvaluator {
 
 	protected static $joiners = array('&&', '||');
 
-	protected static $alphaTranslations = array(
+	protected static $varTranslations = array(
 		"and" => array(self::TOKEN_JOIN, '&&'),
 		"or" => array(self::TOKEN_JOIN, '||'),
 		"not" => array(self::TOKEN_INVERT, "!")
@@ -55,9 +55,9 @@ class ExpressionEvaluator {
 		$len = strlen($expr);
 		$poss = array();
 		$lastToken = self::TOKEN_NONE;
-		$alphaInQuotes = false;
-		$alphaEscaping = false;
-		$alphaInFilter = false;
+		$varInQuotes = false;
+		$varEscaping = false;
+		$varInFilter = false;
 		$numHasDot = false;
 		$groupRatio = 0;
 		for ($i = 0; $i <= $len; $i++) {
@@ -74,7 +74,7 @@ class ExpressionEvaluator {
 						$state = self::TOKEN_NUM;
 					// Test for alphabetical char
 					else if (ctype_alpha($char))
-						$state = self::TOKEN_ALPHA;
+						$state = self::TOKEN_VAR;
 					// Test for operator
 					else if (count($poss = static::filterArrayStartsWith(
 							$char, static::$operators)) > 0)
@@ -135,21 +135,21 @@ class ExpressionEvaluator {
 							"Misplaced numeric '" . $token .
 							"' in expression: '" . $expr . "'");
 					break;
-				case self::TOKEN_ALPHA:
+				case self::TOKEN_VAR:
 					$endClean = false;
 					// If we're in quotes, allow anything
-					if ($alphaInQuotes) {
-						if ($char === '"' && $alphaEscaping === false)
-							$alphaInQuotes = false;
-						else if ($char === '\\' || $alphaEscaping === true)
-							$alphaEscaping = !$alphaEscaping;
+					if ($varInQuotes) {
+						if ($char === '"' && $varEscaping === false)
+							$varInQuotes = false;
+						else if ($char === '\\' || $varEscaping === true)
+							$varEscaping = !$varEscaping;
 						$token .= $char;
 					}
 					else if ($char === Lexer::VARIABLE_FILTER_SEPARATOR) {
 						$token .= $char;
-						$alphaInFilter = true;
+						$varInFilter = true;
 					}
-					else if ($alphaInFilter === true) {
+					else if ($varInFilter === true) {
 						// If the last character was a filter separator,
 						// allow only alphas.  Otherwise, all legals work.
 						$lastChar = $token[strlen($token) - 1];
@@ -182,9 +182,9 @@ class ExpressionEvaluator {
 					}
 					if ($endClean) {
 						// Do we need to translate the result?
-						if (isset(static::$alphaTranslations[$token])) {
-							$state = static::$alphaTranslations[$token][0];
-							$token = static::$alphaTranslations[$token][1];
+						if (isset(static::$varTranslations[$token])) {
+							$state = static::$varTranslations[$token][0];
+							$token = static::$varTranslations[$token][1];
 							$i--;
 						}
 						else if ($lastToken === self::TOKEN_NONE ||
@@ -197,10 +197,10 @@ class ExpressionEvaluator {
 								'\ExpressionEvaluator::evalVariableString("' .
 								$token . '", $context) ';
 							$state = self::TOKEN_NONE;
-							$lastToken = self::TOKEN_ALPHA;
-							$alphaInFilter = false;
-							$alphaEscaping = false;
-							$alphaInQuotes = false;
+							$lastToken = self::TOKEN_VAR;
+							$varInFilter = false;
+							$varEscaping = false;
+							$varInQuotes = false;
 							$i--;
 						}
 						else
@@ -235,7 +235,7 @@ class ExpressionEvaluator {
 						$i--;
 					}
 					// We're all set!  It's whatever the state is.
-					else if ($lastToken === self::TOKEN_ALPHA ||
+					else if ($lastToken === self::TOKEN_VAR ||
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) {
 						$php .= $token;
@@ -249,7 +249,7 @@ class ExpressionEvaluator {
 							"' in expression: '" . $expr . "'");
 					break;
 				case self::TOKEN_OPENGROUP:
-					if ($lastToken !== self::TOKEN_ALPHA &&
+					if ($lastToken !== self::TOKEN_VAR &&
 							$lastToken !== self::TOKEN_NUM) {
 						$php .= $token;
 						$groupRatio++;
@@ -263,7 +263,7 @@ class ExpressionEvaluator {
 							$expr . "'.");
 					break;
 				case self::TOKEN_CLOSEGROUP:
-					if (($lastToken === self::TOKEN_ALPHA ||
+					if (($lastToken === self::TOKEN_VAR ||
 							$lastToken === self::TOKEN_NUM ||
 							$lastToken === self::TOKEN_CLOSEGROUP) &&
 							$groupRatio > 0) {
