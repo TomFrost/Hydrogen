@@ -58,6 +58,7 @@ class ExpressionEvaluator {
 		$alphaInQuotes = false;
 		$alphaEscaping = false;
 		$alphaInFilter = false;
+		$numHasDot = false;
 		$groupRatio = 0;
 		for ($i = 0; $i <= $len; $i++) {
 			if ($i === $len)
@@ -103,9 +104,21 @@ class ExpressionEvaluator {
 					break;
 				case self::TOKEN_NUM:
 					// Current char must be numeric or decimal
-					// TODO: Add logic to ensure only one decimal in a number.
-					if (ctype_digit($char) || $char === '.')
+					if ($token === '.')
+						$numHasDot = true;
+					if (ctype_digit($char))
 						$token .= $char;
+					else if ($char === '.') {
+						if (!$numHasDot) {
+							$token .= $char;
+							$numHasDot = true;
+						}
+						else
+							throw new TemplateSyntaxException(
+								"Number '" . $token .
+								"' cannot have multiple decimal points in expression: '" .
+								$expr . "'");
+					}
 					else if ($lastToken === self::TOKEN_NONE ||
 							$lastToken === self::TOKEN_COMP ||
 							$lastToken === self::TOKEN_JOIN ||
@@ -114,6 +127,7 @@ class ExpressionEvaluator {
 						$php .= $token;
 						$lastToken = self::TOKEN_NUM;
 						$state = self::TOKEN_NONE;
+						$numHasDot = false;
 						$i--;
 					}
 					else
