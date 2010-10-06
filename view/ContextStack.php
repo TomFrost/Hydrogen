@@ -6,6 +6,7 @@
 
 namespace hydrogen\view;
 
+use hydrogen\view\TraversalWrapper;
 use hydrogen\view\exceptions\NoSuchVariableException;
 
 class ContextStack {
@@ -55,6 +56,16 @@ class ContextStack {
 			throw $e;
 		}
 		return $this->stack[$this->stackLevel[$key]][$key];
+	}
+
+	public function getWrapped($key) {
+		try {
+			$var = $this->get($key);
+		}
+		catch (NoSuchVariableException $e) {
+			return NULL;
+		}
+		return new TraversalWrapper($var);
 	}
 
 	public function delete($key) {

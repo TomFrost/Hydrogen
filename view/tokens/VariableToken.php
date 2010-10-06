@@ -12,17 +12,14 @@ use hydrogen\view\Token;
 class VariableToken extends Token {
 	// Reflection to get the class name is slow, but constants are fast :)
 	const TOKEN_TYPE = Lexer::TOKEN_VARIABLE;
-	
-	public $variable;
-	public $drilldowns;
+
+	public $varLevels;
 	public $filters;
-	
-	public function __construct($origin, $raw, $variable, $drilldowns,
-			$filters) {
+
+	public function __construct($origin, $raw, $varLevels, $filters) {
 		$this->origin = &$origin;
 		$this->raw = &$raw;
-		$this->variable = &$variable;
-		$this->drilldowns = &$drilldowns;
+		$this->varLevels = &$varLevels;
 		$this->filters = &$filters;
 	}
 }
