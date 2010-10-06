@@ -6,6 +6,8 @@
 
 namespace hydrogen\view;
 
+use hydrogen\view\exceptions\NoSuchVariableException;
+
 class TraversalWrapper {
 	protected $var;
 
@@ -18,7 +20,7 @@ class TraversalWrapper {
 	}
 
 	public function __get($name) {
-		if (isset($this->var[$name]))
+		if (is_array($this->var) && isset($this->var[$name]))
 			return new TraversalWrapper($this->var[$name]);
 		if (isset($this->var->$name))
 			return new TraversalWrapper($this->var->$name);
@@ -37,12 +39,14 @@ class TraversalWrapper {
 	public function __set($name, $val) {
 		if (is_array($this->var))
 			$this->var[$name] = $val;
-		else
+		else if (is_object($this->var))
 			$this->var->$name = $val;
+		else
+			throw new NoSuchVariableException("Cannot set member variable '$name' on a non-object.");
 	}
 
 	public function __isset($name) {
-		if (isset($this->var[$name]))
+		if (is_array($this->var) && isset($this->var[$name]))
 			return true;
 		if (isset($this->var->$name))
 			return true;
@@ -58,7 +62,7 @@ class TraversalWrapper {
 	}
 
 	public function __unset($name) {
-		if (isset($this->var[$name]))
+		if (is_array($this->var) && isset($this->var[$name]))
 			unset($this->var[$name]);
 		else if (isset($this->var->$name))
 			unset($this->var->$name);
