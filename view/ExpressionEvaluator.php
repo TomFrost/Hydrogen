@@ -366,26 +366,24 @@ class ExpressionEvaluator {
 			throw new TemplateSyntaxException("Missing ')' in expression: '" .
 				$expr . "'.");
 
-		// Parse the tokens
+		// Expand the function keywords
 		$len = count($tokens);
 		for ($i = 0; $i < $len; $i++) {
-			// Format the variables
-			if ($tokens[$i]->type === self::TOKEN_VAR)
-				$tokens[$i]->value = '\\' . __NAMESPACE__ .
-					'\ExpressionEvaluator::evalVariableString("' .
-					$tokens[$i]->value . '", $context)';
 			// Support the 'exists' function
 			if ($tokens[$i]->type === self::TOKEN_FUNC &&
 					$tokens[$i]->value === 'exists') {
 				if (isset($tokens[$i + 1]) &&
 						$tokens[$i + 1]->type === self::TOKEN_VAR) {
 					$var = $tokens[$i + 1];
-					array_splice($tokens, $i, 2, array(
+					$inst = array(
 						new TypedValue(self::TOKEN_PHP, '!is_null('),
 						$var,
 						new TypedValue(self::TOKEN_PHP, ')')
-					));
-					$len++;
+					);
+					array_splice($tokens, $i, 2, $inst);
+					$added = count($inst) - 2;
+					$len += $added;
+					$i += $added;
 				}
 				else
 					throw new TemplateSyntaxException("Keyword 'exists' must be used before a variable in expression: $expr");
@@ -409,11 +407,57 @@ class ExpressionEvaluator {
 						new TypedValue(self::TOKEN_PHP, ') === 0))')
 					);
 					array_splice($tokens, $i, 2, $inst);
-					$len += count($inst) - 2;
+					$added = count($inst) - 2;
+					$len += $added;
+					$i += $added;
 				}
 				else
 					throw new TemplateSyntaxException("Keyword 'empty' must be used before a variable in expression: $expr");
 			}
+			// Support the 'in' function
+			if ($tokens[$i]->type === self::TOKEN_FUNC &&
+					$tokens[$i]->value === 'in') {
+				if ($i !== 0 && isset($tokens[$i + 1]) &&
+						($tokens[$i - 1]->type === self::TOKEN_VAR ||
+						$tokens[$i - 1]->type === self::TOKEN_STRING) &&
+						($tokens[$i + 1]->type === self::TOKEN_VAR ||
+						$tokens[$i + 1]->type === self::TOKEN_STRING)) {
+					$var1 = $tokens[$i - 1];
+					$var2 = $tokens[$i + 1];
+					$inst = array(
+						new TypedValue(self::TOKEN_PHP, '((!is_array('),
+						$var2,
+						new TypedValue(self::TOKEN_PHP, ') && strpos('),
+						clone $var2,
+						new TypedValue(self::TOKEN_PHP, ', '),
+						$var1,
+						new TypedValue(self::TOKEN_PHP,
+							') !== false) || (is_array('),
+						clone $var2,
+						new TypedValue(self::TOKEN_PHP, ') && in_array('),
+						clone $var1,
+						new TypedValue(self::TOKEN_PHP, ', '),
+						clone $var2,
+						new TypedValue(self::TOKEN_PHP, ')))')
+					);
+					array_splice($tokens, $i - 1, 3, $inst);
+					$added = count($inst) - 3;
+					$len += $added;
+					$i += $added;
+				}
+				else
+					throw new TemplateSyntaxException("Keyword 'in' must be used between two arrays or strings in expression: $expr");
+			}
+		}
+
+		// Rewrite the variables to be evaluated by this class
+		$len = count($tokens);
+		for ($i = 0; $i < $len; $i++) {
+			// Format the variables
+			if ($tokens[$i]->type === self::TOKEN_VAR)
+				$tokens[$i]->value = '\\' . __NAMESPACE__ .
+					'\ExpressionEvaluator::evalVariableString("' .
+					$tokens[$i]->value . '", $context)';
 		}
 		return implode(' ', $tokens);
 	}
