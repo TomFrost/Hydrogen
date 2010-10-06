@@ -22,7 +22,7 @@ class TraversalWrapper {
 			return new TraversalWrapper($this->var[$name]);
 		if (isset($this->var->$name))
 			return new TraversalWrapper($this->var->$name);
-		if (is_object($var)) {
+		if (is_object($this->var)) {
 			$methods = get_class_methods($this->var);
 			if (in_array(($func = "get" . ucfirst($name)), $methods) ||
 					in_array(($func = "is" . ucfirst($name)), $methods) ||
@@ -46,7 +46,7 @@ class TraversalWrapper {
 			return true;
 		if (isset($this->var->$name))
 			return true;
-		if (is_object($var)) {
+		if (is_object($this->var)) {
 			$methods = get_class_methods($this->var);
 			if (in_array(($func = "get" . ucfirst($name)), $methods) ||
 					in_array(($func = "is" . ucfirst($name)), $methods) ||
