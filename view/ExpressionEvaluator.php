@@ -31,7 +31,7 @@ class ExpressionEvaluator {
 
 	protected static $joiners = array('&&', '||');
 
-	protected static $functions = array("in", "empty");
+	protected static $functions = array("in", "empty", "exists");
 
 	protected static $varTranslations = array(
 		"and" => array(self::TOKEN_JOIN, '&&'),
@@ -318,6 +318,24 @@ class ExpressionEvaluator {
 				$tokens[$i]->value = '\\' . __NAMESPACE__ .
 					'\ExpressionEvaluator::evalVariableString("' .
 					$tokens[$i]->value . '", $context)';
+			if ($tokens[$i]->type === self::TOKEN_FUNC &&
+					$tokens[$i]->value === 'exists') {
+				if (isset($tokens[$i + 1]) &&
+						$tokens[$i + 1]->type === self::TOKEN_VAR) {
+					array_splice($tokens, $i + 2, 0, array(
+						new TypedValue(self::TOKEN_CLOSEGROUP, ')')
+					));
+					array_splice($tokens, $i, 1, array(
+						new TypedValue(self::TOKEN_INVERT, '!'),
+						new TypedValue(self::TOKEN_FUNC, "is_null"),
+						new TypedValue(self::TOKEN_OPENGROUP, '(')
+					));
+					$len += 3;
+					$i += 2;
+				}
+				else
+					throw new TemplateSyntaxException("Keyword 'exists' must be used before a variable in expression: $expr");
+			}
 		}
 		return implode(' ', $tokens);
 	}
