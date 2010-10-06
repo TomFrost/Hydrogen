@@ -9,8 +9,8 @@ namespace hydrogen\view;
 class TraversalWrapper {
 	protected $var;
 
-	public function __construct($var) {
-		$this->var = $var;
+	public function __construct(&$var) {
+		$this->var = &$var;
 	}
 
 	public function getValue() {
