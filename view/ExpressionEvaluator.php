@@ -24,8 +24,9 @@ class ExpressionEvaluator {
 	const TOKEN_CLOSEGROUP = 7;
 	const TOKEN_INVERT = 8;
 	const TOKEN_STRING = 9;
-	const TOKEN_FUNC = 10;
-	const TOKEN_PHP = 11;
+	const TOKEN_CONCAT = 10;
+	const TOKEN_FUNC = 11;
+	const TOKEN_PHP = 12;
 
 	protected static $operators = array('-', '+', '/', '*', '%');
 
@@ -65,6 +66,7 @@ class ExpressionEvaluator {
 		$varEscaping = false;
 		$varInFilter = false;
 		$numHasDot = false;
+		$stringEscaping = false;
 		$groupRatio = 0;
 		for ($i = 0; $i <= $len; $i++) {
 			if ($i === $len)
@@ -99,12 +101,39 @@ class ExpressionEvaluator {
 					// Test for close group
 					else if ($char === ')')
 						$state = self::TOKEN_CLOSEGROUP;
+					// Test for string
+					else if ($char === '"')
+						$state = self::TOKEN_STRING;
 					// Spaces are legal, but nothing else
 					else if ($char !== ' ')
 						throw new TemplateSyntaxException(
 							"Illegal character '" . $char .
 							"' (ASCII " . ord($char) . ") in expression: '" .
 							$expr . "'");
+					break;
+				case self::TOKEN_STRING:
+					// Current char can be anything but an unescaped quote.
+					$token .= $char;
+					if ($stringEscaping === false && $char === '"') {
+						if ($lastToken === self::TOKEN_NONE ||
+								$lastToken === self::TOKEN_COMP ||
+								$lastToken === self::TOKEN_CONCAT ||
+								$lastToken === self::TOKEN_FUNC ||
+								$lastToken === self::TOKEN_JOIN ||
+								$lastToken === self::TOKEN_OPENGROUP) {
+							$tokens[] = new TypedValue(
+								self::TOKEN_STRING, $token);
+							$state = self::TOKEN_NONE;
+							$lastToken = self::TOKEN_STRING;
+						}
+						else
+							throw new TemplateSyntaxException(
+								"Misplaced string $token in expression $expr");
+					}
+					else if ($stringEscaping === true)
+						$stringEscaping = false;
+					else if ($char === '\\')
+						$stringEscaping = true;
 					break;
 				case self::TOKEN_NUM:
 					// Current char must be numeric or decimal
@@ -123,11 +152,19 @@ class ExpressionEvaluator {
 								"' cannot have multiple decimal points in expression: '" .
 								$expr . "'");
 					}
+					else if ($token === '.') {
+						// If out token is JUST a dot, this isn't a number
+						// at all-- it's a concatenator
+						$state = self::TOKEN_CONCAT;
+						$numHasDot = false;
+						$i--;
+					}
 					else if ($lastToken === self::TOKEN_NONE ||
 							$lastToken === self::TOKEN_COMP ||
 							$lastToken === self::TOKEN_JOIN ||
 							$lastToken === self::TOKEN_OP ||
-							$lastToken === self::TOKEN_OPENGROUP) {
+							$lastToken === self::TOKEN_OPENGROUP ||
+							$lastToken === self::TOKEN_CONCAT) {
 						$tokens[] = new TypedValue(self::TOKEN_NUM, $token);
 						$lastToken = self::TOKEN_NUM;
 						$state = self::TOKEN_NONE;
@@ -206,7 +243,8 @@ class ExpressionEvaluator {
 								$lastToken === self::TOKEN_JOIN ||
 								$lastToken === self::TOKEN_OP ||
 								$lastToken === self::TOKEN_OPENGROUP ||
-								$lastToken === self::TOKEN_FUNC) {
+								$lastToken === self::TOKEN_FUNC ||
+								$lastToken === self::TOKEN_CONCAT) {
 							$tokens[] = new TypedValue(self::TOKEN_VAR,
 								$token);
 							$state = self::TOKEN_NONE;
@@ -279,6 +317,7 @@ class ExpressionEvaluator {
 				case self::TOKEN_CLOSEGROUP:
 					if (($lastToken === self::TOKEN_VAR ||
 							$lastToken === self::TOKEN_NUM ||
+							$lastToken === self::TOKEN_STRING ||
 							$lastToken === self::TOKEN_CLOSEGROUP) &&
 							$groupRatio > 0) {
 						$tokens[] = new TypedValue(self::TOKEN_CLOSEGROUP,
@@ -307,6 +346,20 @@ class ExpressionEvaluator {
 						throw new TemplateSyntaxException(
 							"Misplaced '!' in expression: '" .
 							$expr . "'.");
+					break;
+				case self::TOKEN_CONCAT:
+					if ($lastToken === self::TOKEN_CLOSEGROUP ||
+							$lastToken === self::TOKEN_NUM ||
+							$lastToken === self::TOKEN_STRING ||
+							$lastToken === self::TOKEN_VAR) {
+						$tokens[] = new TypedValue(self::TOKEN_CONCAT, $token);
+						$state = self::TOKEN_NONE;
+						$lastToken = self::TOKEN_CONCAT;
+						$i--;
+					}
+					else
+						throw new TemplateSyntaxException(
+							"Misplaced '.' in expression: '" . $expr . "'.");
 			}
 		}
 		if ($groupRatio !== 0)
@@ -316,10 +369,12 @@ class ExpressionEvaluator {
 		// Parse the tokens
 		$len = count($tokens);
 		for ($i = 0; $i < $len; $i++) {
+			// Format the variables
 			if ($tokens[$i]->type === self::TOKEN_VAR)
 				$tokens[$i]->value = '\\' . __NAMESPACE__ .
 					'\ExpressionEvaluator::evalVariableString("' .
 					$tokens[$i]->value . '", $context)';
+			// Support the 'exists' function
 			if ($tokens[$i]->type === self::TOKEN_FUNC &&
 					$tokens[$i]->value === 'exists') {
 				if (isset($tokens[$i + 1]) &&
@@ -335,6 +390,7 @@ class ExpressionEvaluator {
 				else
 					throw new TemplateSyntaxException("Keyword 'exists' must be used before a variable in expression: $expr");
 			}
+			// Support the 'empty' function
 			if ($tokens[$i]->type === self::TOKEN_FUNC &&
 					$tokens[$i]->value === 'empty') {
 				if (isset($tokens[$i + 1]) &&
