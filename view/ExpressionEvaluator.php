@@ -23,7 +23,9 @@ class ExpressionEvaluator {
 	const TOKEN_OPENGROUP = 6;
 	const TOKEN_CLOSEGROUP = 7;
 	const TOKEN_INVERT = 8;
-	const TOKEN_FUNC = 9;
+	const TOKEN_STRING = 9;
+	const TOKEN_FUNC = 10;
+	const TOKEN_PHP = 11;
 
 	protected static $operators = array('-', '+', '/', '*', '%');
 
@@ -322,19 +324,39 @@ class ExpressionEvaluator {
 					$tokens[$i]->value === 'exists') {
 				if (isset($tokens[$i + 1]) &&
 						$tokens[$i + 1]->type === self::TOKEN_VAR) {
-					array_splice($tokens, $i + 2, 0, array(
-						new TypedValue(self::TOKEN_CLOSEGROUP, ')')
+					$var = $tokens[$i + 1];
+					array_splice($tokens, $i, 2, array(
+						new TypedValue(self::TOKEN_PHP, '!is_null('),
+						$var,
+						new TypedValue(self::TOKEN_PHP, ')')
 					));
-					array_splice($tokens, $i, 1, array(
-						new TypedValue(self::TOKEN_INVERT, '!'),
-						new TypedValue(self::TOKEN_FUNC, "is_null"),
-						new TypedValue(self::TOKEN_OPENGROUP, '(')
-					));
-					$len += 3;
-					$i += 2;
+					$len++;
 				}
 				else
 					throw new TemplateSyntaxException("Keyword 'exists' must be used before a variable in expression: $expr");
+			}
+			if ($tokens[$i]->type === self::TOKEN_FUNC &&
+					$tokens[$i]->value === 'empty') {
+				if (isset($tokens[$i + 1]) &&
+						$tokens[$i + 1]->type === self::TOKEN_VAR) {
+					$var = $tokens[$i + 1];
+					$inst = array(
+						new TypedValue(self::TOKEN_PHP, '(!is_null('),
+						$var,
+						new TypedValue(self::TOKEN_PHP, ') && '),
+						clone $var,
+						new TypedValue(self::TOKEN_PHP,
+							' !== "" && (!is_array('),
+						clone $var,
+						new TypedValue(self::TOKEN_PHP, ') || count('),
+						clone $var,
+						new TypedValue(self::TOKEN_PHP, ') === 0))')
+					);
+					array_splice($tokens, $i, 2, $inst);
+					$len += count($inst) - 2;
+				}
+				else
+					throw new TemplateSyntaxException("Keyword 'empty' must be used before a variable in expression: $expr");
 			}
 		}
 		return implode(' ', $tokens);
