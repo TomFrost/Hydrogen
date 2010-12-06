@@ -1,4 +1,6 @@
 .DS_Store
 *~
 *.kpf
+*.komodoproject
+.komodotools*
 hydrogen.autoconfig.php
