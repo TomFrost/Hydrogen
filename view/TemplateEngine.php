@@ -6,9 +6,12 @@
 
 namespace hydrogen\view;
 
-interface TemplateEngine {
+abstract class TemplateEngine {
 
-	public static function getPHP($loader, $templateName);
+	public abstract static function getPHP($templateName, $loader);
+	
+	// Engines themselves should not be instantiated
+	protected function __construct() {}
 
 }
 
