@@ -4,9 +4,9 @@
  * All rights reserved.
  */
 
-namespace hydrogen\view;
+namespace hydrogen\view\engines\hydrogen;
 
-use hydrogen\view\ExpressionEvaluator;
+use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
 
 class FilterArgument {
 	const TYPE_VARIABLE = 0;
