@@ -13,7 +13,7 @@ class LoaderFactory {
 	
 	public static function getLoader($loaderType=false) {
 		if (!$loaderType)
-			$loaderType = Config::getVal("view", "loader_type") ?: "File";
+			$loaderType = Config::getVal("view", "loader") ?: "File";
 		if (!isset(static::$loaders[$loaderType])) {
 			$class = __NAMESPACE__ . '\loaders\\' . $loaderType . 'Loader';
 			static::$loaders[$loaderType] = new $class();

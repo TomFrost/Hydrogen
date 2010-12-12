@@ -14,8 +14,8 @@ use hydrogen\view\exceptions\NoSuchViewException;
 class ViewSandbox {
 	
 	protected $context;
-	protected $appURL;
-	protected $viewURL;
+	protected $cleanAppURL;
+	protected $cleanViewURL;
 	
 	/**
 	 * Creates a new ViewSandbox and calculates the necessary URLs.
@@ -25,18 +25,18 @@ class ViewSandbox {
 	 */
 	public function __construct($context=false) {
 		$this->context = $context ?: new ContextStack();
-		$this->appURL = Config::getRequiredVal("general", "app_url");
-		if ($this->appURL[strlen($this->appURL) - 1] == '/')
-			$this->appURL = substr($this->appURL, 0, -1);
-		$this->viewURL = Config::getVal("view", "root_url");
-		if ($this->viewURL === false) {
-			$this->viewURL = $this->appURL(Config::getRequiredVal("view", 
+		$this->cleanAppURL = Config::getRequiredVal("general", "app_url");
+		if ($this->cleanAppURL[strlen($this->cleanAppURL) - 1] == '/')
+			$this->cleanAppURL = substr($this->cleanAppURL, 0, -1);
+		$this->cleanViewURL = Config::getVal("view", "root_url");
+		if ($this->cleanViewURL === false) {
+			$this->cleanViewURL = $this->appURL(Config::getRequiredVal("view", 
 				"url_path"));
 		}
-		if ($this->viewURL[strlen($this->viewURL) - 1] == '/')
-			$this->viewURL = substr($this->viewURL, 0, -1);
-		$this->context->viewURL = $this->viewURL;
-		$this->context->appURL = $this->appURL;
+		if ($this->cleanViewURL[strlen($this->cleanViewURL) - 1] == '/')
+			$this->cleanViewURL = substr($this->cleanViewURL, 0, -1);
+		$this->context->viewURL = $this->cleanViewURL;
+		$this->context->appURL = $this->cleanAppURL;
 	}
 	
 	/**
@@ -102,6 +102,49 @@ class ViewSandbox {
 	 */
 	public function loadView($viewName) {
 		View::loadIntoSandbox($viewName, $this);
+	}
+	
+	/**
+	 * Generates a URL relative to the base URL of this web application.
+	 * Calling this function with no arguments returns the base URL set in
+	 * the config file, with the trailing slash (if there is one) removed.
+	 *
+	 * Optionally, this function may be called with a path, which will be
+	 * appended to the base URL before it is returned.
+	 *
+	 * @param path string|boolean The path to append to the base app URL, or
+	 * 		false to return the base URL with no additional path.
+	 * @return string The base URL for this web app with the given path
+	 * 		appended, if provided.
+	 */
+	public function appURL($path=false) {
+		if ($path !== false) {
+			if ($path[0] == '/')
+				return $this->cleanAppURL . $path;
+			return $this->cleanAppURL . '/' . $path;
+		}
+		return $this->cleanAppURL;
+	}
+	
+	/**
+	 * Generates a URL relative to the root view URL of this web application.
+	 * Calling this function with no arguments returns the root view URL for
+	 * the currently used view, with no trailing slash.  Calling this function
+	 * with a path returns the root view URL with the given path appended
+	 * to it.
+	 *
+	 * @param path string|boolean The path to append to the root view URL, or
+	 * 		false to return the view URL with no additional path.
+	 * @return string The root URL for this view with the given path appended,
+	 * 		if provided.
+	 */
+	public function viewURL($path=false) {
+		if ($path !== false) {
+			if ($path[0] == '/')
+				return $this->cleanViewURL . $path;
+			return $this->cleanViewURL . '/' . $path;
+		}
+		return $this->cleanViewURL;
 	}
 	
 	/**

@@ -8,7 +8,7 @@ namespace hydrogen\view\engines\purephp;
 
 use hydrogen\view\TemplateEngine;
 
-class PurephpEngine extends TemplateEngine {
+class PurephpEngine implements TemplateEngine {
 
 	public static function getPHP($templateName, $loader) {
 		return "<?php echo 'unfinished!'; ?>";

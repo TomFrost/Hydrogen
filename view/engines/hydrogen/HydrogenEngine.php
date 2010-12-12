@@ -9,7 +9,7 @@ namespace hydrogen\view\engines\hydrogen;
 use hydrogen\view\TemplateEngine;
 use hydrogen\view\engines\hydrogen\Parser;
 
-class HydrogenEngine extends TemplateEngine {
+class HydrogenEngine implements TemplateEngine {
 
 	public static function getPHP($templateName, $loader) {
 		$parser = new Parser($templateName, $loader);
