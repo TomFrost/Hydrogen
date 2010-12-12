@@ -65,8 +65,6 @@ class PHPFile {
 		$page = str_replace(self::PHP_CLOSETAG . self::PHP_OPENTAG, '', $page);
 		return $page;
 	}
-
-	public function writePHPFile($filePath) {}
 }
 
 ?>
