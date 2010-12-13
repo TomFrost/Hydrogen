@@ -7,7 +7,7 @@
 namespace hydrogen\view\engines\hydrogen\nodes;
 
 use hydrogen\view\engines\hydrogen\Node;
-use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
+use hydrogen\view\engines\hydrogen\ExpressionParser;
 
 class EvalNode implements Node {
 	protected $expr;
@@ -16,11 +16,8 @@ class EvalNode implements Node {
 		$this->expr = $expr;
 	}
 
-	public function render($context) {
-		$result = ExpressionEvaluator::evaluate($this->expr, $context);
-		if (is_bool($result))
-			echo $result ? 'true' : 'false';
-		else
-			echo $result;
+	public function render($phpFile) {
+		$result = ExpressionEvaluator::exprToPHP($this->expr);
+		$phpFile->addPageContent($result);
 	}
 }

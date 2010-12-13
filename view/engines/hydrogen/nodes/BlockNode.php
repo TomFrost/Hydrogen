@@ -19,7 +19,7 @@ class BlockNode implements Node {
 		$this->nodes = $nodes;
 	}
 
-	public function render($context) {
-		$this->nodes->render($context);
+	public function render($phpFile) {
+		$this->nodes->render($phpFile);
 	}
 }

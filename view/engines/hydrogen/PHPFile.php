@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-namespace hydrogen\view;
+namespace hydrogen\view\engines\hydrogen;
 
 use hydrogen\view\exceptions\MemberAlreadyExistsException;
 
@@ -51,11 +51,11 @@ class PHPFile {
 
 	public function getPHP() {
 		$page = self::PHP_OPENTAG;
-		foreach ($contextDeclarations as $var => $val)
+		foreach ($this->contextDeclarations as $var => $val)
 			$page .= '$context->' . $var . " = $val;";
-		foreach ($privateDeclarations as $var => $val)
+		foreach ($this->privateDeclarations as $var => $val)
 			$page .= '$' . $var . " = $val;";
-		foreach ($functions as $name => $data) {
+		foreach ($this->functions as $name => $data) {
 			$page .= "function $name(";
 			if (is_array($data[0]))
 				$page .= implode(', ', $data[0]);

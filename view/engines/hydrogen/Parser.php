@@ -123,11 +123,14 @@ class Parser {
 	}
 
 	protected function getBlockNode($origin, $cmd, $args) {
-		$class = '\hydrogen\view\tags\\' . ucfirst(strtolower($cmd)) . 'Tag';
+		$class = '\\' . __NAMESPACE__ . '\tags\\' .
+			ucfirst(strtolower($cmd)) . 'Tag';
 		if (!@class_exists($class))
 			throw new NoSuchTagException("Tag in template \"$origin\" does not exist: $cmd");
-		if ($class::mustBeFirst() && $this->originHasNodes($origin))
-			throw new TemplateSyntaxException("Tag must be first in template: $cmd");
+		if ($class::mustBeFirst() && $this->originHasNodes($origin)) {
+			throw new TemplateSyntaxException(
+				"Tag must be first in template: $cmd");
+		}
 		return $class::getNode($cmd, $args, $this, $origin);
 	}
 }

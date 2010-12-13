@@ -12,7 +12,7 @@ use hydrogen\view\engines\hydrogen\exceptions\NoSuchVariableException;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
-class ExpressionEvaluator {
+class ExpressionParser {
 
 	const TOKEN_NONE = 0;
 	const TOKEN_OP = 1;
@@ -49,11 +49,6 @@ class ExpressionEvaluator {
 
 	// This is a statically accessed class
 	protected function __construct() {}
-
-	public static function evaluate($expr, $context) {
-		$php = static::exprToPHP($expr);
-		return eval("return $php;");
-	}
 
 	public static function exprToPHP(&$expr) {
 		$state = self::TOKEN_NONE;
@@ -456,7 +451,7 @@ class ExpressionEvaluator {
 			// Format the variables
 			if ($tokens[$i]->type === self::TOKEN_VAR)
 				$tokens[$i]->value = '\\' . __NAMESPACE__ .
-					'\ExpressionEvaluator::evalVariableString("' .
+					'\ExpressionParser::evalVariableString("' .
 					$tokens[$i]->value . '", $context)';
 		}
 		return implode(' ', $tokens);
@@ -487,7 +482,7 @@ class ExpressionEvaluator {
 		if ($var !== NULL) {
 			$var = $var->getValue();
 			foreach ($filters as $filter) {
-				$class = '\hydrogen\view\filters\\' .
+				$class = '\\' . __NAMESPACE__ . '\filters\\' .
 					ucfirst(strtolower($filter->filter)) . 'Filter';
 				if (!@class_exists($class)) {
 					$e = new NoSuchFilterException('Filter does not exist: "' .

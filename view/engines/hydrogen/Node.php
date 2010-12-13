@@ -7,7 +7,7 @@
 namespace hydrogen\view\engines\hydrogen;
 
 interface Node {
-	public function render($context);
+	public function render($phpFile);
 }
 
 ?>

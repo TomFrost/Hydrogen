@@ -6,7 +6,7 @@
 
 namespace hydrogen\view\engines\hydrogen\nodes;
 
-use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
+use hydrogen\view\engines\hydrogen\ExpressionParser;
 use hydrogen\view\engines\hydrogen\Node;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchVariableException;
@@ -24,9 +24,9 @@ class VariableNode implements Node {
 		$this->origin = $origin;
 	}
 
-	public function render($context) {
+	public function render($phpFile) {
 		try {
-			$val = ExpressionEvaluator::evalVariableTokens($this->varLevels,
+			$val = ExpressionParser::evalVariableTokens($this->varLevels,
 				$this->filters, $context);
 		}
 		catch (NoSuchFilterException $e) {

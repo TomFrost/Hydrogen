@@ -6,13 +6,15 @@
 
 namespace hydrogen\view\engines\hydrogen;
 
+use hydrogen\view\engines\hydrogen\PHPFile;
+
 class NodeArray extends \ArrayObject {
 
-	public function render($context) {
-		$rendered = '';
+	public function render() {
+		$phpFile = new PHPFile();
 		foreach ($this as $node)
-			$rendered .= $node->render($context);
-		return $rendered;
+			$node->render($phpFile);
+		return $phpFile->getPHP();
 	}
 }
 
