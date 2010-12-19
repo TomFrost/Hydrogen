@@ -6,6 +6,7 @@
 
 namespace hydrogen\view\engines\hydrogen;
 
+use hydrogen\view\engines\hydrogen\nodes\VariableNode;
 use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
 
 class FilterArgument {
@@ -15,9 +16,14 @@ class FilterArgument {
 		$this->data = &$data;
 	}
 
-	public function getPHPValue() {
-		if (is_object($this->data))
-			return $this->data->getVariablePHP();
+	public function getPHPValue($phpFile) {
+		if (is_object($this->data)) {
+			$var = new VariableNode(
+				$this->data->varLevels,
+				$this->data->filters,
+				$this->data->origin);
+			return $var->getVariablePHP($phpFile);
+		}
 		return $this->data;
 	}
 }
