@@ -10,8 +10,8 @@ use hydrogen\view\engines\hydrogen\Filter;
 
 class UpperFilter implements Filter {
 
-	public static function applyTo($string, $args, $context) {
-		return strtoupper($string);
+	public static function applyTo($string, $args, $phpfile) {
+		return 'strtoupper(' . $string . ')';
 	}
 
 }

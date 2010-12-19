@@ -7,7 +7,7 @@
 namespace hydrogen\view\engines\hydrogen;
 
 interface Filter {
-	public static function applyTo($string, $args, $context);
+	public static function applyTo($string, $args, $phpfile);
 }
 
 ?>
