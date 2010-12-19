@@ -28,12 +28,12 @@ class VariableNode implements Node {
 	public function render($phpFile) {
 		$phpFile->addPageContent(
 			PHPFile::PHP_OPENTAG .
-			'echo ' . $this->getVariablePHP($phpFile) .
+			'echo ' . $this->getVariablePHP($phpFile) . ';' .
 			PHPFile::PHP_CLOSETAG);
 	}
 	
 	public function getVariablePHP($phpFile) {
-		$var = '$context->';
+		$var = '$context';
 		foreach ($this->varLevels as $level)
 			$var .= "->" . $level;
 		$var .= "->getValue()";
