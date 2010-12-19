@@ -9,21 +9,15 @@ namespace hydrogen\view\engines\hydrogen;
 use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
 
 class FilterArgument {
-	const TYPE_VARIABLE = 0;
-	const TYPE_NATIVE = 1;
-
 	protected $data;
-	protected $type;
 
-	public function __construct($type, $data) {
-		$this->type = &$type;
+	public function __construct($data) {
 		$this->data = &$data;
 	}
 
-	public function getValue($context) {
-		if ($this->type === self::TYPE_VARIABLE)
-			return ExpressionEvaluator::evalVariableString($this->data,
-				$context);
+	public function getPHPValue() {
+		if (is_object($this->data))
+			return $this->data->renderPlain();
 		return $this->data;
 	}
 }
