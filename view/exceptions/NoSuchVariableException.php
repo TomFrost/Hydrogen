@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-namespace hydrogen\view\engines\hydrogen\exceptions;
+namespace hydrogen\view\exceptions;
 
 class NoSuchVariableException extends \Exception {
 	public $variable = false;
