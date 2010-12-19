@@ -22,7 +22,7 @@ class FileLoader implements Loader {
 	 */
 	public function getViewPath($viewName) {
 		$path = Config::getRequiredVal("view", "folder") .
-			DIRECTORY_SEPARATOR . $viewName .
+			'/' . $viewName .
 			Config::getRequiredVal("view", "file_extension");
 		return Config::getAbsolutePath($path);
 	}
