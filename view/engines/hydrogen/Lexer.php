@@ -115,7 +115,8 @@ class Lexer {
 				}
 				else if (ctype_alpha($fArgs[$i][0])) {
 					$fArgs[$i] = new FilterArgument(
-						$fArgs[$i] = static::getVariableToken($fArgs[$i])
+						$fArgs[$i] = static::getVariableToken($origin,
+							$fArgs[$i])
 					);
 				}
 				else
