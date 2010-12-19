@@ -33,7 +33,10 @@ class TraversalWrapper {
 				return new TraversalWrapper(
 					call_user_func(array($this->var, $func)));
 		}
-		return NULL;
+		$e = new NoSuchVariableException(
+			"Variable does not exist in context: $name");
+		$e->variable = $name;
+		throw $e;
 	}
 
 	public function __set($name, $val) {
