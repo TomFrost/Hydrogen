@@ -11,6 +11,7 @@ use hydrogen\view\engines\hydrogen\Node;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchVariableException;
 use hydrogen\view\engines\hydrogen\Lexer;
+use hydrogen\view\engines\hydrogen\PHPFile;
 use hydrogen\config\Config;
 
 class VariableNode implements Node {
@@ -25,30 +26,27 @@ class VariableNode implements Node {
 	}
 
 	public function render($phpFile) {
-		try {
-			$val = ExpressionParser::evalVariableTokens($this->varLevels,
-				$this->filters, $context);
-		}
-		catch (NoSuchFilterException $e) {
-			$fe = new NoSuchFilterException('Filter "' . $e->filter .
-				'" does not exist in template "' . $this->origin . '".');
-			$fe->filter = &$e->filter;
-			throw $fe;
-		}
-		if ($val === NULL) {
-			$this->reportMissing(implode(Lexer::VARIABLE_LEVEL_SEPARATOR,
-				$this->varLevels));
-			return;
-		}
-		echo $val;
+		$phpFile->addPageContent(
+			PHPFile::PHP_OPENTAG .
+			'echo ' . $this->getVariablePHP($phpFile) .
+			PHPFile::PHP_CLOSETAG);
 	}
-
-	protected function reportMissing($varString) {
-		if (Config::getVal("view", "print_missing_var"))
-			echo "?? " . $varString . " ??";
-		else
-			throw new NoSuchVariableException('Variable "' .
-				$varString . '" does not exist in template "' .
-				$this->origin . '".');
+	
+	public function getVariablePHP($phpFile) {
+		$var = '$context->';
+		foreach ($this->varLevels as $level)
+			$var .= "->" . $level;
+		$var .= "->getValue()";
+		foreach ($this->filters as $filter) {
+			$class = '\hydrogen\view\engines\hydrogen\filters\\' .
+				ucfirst(strtolower($filter->filter)) . 'Filter';
+			if (!@class_exists($class)) {
+				throw new NoSuchFilterException('Filter in "' .
+					$this->origin . '" does not exist: "' .
+					$filter . '".');
+			}
+			$var = $class::applyTo($var, $filter->args, $phpFile);
+		}
+		return $var;
 	}
 }

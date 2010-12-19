@@ -17,7 +17,7 @@ class FilterArgument {
 
 	public function getPHPValue() {
 		if (is_object($this->data))
-			return $this->data->renderPlain();
+			return $this->data->getVariablePHP();
 		return $this->data;
 	}
 }

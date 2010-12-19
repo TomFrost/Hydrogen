@@ -7,7 +7,7 @@
 namespace hydrogen\view\engines\hydrogen\exceptions;
 
 class NoSuchFilterException extends \Exception {
-	public $filter = false;
+
 }
 
 ?>

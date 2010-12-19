@@ -98,13 +98,11 @@ class Lexer {
 				if (static::surroundedby($fArgs[$i], '"', '"')) {
 					$fArgs[$i] = stripslashes($fArgs[$i]);
 					$fArgs[$i] = new FilterArgument(
-						FilterArgument::TYPE_NATIVE,
 						substr($fArgs[$i], 1, -1)
 					);
 				}
 				else if (is_numeric($fArgs[$i])) {
 					$fArgs[$i] = new FilterArgument(
-						FilterArgument::TYPE_NATIVE,
 						ctype_digit($fArgs[$i]) ? (int)$fArgs[$i] :
 							(float)$fArgs[$i]
 					);
@@ -112,14 +110,12 @@ class Lexer {
 				else if (($bool = strtolower($fArgs[$i]) === 'true') ||
 						$bool === 'false') {
 					$fArgs[$i] = new FilterArgument(
-						FilterArgument::TYPE_NATIVE,
 						$fArgs[$i] === 'true' ? true : false
 					);
 				}
 				else if (ctype_alpha($fArgs[$i][0])) {
 					$fArgs[$i] = new FilterArgument(
-						FilterArgument::TYPE_VARIABLE,
-						$fArgs[$i]
+						$fArgs[$i] = static::getVariableToken($fArgs[$i])
 					);
 				}
 				else
