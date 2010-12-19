@@ -17,7 +17,7 @@ class EvalNode implements Node {
 	}
 
 	public function render($phpFile) {
-		$result = ExpressionEvaluator::exprToPHP($this->expr);
+		$result = ExpressionParser::exprToPHP($this->expr);
 		$phpFile->addPageContent($result);
 	}
 }
