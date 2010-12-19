@@ -50,18 +50,24 @@ class PHPFile {
 	}
 
 	public function getPHP() {
-		$page = self::PHP_OPENTAG;
-		foreach ($this->contextDeclarations as $var => $val)
-			$page .= '$context->' . $var . " = $val;";
-		foreach ($this->privateDeclarations as $var => $val)
-			$page .= '$' . $var . " = $val;";
-		foreach ($this->functions as $name => $data) {
-			$page .= "function $name(";
-			if (is_array($data[0]))
-				$page .= implode(', ', $data[0]);
-			$page .= ") {$data[1]}";
+		$page = '';
+		if (count($this->contextDeclarations) +
+				count($this->privateDeclarations) +
+				count($this->functions) > 0) {
+			$page = self::PHP_OPENTAG;
+			foreach ($this->contextDeclarations as $var => $val)
+				$page .= '$context->' . $var . " = $val;";
+			foreach ($this->privateDeclarations as $var => $val)
+				$page .= '$' . $var . " = $val;";
+			foreach ($this->functions as $name => $data) {
+				$page .= "function $name(";
+				if (is_array($data[0]))
+					$page .= implode(', ', $data[0]);
+				$page .= ") {$data[1]}";
+			}
+			$page .= self::PHP_CLOSETAG;
 		}
-		$page .= self::PHP_CLOSETAG . $this->content;
+		$page .= $this->content;
 		$page = str_replace(self::PHP_CLOSETAG . self::PHP_OPENTAG, '', $page);
 		return $page;
 	}
