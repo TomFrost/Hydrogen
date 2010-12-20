@@ -11,7 +11,7 @@ use hydrogen\view\TemplateEngine;
 class PurephpEngine implements TemplateEngine {
 
 	public static function getPHP($templateName, $loader) {
-		return "<?php echo 'unfinished!'; ?>";
+		return $loader->load($templateName);
 	}
 
 }
