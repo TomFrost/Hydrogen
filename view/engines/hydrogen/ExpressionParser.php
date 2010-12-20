@@ -8,6 +8,7 @@ namespace hydrogen\view\engines\hydrogen;
 
 use hydrogen\common\TypedValue;
 use hydrogen\view\engines\hydrogen\Lexer;
+use hydrogen\view\engines\hydrogen\nodes\VariableNode;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
@@ -49,7 +50,7 @@ class ExpressionParser {
 	// This is a statically accessed class
 	protected function __construct() {}
 
-	public static function exprToPHP(&$expr) {
+	public static function exprToPHP(&$expr, $phpFile, $origin='expression') {
 		$state = self::TOKEN_NONE;
 		$token = '';
 		$tokens = array();
@@ -449,9 +450,8 @@ class ExpressionParser {
 		for ($i = 0; $i < $len; $i++) {
 			// Format the variables
 			if ($tokens[$i]->type === self::TOKEN_VAR)
-				$tokens[$i]->value = '\\' . __NAMESPACE__ .
-					'\ExpressionParser::evalVariableString("' .
-					$tokens[$i]->value . '", $context)';
+				$tokens[$i]->value = static::parseVariableString(
+					$tokens[$i]->value, $phpFile, $origin);
 		}
 		return implode(' ', $tokens);
 	}
@@ -474,31 +474,11 @@ class ExpressionParser {
 		return $haystack;
 	}
 
-	public static function evalVariableTokens($varLevels, $filters, $context) {
-		$var = $context->getWrapped(array_shift($varLevels));
-		while ($var !== NULL && $level = array_shift($varLevels))
-			$var = $var->$level;
-		if ($var !== NULL) {
-			$var = $var->getValue();
-			foreach ($filters as $filter) {
-				$class = '\\' . __NAMESPACE__ . '\filters\\' .
-					ucfirst(strtolower($filter->filter)) . 'Filter';
-				if (!@class_exists($class)) {
-					$e = new NoSuchFilterException('Filter does not exist: "' .
-						$filter . '".');
-					$e->filter = $filter;
-					throw $e;
-				}
-				$var = $class::applyTo($var, $filter->args, $context);
-			}
-		}
-		return $var;
-	}
-
-	public static function evalVariableString($varString, $context) {
-		$token = Lexer::getVariableToken("expr", $varString);
-		return static::evalVariableTokens($token->varLevels, $token->filters,
-			$context);
+	protected static function parseVariableString($varString,
+			$phpFile, $origin) {
+		$token = Lexer::getVariableToken($origin, $varString);
+		$vNode = new VariableNode($token->varLevels, $token->filters, $origin);
+		return $vNode->getVariablePHP($phpFile);
 	}
 }
 

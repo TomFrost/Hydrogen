@@ -15,7 +15,7 @@ class EvalTag extends Tag {
 	public static function getNode($cmd, $args, $parser, $origin) {
 		if (empty($args))
 			throw new TemplateSyntaxException("Tag 'eval' requires an expression argument in template $origin.");
-		return new EvalNode($args);
+		return new EvalNode($args, $origin);
 	}
 
 }
