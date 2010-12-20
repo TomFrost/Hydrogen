@@ -26,10 +26,15 @@ class VariableNode implements Node {
 	}
 
 	public function render($phpFile) {
-		$phpFile->addPageContent(
-			PHPFile::PHP_OPENTAG .
-			'echo ' . $this->getVariablePHP($phpFile) . ';' .
-			PHPFile::PHP_CLOSETAG);
+		$phpFile->addPageContent(PHPFile::PHP_OPENTAG);
+		$printVar = Config::getVal('view', 'print_missing_var') ?: false;
+		if ($printVar)
+			$phpFile->addPageContent('try {');
+		$phpFile->addPageContent('echo ' . $this->getVariablePHP($phpFile) .
+			';');
+		if ($printVar)
+			$phpFile->addPageContent('} catch (\hydrogen\view\exceptions\NoSuchVariableException $e) { echo "{?", $e->variable, "?}"; }');
+		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
 	}
 	
 	public function getVariablePHP($phpFile) {

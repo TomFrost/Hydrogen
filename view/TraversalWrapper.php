@@ -10,9 +10,11 @@ use hydrogen\view\exceptions\NoSuchVariableException;
 
 class TraversalWrapper {
 	protected $var;
+	protected $traversed;
 
-	public function __construct(&$var) {
+	public function __construct(&$var, &$traversed=array()) {
 		$this->var = &$var;
+		$this->traversed = &$traversed;
 	}
 
 	public function getValue() {
@@ -20,10 +22,11 @@ class TraversalWrapper {
 	}
 
 	public function __get($name) {
+		$this->traversed[] = $name;
 		if (is_array($this->var) && isset($this->var[$name]))
-			return new TraversalWrapper($this->var[$name]);
+			return new TraversalWrapper($this->var[$name], $this->traversed);
 		if (isset($this->var->$name))
-			return new TraversalWrapper($this->var->$name);
+			return new TraversalWrapper($this->var->$name, $this->traversed);
 		if (is_object($this->var)) {
 			$methods = get_class_methods($this->var);
 			if (in_array(($func = "get" . ucfirst($name)), $methods) ||
@@ -31,11 +34,13 @@ class TraversalWrapper {
 					in_array(($func = "get_" . $name), $methods) ||
 					in_array(($func = "is_" . $name), $methods))
 				return new TraversalWrapper(
-					call_user_func(array($this->var, $func)));
+					call_user_func(array($this->var, $func)),
+					$this->traversed);
 		}
+		$varName = implode('.', $this->traversed);
 		$e = new NoSuchVariableException(
-			"Variable does not exist in context: $name");
-		$e->variable = $name;
+			"Variable does not exist in context: $varName");
+		$e->variable = $varName;
 		throw $e;
 	}
 

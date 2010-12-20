@@ -75,13 +75,9 @@ class ContextStack {
 	}
 
 	public function getWrapped($key) {
-		//try {
-			$var = $this->get($key);
-		//}
-		//catch (NoSuchVariableException $e) {
-		//	return NULL;
-		//}
-		return new TraversalWrapper($var);
+		$var = $this->get($key);
+		$traversed = array($key);
+		return new TraversalWrapper($var, $traversed);
 	}
 
 	public function delete($key) {

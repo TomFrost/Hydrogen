@@ -130,6 +130,18 @@ Config::setVal("view", "url_path", "themes/default");
 //Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
 
 
+/***  For THE 'hydrogen' VIEW ENGINE ONLY:
+ ***  [view] -> print_missing_var
+ ***  Default if not set: false
+ ***
+ ***  In a template, if a variable is requested but is missing, should we
+ ***  print it out like this: {?varname?}  in the page output?  If false,
+ ***  an exception will be thrown instead.  Leave this on for development, but
+ ***  the default is false.
+ ***/	
+Config::setVal("view", "print_missing_var", true);
+
+
 /***  [view] -> use_cache
  ***  Default if not set: true
  ***
