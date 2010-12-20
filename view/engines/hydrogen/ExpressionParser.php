@@ -148,7 +148,7 @@ class ExpressionParser {
 								$expr . "'");
 					}
 					else if ($token === '.') {
-						// If out token is JUST a dot, this isn't a number
+						// If our token is JUST a dot, this isn't a number
 						// at all-- it's a concatenator
 						$state = self::TOKEN_CONCAT;
 						$numHasDot = false;
