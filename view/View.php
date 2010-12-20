@@ -11,6 +11,7 @@ use hydrogen\view\ContextStack;
 use hydrogen\view\LoaderFactory;
 use hydrogen\view\exceptions\NoSuchVariableException;
 use hydrogen\view\exceptions\NoSuchViewException;
+use hydrogen\view\exceptions\ViewCacheException;
 
 class View {
 	
@@ -77,7 +78,9 @@ class View {
 	
 	/**
 	 * Loads and displays the specified view inside of an existing
-	 * ViewSandbox.
+	 * ViewSandbox, respecting the [view]->use_cache setting in the autoconfig
+	 * to load the specified view from the cache (or write it into the cache
+	 * if it does not exist there) if appropriate.
 	 *
 	 * @param string viewName The name of the view to load.
 	 * @param ViewSandbox sandbox The sandbox into which the view should be
@@ -85,9 +88,66 @@ class View {
 	 */
 	public static function loadIntoSandbox($viewName, $sandbox) {
 		if (Config::getRequiredVal('view', 'use_cache'))
-			$sandbox->loadPHPFile(static::getCachedView($viewName));
+			static::loadCachedIntoSandbox($viewName, $sandbox);
 		else
 			$sandbox->loadRawPHP(static::getViewPHP($viewName));
+	}
+	
+	/**
+	 * Loads the cached version of a specified view into the given sandbox.
+	 * If the specified view is not found in the cache folder, the view is
+	 * rendered to PHP and then written into a new cache file, which is then
+	 * loaded for this request and future requests.  This function requires
+	 * that Config::setCachePath has been called (probably already done in the
+	 * autoconfig file).
+	 *
+	 * @param string viewName The view file to load from the cache, or create
+	 * 		in the cache if it is not found.
+	 * @param ViewSandbox sandbox The sandbox into which the cached view should
+	 * 		be loaded.
+	 * @throws NoSuchViewException if the specified view cannot be found.
+	 * @throws ViewCacheException if there is any problem creating/writing to
+	 * 		cache files.
+	 */
+	protected static function loadCachedIntoSandbox($viewName, $sandbox) {
+		$path = Config::getCachePath() . '/hydrogen/view/' .
+			$viewName . '.php';
+		try {
+			$sandbox->loadPHPFile($path);
+		}
+		catch (NoSuchViewException $e) {
+			$php = static::getViewPHP($viewName);
+			$folder = dirname($path);
+			// Create the view cache folder if it doesn't exist.
+			if (!file_exists($folder)) {
+				$success = @mkdir($folder, 0777, true);
+				if (!$success) {
+					throw new ViewCacheException(
+						'Could not create the view cache folder: "' .
+						$folder . '". Check your filesystem permissions!');
+				}
+			}
+			// Attempt to open the file for writing
+			$fp = @fopen($path, 'w');
+			if (!$fp)
+				throw new ViewCacheException('Could not create or open the cached view file for writing: ' . $path);
+			// Get the lock on the file.  If we can't get the lock, bypass all
+			// this and load the raw PHP into the sandbox; another user is
+			// writing the cache file.
+			if (@flock($fp, LOCK_EX | LOCAL_NB)) {
+				$success = @fwrite($fp, $php);
+				@fclose($fp);
+				if (!$success) {
+					throw new ViewCacheException(
+						'Could not write to view cache file.');
+				}
+				$sandbox->loadPHPFile($path);
+			}
+			else {
+				@fclose($fp);
+				$sandbox->loadRawPHP($php);
+			}
+		}
 	}
 	
 	/**

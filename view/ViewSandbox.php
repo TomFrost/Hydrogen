@@ -157,7 +157,7 @@ class ViewSandbox {
 	 */
 	public function loadPHPFile($filePath) {
 		$context = $this->context;
-		$success = include($filePath);
+		$success = @include($filePath);
 		if (!$success) {
 			throw new NoSuchViewException("View file could not be loaded: " .
 				$filePath);
