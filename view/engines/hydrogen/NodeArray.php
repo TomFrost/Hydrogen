@@ -10,8 +10,8 @@ use hydrogen\view\engines\hydrogen\PHPFile;
 
 class NodeArray extends \ArrayObject {
 
-	public function render() {
-		$phpFile = new PHPFile();
+	public function render($phpFile=false) {
+		$phpFile = $phpFile ?: new PHPFile();
 		foreach ($this as $node)
 			$node->render($phpFile);
 		return $phpFile->getPHP();
