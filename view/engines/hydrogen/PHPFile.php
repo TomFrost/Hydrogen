@@ -44,7 +44,7 @@ class PHPFile {
 		$this->privateDeclarations[$name] = $value;
 	}
 
-	public function addFunction($name, $args, $codei, $override=false) {
+	public function addFunction($name, $args, $code, $override=false) {
 		if (!$override && isset($this->functions[$name]) &&
 				$this->functions[$name][0] != $args &&
 				$this->functions[$name][1] != $code) {
