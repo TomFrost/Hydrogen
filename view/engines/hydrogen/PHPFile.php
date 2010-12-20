@@ -24,24 +24,34 @@ class PHPFile {
 		$this->content = '';
 	}
 
-	public function addContextDeclaration($name, $value) {
-		if (isset($this->contextDeclarations[$name]))
+	public function addContextDeclaration($name, $value, $override=false) {
+		if (!$override && isset($this->contextDeclarations[$name]) &&
+				$this->contextDeclarations[$name] != $value) {
 			throw new MemberAlreadyExistsException(
-				"A context variable named '$name' has already been declared.");
+				'A different context variable named "' . $name .
+				'" has already been declared.');
+		}
 		$this->contextDeclarations[$name] = $value;
 	}
 
-	public function addPrivateDeclaration($name, $value) {
-		if (isset($this->privateDeclarations[$name]))
+	public function addPrivateDeclaration($name, $value, $override=false) {
+		if (!$override && isset($this->privateDeclarations[$name]) &&
+				$this->privateDeclarations[$name] != $value) {
 			throw new MemberAlreadyExistsException(
-				"A private variable named '$name' has already been declared.");
+				'A different private variable named "' . $name .
+				'" has already been declared.');
+		}
 		$this->privateDeclarations[$name] = $value;
 	}
 
-	public function addFunction($name, $args, $code) {
-		if (isset($this->functions[$name]))
+	public function addFunction($name, $args, $codei, $override=false) {
+		if (!$override && isset($this->functions[$name]) &&
+				$this->functions[$name][0] != $args &&
+				$this->functions[$name][1] != $code) {
 			throw new MemberAlreadyExistsException(
-				"A function named '$name' has already been declared.");
+				'A different function named "' . $name .
+				'" has already been declared.');
+		}
 		$this->functions[$name] = array($args, $code);
 	}
 
