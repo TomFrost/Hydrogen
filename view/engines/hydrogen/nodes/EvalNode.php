@@ -20,7 +20,8 @@ class EvalNode implements Node {
 	public function render($phpFile) {
 		$result = ExpressionParser::exprToPHP($this->expr);
 		$phpFile->addPageContent(PHPFile::PHP_OPENTAG .
-			'echo ' . $result . ';' .
+			'if (is_bool($temp = (' . $result .
+			'))) echo $temp ? "true" : "false"; else echo $temp;' .
 			PHPFile::PHP_CLOSETAG);
 	}
 }
