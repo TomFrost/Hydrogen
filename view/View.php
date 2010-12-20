@@ -29,11 +29,8 @@ class View {
 	 */
 	public static function getVar($key) {
 		if (!static::$defaultContext)
-			return static::$defaultContext->get($key);
-		else {
-			throw new NoSuchVariableException(
-				"Variable does not exist in context: $key");
-		}
+			static::$defaultContext = new ContextStack();
+		return static::$defaultContext->get($key);
 	}
 	
 	/**
