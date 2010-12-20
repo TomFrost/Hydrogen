@@ -143,7 +143,7 @@ Config::setVal("view", "print_missing_var", true);
 
 
 /***  [view] -> use_cache
- ***  Default if not set: true
+ ***  This is a REQUIRED value
  ***
  ***  This value controls the cacheing of compiled views.  This *dramatically*
  ***  increases the performance of your view rendering, shaving a considerable

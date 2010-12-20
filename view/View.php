@@ -84,12 +84,29 @@ class View {
 	 * 		loaded.
 	 */
 	public static function loadIntoSandbox($viewName, $sandbox) {
+		if (Config::getRequiredVal('view', 'use_cache'))
+			$sandbox->loadPHPFile(static::getCachedView($viewName));
+		else
+			$sandbox->loadRawPHP(static::getViewPHP($viewName));
+	}
+	
+	/**
+	 * Retrieves the raw PHP code for any specified view, loading it through
+	 * the view loader and template engine specified in the Hydrogen
+	 * autoconfig file.
+	 *
+	 * @param string viewName The name of the view for which the raw PHP should
+	 * 		be retreived.
+	 * @return string A string containing the raw PHP of the specified view.
+	 * @throws NoSuchViewException if the specified view cannot be found or
+	 * 		loaded.
+	 */
+	protected static function getViewPHP($viewName) {
 		$engine = Config::getVal("view", "engine") ?: static::DEFAULT_ENGINE;
 		$engineClass = '\hydrogen\view\engines\\' . $engine . '\\' .
 			ucfirst($engine) . 'Engine';
 		$loader = LoaderFactory::getLoader();
-		$php = $engineClass::getPHP($viewName, $loader);
-		$sandbox->loadRawPHP($php);
+		return $engineClass::getPHP($viewName, $loader);
 	}
 	
 	/**
