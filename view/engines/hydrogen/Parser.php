@@ -19,11 +19,13 @@ class Parser {
 	protected $originNodes;
 	protected $originParent;
 	protected $objs;
+	protected $autoescapeStack;
 
 	public function __construct($viewName, $loader) {
 		$this->loader = $loader;
 		$this->originNodes = array();
 		$this->originParent = array();
+		$this->autoescapeStack = array(true);
 		$this->tokens = $this->getTokensForPage($viewName);
 	}
 
@@ -65,7 +67,8 @@ class Parser {
 					break;
 				case Lexer::TOKEN_VARIABLE:
 					$nodes[] = new VariableNode($token->varLevels,
-						$token->filters, $token->origin);
+						$token->filters, $this->autoescaping(),
+						$token->origin);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_BLOCK:
@@ -120,6 +123,18 @@ class Parser {
 
 	public function getObject($key) {
 		return isset($this->objs[$key]) ? $this->objs[$key] : false;
+	}
+	
+	public function autoescaping() {
+		return $this->autoescapeStack[count($this->autoescapeStack) - 1];
+	}
+	
+	public function pushAutoescape($enabled) {
+		$this->autoescapeStack[] = $enabled;
+	}
+	
+	public function popAutoescape() {
+		array_pop($this->autoescapeStack);
 	}
 
 	protected function getBlockNode($origin, $cmd, $args) {

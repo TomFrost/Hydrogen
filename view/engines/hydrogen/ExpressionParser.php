@@ -470,7 +470,8 @@ class ExpressionParser {
 	protected static function parseVariableString($varString,
 			$phpFile, $origin) {
 		$token = Lexer::getVariableToken($origin, $varString);
-		$vNode = new VariableNode($token->varLevels, $token->filters, $origin);
+		$vNode = new VariableNode($token->varLevels, $token->filters,
+			false, $origin);
 		return $vNode->getVariablePHP($phpFile);
 	}
 }

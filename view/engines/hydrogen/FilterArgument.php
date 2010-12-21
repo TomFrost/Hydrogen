@@ -21,6 +21,7 @@ class FilterArgument {
 			$var = new VariableNode(
 				$this->data->varLevels,
 				$this->data->filters,
+				false,
 				$this->data->origin);
 			return $var->getVariablePHP($phpFile);
 		}

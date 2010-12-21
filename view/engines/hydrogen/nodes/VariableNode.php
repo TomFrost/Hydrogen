@@ -18,10 +18,12 @@ class VariableNode implements Node {
 	protected $varLevels;
 	protected $filters;
 	protected $origin;
+	protected $escape;
 
-	public function __construct($varLevels, $filters, $origin) {
+	public function __construct($varLevels, $filters, $escape, $origin) {
 		$this->varLevels = $varLevels;
 		$this->filters = $filters ?: array();
+		$this->escape = $escape;
 		$this->origin = $origin;
 	}
 
@@ -30,8 +32,8 @@ class VariableNode implements Node {
 		$printVar = Config::getVal('view', 'print_missing_var') ?: false;
 		if ($printVar)
 			$phpFile->addPageContent('try {');
-		$phpFile->addPageContent('echo ' . $this->getVariablePHP($phpFile) .
-			';');
+		$phpFile->addPageContent('echo ' .
+			$this->getVariablePHP($phpFile) . ';');
 		if ($printVar)
 			$phpFile->addPageContent('} catch (\hydrogen\view\exceptions\NoSuchVariableException $e) { echo "{?", $e->variable, "?}"; }');
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
@@ -42,6 +44,8 @@ class VariableNode implements Node {
 		foreach ($this->varLevels as $level)
 			$var .= "->" . $level;
 		$var .= "->getValue()";
+		if ($this->escape)
+			$var = 'htmlentities(' . $var . ')';
 		foreach ($this->filters as $filter) {
 			$class = '\hydrogen\view\engines\hydrogen\filters\\' .
 				ucfirst(strtolower($filter->filter)) . 'Filter';
