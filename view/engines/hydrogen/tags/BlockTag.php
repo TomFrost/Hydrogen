@@ -12,8 +12,10 @@ use hydrogen\view\engines\hydrogen\nodes\BlockNode;
 class BlockTag extends Tag {
 
 	public static function getNode($cmd, $args, $parser, $origin) {
+		$parser->stackPush('block', $args);
 		$nodes = $parser->parse("endblock");
 		$parser->skipNextToken();
+		$parser->stackPop('block');
 		$block = $parser->getObject($args);
 		if ($block) {
 			$block->setNodes($nodes);
