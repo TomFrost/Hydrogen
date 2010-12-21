@@ -52,7 +52,7 @@ class VariableNode implements Node {
 			if (!@class_exists($class)) {
 				throw new NoSuchFilterException('Filter in "' .
 					$this->origin . '" does not exist: "' .
-					$filter . '".');
+					$filter->filter . '".');
 			}
 			$var = $class::applyTo($var, $filter->args, $phpFile);
 		}
