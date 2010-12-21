@@ -19,13 +19,13 @@ class Parser {
 	protected $originNodes;
 	protected $originParent;
 	protected $objs;
-	protected $autoescapeStack;
+	protected $stacks;
 
 	public function __construct($viewName, $loader) {
 		$this->loader = $loader;
 		$this->originNodes = array();
 		$this->originParent = array();
-		$this->autoescapeStack = array(true);
+		$this->stacks = array();
 		$this->tokens = $this->getTokensForPage($viewName);
 	}
 
@@ -67,7 +67,8 @@ class Parser {
 					break;
 				case Lexer::TOKEN_VARIABLE:
 					$nodes[] = new VariableNode($token->varLevels,
-						$token->filters, $this->autoescaping(),
+						$token->filters,
+						$this->stackPeek('autoescape'),
 						$token->origin);
 					$this->originNodes[$token->origin] = true;
 					break;
@@ -125,16 +126,23 @@ class Parser {
 		return isset($this->objs[$key]) ? $this->objs[$key] : false;
 	}
 	
-	public function autoescaping() {
-		return $this->autoescapeStack[count($this->autoescapeStack) - 1];
+	public function stackPeek($stack) {
+		if (isset($this->stacks[$stack]))
+			return $this->stacks[$stack][count($this->stacks[$stack]) - 1];
+		return null;
 	}
 	
-	public function pushAutoescape($enabled) {
-		$this->autoescapeStack[] = $enabled;
+	public function stackPush($stack, $value) {
+		if (!isset($this->stacks[$stack]))
+			$this->stacks[$stack] = array($value);
+		else
+			$this->stacks[$stack][] = $value;
 	}
 	
-	public function popAutoescape() {
-		array_pop($this->autoescapeStack);
+	public function stackPop($stack) {
+		if (isset($this->stacks[$stack]))
+			return array_pop($this->stacks[$stack]);
+		return null;
 	}
 
 	protected function getBlockNode($origin, $cmd, $args) {

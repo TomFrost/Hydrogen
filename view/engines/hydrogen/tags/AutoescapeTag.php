@@ -14,16 +14,16 @@ class AutoescapeTag extends Tag {
 
 	public static function getNode($cmd, $args, $parser, $origin) {
 		if (($arg = strtolower($args)) === 'off')
-			$parser->pushAutoescape(false);
+			$parser->stackPush('autoescape', false);
 		else if ($arg === 'on')
-			$parser->pushAutoescape(true);
+			$parser->stackPush('autoescape', true);
 		else {
 			throw new TemplateSyntaxException(
 				'Autoescape tag requires either "on" or "off" as an argument.');
 		}
 		$nodes = $parser->parse("endautoescape");
 		$parser->skipNextToken();
-		$parser->popAutoescape();
+		$parser->popStack('autoescape');
 		return new BlockNode($nodes);
 	}
 
