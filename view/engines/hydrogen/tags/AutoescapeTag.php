@@ -7,7 +7,7 @@
 namespace hydrogen\view\engines\hydrogen\tags;
 
 use hydrogen\view\engines\hydrogen\Tag;
-use hydrogen\view\engines\hydrogen\nodes\AutoescapeNode;
+use hydrogen\view\engines\hydrogen\nodes\BlockNode;
 
 class AutoescapeTag extends Tag {
 
