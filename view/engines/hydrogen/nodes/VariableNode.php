@@ -23,7 +23,7 @@ class VariableNode implements Node {
 	public function __construct($varLevels, $filters, $escape, $origin) {
 		$this->varLevels = $varLevels;
 		$this->filters = $filters ?: array();
-		$this->escape = $escape == NULL || $escape ? true : false;
+		$this->escape = $escape === NULL || $escape ? true : false;
 		$this->origin = $origin;
 	}
 
