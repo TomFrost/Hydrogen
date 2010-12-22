@@ -74,7 +74,7 @@ class Parser {
 					break;
 				case Lexer::TOKEN_BLOCK:
 					if ($untilBlock !== false &&
-							in_array($token->raw, $untilBlock)) {
+							in_array($token->cmd, $untilBlock)) {
 						$reachedUntil = true;
 						array_unshift($this->tokens, $token);
 						break;
