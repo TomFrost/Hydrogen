@@ -66,12 +66,16 @@ class ContextStack {
 			$this->set($key, $value);
 	}
 
-	public function get($key) {
+	public function get($key, $nullIfNotFound=false) {
 		if (!$this->keyExists($key)) {
-			$e = new NoSuchVariableException(
-				"Variable does not exist in context: $key");
-			$e->variable = $key;
-			throw $e;
+			if ($nullIfNotFound)
+				return null;
+			else {
+				$e = new NoSuchVariableException(
+					"Variable does not exist in context: $key");
+				$e->variable = $key;
+				throw $e;
+			}
 		}
 		return $this->stack[$this->stackLevel[$key]][$key];
 	}
