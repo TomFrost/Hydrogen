@@ -198,7 +198,7 @@ class Lexer {
 		return $min;
 	}
 
-	protected static function surroundedBy($haystack, $startsWith, $endsWith) {
+	public static function surroundedBy($haystack, $startsWith, $endsWith) {
 		$sLen = strlen($startsWith);
 		$eLen = strlen($endsWith);
 		if (strlen($haystack) >= $sLen + $eLen) {
