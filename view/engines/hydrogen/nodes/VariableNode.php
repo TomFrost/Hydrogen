@@ -59,3 +59,5 @@ class VariableNode implements Node {
 		return $var;
 	}
 }
+
+?>

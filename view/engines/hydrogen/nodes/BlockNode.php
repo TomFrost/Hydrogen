@@ -28,3 +28,5 @@ class BlockNode implements Node {
 		$this->nodes->render($phpFile);
 	}
 }
+
+?>

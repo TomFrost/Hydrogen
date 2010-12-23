@@ -40,3 +40,5 @@ class FilterNode implements Node {
 			$var . ';' . PHPFile::PHP_CLOSETAG);
 	}
 }
+
+?>

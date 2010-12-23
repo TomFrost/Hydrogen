@@ -19,3 +19,5 @@ class TextNode implements Node {
 		$phpFile->addPageContent($this->text);
 	}
 }
+
+?>

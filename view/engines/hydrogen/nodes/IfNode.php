@@ -43,3 +43,5 @@ class IfNode implements Node {
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
 	}
 }
+
+?>

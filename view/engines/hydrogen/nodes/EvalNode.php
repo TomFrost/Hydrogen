@@ -27,3 +27,5 @@ class EvalNode implements Node {
 			PHPFile::PHP_CLOSETAG);
 	}
 }
+
+?>
