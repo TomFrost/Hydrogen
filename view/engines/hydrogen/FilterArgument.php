@@ -16,7 +16,7 @@ class FilterArgument {
 		$this->data = &$data;
 	}
 
-	public function getPHPValue($phpFile) {
+	public function getValue($phpFile) {
 		if (is_object($this->data)) {
 			$var = new VariableNode(
 				$this->data->varLevels,
