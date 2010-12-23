@@ -39,11 +39,12 @@ class VariableNode implements Node {
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
 	}
 	
-	public function getVariablePHP($phpFile) {
+	public function getVariablePHP($phpFile, $forSetting=false) {
 		$var = '$context';
 		foreach ($this->varLevels as $level)
 			$var .= "->" . $level;
-		$var .= "->getValue()";
+		if ($forSetting)
+			$var .= "->getValue()";
 		if ($this->escape)
 			$var = 'htmlentities(' . $var . ')';
 		foreach ($this->filters as $filter) {
