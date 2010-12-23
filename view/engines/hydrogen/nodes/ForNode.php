@@ -27,6 +27,8 @@ class ForNode implements Node {
 	}
 
 	public function render($phpFile) {
+		$phpFile->addPrivateDeclaration('forStackIdx', 'array()');
+		$phpFile->addPrivateDeclaration('forStackStat', 'array()');
 		$arrayPHP = $this->arrayVar->getVariablePHP($phpFile);
 		$phpFile->addPageContent(PHPFile::PHP_OPENTAG . '$array = ' .
 				$arrayPHP . '; ');
@@ -36,10 +38,27 @@ class ForNode implements Node {
 			$this->emptyNodes->render($phpFile);
 			$phpFile->addPageContent(PHPFile::PHP_OPENTAG . '} else { ');
 		}
-		$phpFile->addPageContent('foreach ($array as ');
+		$phpFile->addPageContent('$forStackIdx[] = -1; ' .
+			'$forStackStat[] = $context->get("forloop", true); ' .
+			'foreach ($array as ');
 		if ($this->keyVar)
 			$phpFile->addPageContent('$key => ');
-		$phpFile->addPageContent('$value) { $context->push(); ');
+		$loopPHP = <<<'PHP'
+			$context->push();
+			$idx = &$forStackIdx[count($forStackIdx) - 1];
+			$par = &$forStackStat[count($forStackStat) - 1];
+			$max = count($array);
+			$context->set('forloop', array(
+				'counter' => ++$idx + 1,
+				'counter0' => $idx,
+				'revcounter' => $max - $idx,
+				'revcounter0' => $max - $idx - 1,
+				'first' => $idx === 0,
+				'last' => $max === ($idx + 1),
+				'parentloop' => $par
+			), true);
+PHP;
+		$phpFile->addPageContent('$value) { ' . $loopPHP);
 		if ($this->keyVar) {
 			$phpFile->addPageContent(
 				$this->keyVar->getVariablePHP($phpFile, true) . ' = $key; ');
@@ -48,7 +67,9 @@ class ForNode implements Node {
 			$this->valVar->getVariablePHP($phpFile, true) . ' = $value; ' .
 				PHPFile::PHP_CLOSETAG);
 		$this->forNodes->render($phpFile);
-		$phpFile->addPageContent(PHPFile::PHP_OPENTAG . ' $context->pop(); }');
+		$phpFile->addPageContent(PHPFile::PHP_OPENTAG .
+			' $context->pop(); } array_pop($forStackIdx); ' .
+			'array_pop($forStackStat);');
 		if ($this->emptyNodes)
 			$phpFile->addPageContent(' }');
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
