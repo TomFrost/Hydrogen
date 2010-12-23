@@ -22,3 +22,5 @@ class AddFilter implements Filter {
 	}
 
 }
+
+?>

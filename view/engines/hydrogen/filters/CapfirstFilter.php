@@ -15,3 +15,5 @@ class CapfirstFilter implements Filter {
 	}
 
 }
+
+?>

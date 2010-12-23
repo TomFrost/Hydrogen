@@ -15,3 +15,5 @@ class LowerFilter implements Filter {
 	}
 
 }
+
+?>

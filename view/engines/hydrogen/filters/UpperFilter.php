@@ -15,3 +15,5 @@ class UpperFilter implements Filter {
 	}
 
 }
+
+?>
