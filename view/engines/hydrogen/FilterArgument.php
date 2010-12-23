@@ -25,7 +25,7 @@ class FilterArgument {
 				$this->data->origin);
 			return $var->getVariablePHP($phpFile);
 		}
-		return $this->data;
+		return "'" . $this->data . "'";
 	}
 }
 
