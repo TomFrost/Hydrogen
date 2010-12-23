@@ -17,7 +17,7 @@ class AddFilter implements Filter {
 
 		$string = '(' . $string;
 		foreach ($args as $arg)
-			$string .= '+' . $arg->getPHPValue($phpfile);
+			$string .= '+' . $arg->getValue($phpfile);
 		return $string . ')';
 	}
 
