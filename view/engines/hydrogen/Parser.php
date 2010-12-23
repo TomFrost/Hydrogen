@@ -29,12 +29,12 @@ class Parser {
 		$this->tokens = $this->getTokensForPage($viewName);
 	}
 
-	protected function getTokensForPage(&$pageName) {
+	protected function getTokensForPage($pageName) {
 		$page = $this->loader->load($pageName);
 		return Lexer::tokenize($pageName, $page);
 	}
 
-	public function appendPage(&$pageName) {
+	public function appendPage($pageName) {
 		$pageTokens = $this->getTokensForPage($pageName);
 
 		// array_merge and array_splice take too much ram due to the
@@ -44,7 +44,7 @@ class Parser {
 			array_push($this->tokens, $val);
 	}
 
-	public function prependPage(&$pageName) {
+	public function prependPage($pageName) {
 		$pageTokens = $this->getTokensForPage($pageName);
 
 		// array_merge and array_splice take too much ram due to the
