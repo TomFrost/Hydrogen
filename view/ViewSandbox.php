@@ -175,6 +175,7 @@ class ViewSandbox {
 	 */
 	public function loadRawPHP($phpCode) {
 		$context = $this->context;
+		echo $phpCode;
 		$parsed = eval('?>' . $phpCode);
 		if ($parsed === false)
 			throw new NoSuchViewException("Raw PHP view could not be loaded due to parse error.");

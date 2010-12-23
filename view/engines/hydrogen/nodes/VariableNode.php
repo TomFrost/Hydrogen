@@ -43,7 +43,7 @@ class VariableNode implements Node {
 		$var = '$context';
 		foreach ($this->varLevels as $level)
 			$var .= "->" . $level;
-		if ($forSetting)
+		if (!$forSetting)
 			$var .= "->getValue()";
 		if ($this->escape)
 			$var = 'htmlentities(' . $var . ')';
