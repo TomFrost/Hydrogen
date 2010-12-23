@@ -88,6 +88,13 @@ class Lexer {
 			self::VARIABLE_FILTER_SEPARATOR);
 		$varStr = array_shift($tokens);
 		$varLevels = explode(self::VARIABLE_LEVEL_SEPARATOR, $varStr);
+		foreach ($varLevels as $level) {
+			if (!preg_match('/^[a-zA-Z]([a-zA-Z0-9_]+)?$/', $level)) {
+				throw new TemplateSyntaxException('Variable "' . $level .
+					'" in template "' . $origin .
+					'" contains illegal characters.');
+			}
+		}
 		$filters = array();
 		foreach ($tokens as $token) {
 			$fArgs = static::quoteSafeExplode($token,
