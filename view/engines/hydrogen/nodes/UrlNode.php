@@ -25,12 +25,12 @@ class UrlNode implements Node {
 			$appURL = substr($appURL, 0, -1);
 		foreach ($this->folders as $folder) {
 			if (is_object($folder)) {
-				$appURL .= '/' . PHPFile::PHP_OPENTAG . 'echo ' .
-					$folder->getVariablePHP($phpFile) . ';' .
+				$appURL .= '/' . PHPFile::PHP_OPENTAG . 'echo urlencode(' .
+					$folder->getVariablePHP($phpFile) . ');' .
 					PHPFile::PHP_CLOSETAG;
 			}
 			else
-				$appURL .= '/' . $folder;
+				$appURL .= '/' . urlencode($folder);
 		}
 		if ($this->kvPairs) {
 			if (strtolower(substr($appURL, -4)) !== '.php')
@@ -39,12 +39,12 @@ class UrlNode implements Node {
 			foreach ($this->kvPairs as $key => $val) {
 				$appURL .= $key . '=';
 				if (is_object($val)) {
-					$appURL .= PHPFile::PHP_OPENTAG . 'echo ' .
-						$val->getVariablePHP($phpFile) . ';' .
+					$appURL .= PHPFile::PHP_OPENTAG . 'echo urlencode(' .
+						$val->getVariablePHP($phpFile) . ');' .
 						PHPFile::PHP_CLOSETAG;
 				}
 				else
-					$appURL .= $val;
+					$appURL .= urlencode($val);
 				$appURL .= '&';
 			}
 			$appURL = substr($appURL, 0, -1);
