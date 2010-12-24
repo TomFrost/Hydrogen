@@ -6,11 +6,7 @@
 
 namespace hydrogen\view\engines\hydrogen\nodes;
 
-use hydrogen\view\engines\hydrogen\ExpressionParser;
 use hydrogen\view\engines\hydrogen\Node;
-use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
-use hydrogen\view\engines\hydrogen\exceptions\NoSuchVariableException;
-use hydrogen\view\engines\hydrogen\Lexer;
 use hydrogen\view\engines\hydrogen\PHPFile;
 use hydrogen\config\Config;
 
