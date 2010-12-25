@@ -13,24 +13,34 @@ use hydrogen\config\Config;
 class UrlNode implements Node {
 	protected $folders;
 	protected $kvPairs;
+	protected $relative;
 
-	public function __construct($folders, $kvPairs) {
+	public function __construct($folders, $kvPairs, $relative) {
 		$this->folders = $folders;
 		$this->kvPairs = $kvPairs;
+		$this->relative = $relative;
 	}
 
 	public function render($phpFile) {
-		$appURL = Config::getRequiredVal('general', 'app_url');
-		while ($appURL[strlen($appURL) - 1] === '/')
+		$appURL = $this->relative ?
+			Config::getRequiredVal('general', 'app_url') : '';
+		while ($appURL && $appURL[strlen($appURL) - 1] === '/')
 			$appURL = substr($appURL, 0, -1);
+		$first = true;
 		foreach ($this->folders as $folder) {
-			if (is_object($folder)) {
-				$appURL .= '/' . PHPFile::PHP_OPENTAG . 'echo urlencode(' .
-					$folder->getVariablePHP($phpFile) . ');' .
-					PHPFile::PHP_CLOSETAG;
+			if ($first && !$this->relative) {
+				$appURL .= $folder;
+				$first = false;
 			}
-			else
-				$appURL .= '/' . urlencode($folder);
+			else {
+				if (is_object($folder)) {
+					$appURL .= '/' . PHPFile::PHP_OPENTAG . 'echo urlencode(' .
+						$folder->getVariablePHP($phpFile) . ');' .
+						PHPFile::PHP_CLOSETAG;
+				}
+				else
+					$appURL .= '/' . urlencode($folder);
+			}
 		}
 		if ($this->kvPairs) {
 			if (strtolower(substr($appURL, -4)) !== '.php')

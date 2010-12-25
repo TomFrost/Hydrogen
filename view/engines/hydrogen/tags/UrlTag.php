@@ -17,10 +17,19 @@ class UrlTag extends Tag {
 	public static function getNode($cmd, $args, $parser, $origin) {
 		$folders = array();
 		$kvPairs = array();
+		$relative = true;
 		$tokens = preg_split('/\s/', $args, 2, PREG_SPLIT_NO_EMPTY);
 		if (isset($tokens[0])) {
-			$folders = preg_split('/\//', $tokens[0], null,
-				PREG_SPLIT_NO_EMPTY);
+			if (strpos(strtolower($tokens[0]), 'http') === 0) {
+				$relative = false;
+				while ($tokens[0][strlen($tokens[0]) -1] === '/')
+					$tokens[0] = substr($tokens[0], 0, -1);
+				$folders[] = $tokens[0];
+			}
+			else {
+				$folders = preg_split('/\//', $tokens[0], null,
+					PREG_SPLIT_NO_EMPTY);
+			}
 			if (isset($tokens[1])) {
 				$tokens = preg_split('/[\s\/]/', $tokens[1], null,
 					PREG_SPLIT_NO_EMPTY);
@@ -57,7 +66,7 @@ class UrlTag extends Tag {
 				}
 			}
 		}
-		return new UrlNode($folders, $kvPairs);
+		return new UrlNode($folders, $kvPairs, $relative);
 	}
 
 }
