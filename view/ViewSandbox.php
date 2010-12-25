@@ -35,8 +35,6 @@ class ViewSandbox {
 		}
 		if ($this->cleanViewURL[strlen($this->cleanViewURL) - 1] == '/')
 			$this->cleanViewURL = substr($this->cleanViewURL, 0, -1);
-		$this->context->viewURL = $this->cleanViewURL;
-		$this->context->appURL = $this->cleanAppURL;
 	}
 	
 	/**
