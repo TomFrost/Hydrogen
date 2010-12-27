@@ -18,6 +18,8 @@ class View {
 	const DEFAULT_ENGINE = "hydrogen";
 	
 	protected static $defaultContext = false;
+    
+    protected static $sandbox = false;
 	
 	/**
 	 * Gets a variable's value from the default View context.
@@ -52,6 +54,16 @@ class View {
 		else
 			static::$defaultContext->set($keyOrArray, $value);
 	}
+    
+    /**
+     * This Method allows you to overwrite the default sandbox with a sandbox of
+     * your choosing, so that you may implement extend the sandbox
+     *
+     * @param sandbox ViewSandbox An object of a type that extends ViewSandbox
+     */
+    public static function setSandbox($sandbox) {
+        static::$sandbox = $sandbox;
+    }
 	
 	/**
 	 * Loads and displays the specified view inside of a new ViewSandbox
@@ -69,8 +81,9 @@ class View {
 			static::setVar($context);
 		else if ($context !== false)
 			$viewContext = $context;
-		$sandbox = new ViewSandbox($viewContext);
-		static::loadIntoSandbox($viewName, $sandbox);
+    	if (!static::$sandbox)
+            static::$sandbox = new ViewSandbox($viewContext);
+		static::loadIntoSandbox($viewName, static::$sandbox);
 	}
 	
 	/**
