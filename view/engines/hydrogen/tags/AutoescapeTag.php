@@ -23,7 +23,7 @@ class AutoescapeTag extends Tag {
 		}
 		$nodes = $parser->parse("endautoescape");
 		$parser->skipNextToken();
-		$parser->popStack('autoescape');
+		$parser->stackPop('autoescape');
 		return new BlockNode($nodes);
 	}
 
