@@ -10,8 +10,9 @@ use hydrogen\view\engines\hydrogen\Filter;
 
 class EscapeFilter implements Filter {
 
-	public static function applyTo($string, $args, $phpfile) {
-		return 'htmlentities(' . $string . ')';
+	public static function applyTo($string, $args, &$escape, $phpfile) {
+		$escape = true;
+		return $string;
 	}
 
 }

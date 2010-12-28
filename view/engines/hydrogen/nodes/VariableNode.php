@@ -50,8 +50,7 @@ class VariableNode implements Node {
 			$var .= "->" . $level;
 		if (!$forSetting)
 			$var .= "->getValue()";
-		if ($this->escape)
-			$var = 'htmlentities(' . $var . ')';
+		$escape = $this->escape;
 		foreach ($this->filters as $filter) {
 			$class = '\hydrogen\view\engines\hydrogen\filters\\' .
 				ucfirst(strtolower($filter->filter)) . 'Filter';
@@ -60,8 +59,10 @@ class VariableNode implements Node {
 					$this->origin . '" does not exist: "' .
 					$filter->filter . '".');
 			}
-			$var = $class::applyTo($var, $filter->args, $phpFile);
+			$var = $class::applyTo($var, $filter->args, $escape, $phpFile);
 		}
+		if ($escape)
+			$var = 'htmlentities(' . $var . ')';
 		return $var;
 	}
 }

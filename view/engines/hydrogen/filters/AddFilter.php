@@ -11,10 +11,10 @@ use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
 class AddFilter implements Filter {
 
-	public static function applyTo($string, $args, $phpfile) {
+	public static function applyTo($string, $args, &$escape, $phpfile) {
 		if (count($args) === 0)
 			throw new TemplateSyntaxException("The 'add' filter requires at least one argument.");
-
+		$escape = false;
 		$string = '(' . $string;
 		foreach ($args as $arg)
 			$string .= '+' . $arg->getValue($phpfile);

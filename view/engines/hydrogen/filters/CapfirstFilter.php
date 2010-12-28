@@ -10,7 +10,7 @@ use hydrogen\view\engines\hydrogen\Filter;
 
 class CapfirstFilter implements Filter {
 
-	public static function applyTo($string, $args, $phpfile) {
+	public static function applyTo($string, $args, &$escape, $phpfile) {
 		return 'ucfirst(' . $string . ')';
 	}
 

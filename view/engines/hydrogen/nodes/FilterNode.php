@@ -32,7 +32,10 @@ class FilterNode implements Node {
 					$this->origin . '" does not exist: "' .
 					$filter->filter . '".');
 			}
-			$var = $class::applyTo($var, $filter->args, $phpFile);
+			$escape = false;
+			$var = $class::applyTo($var, $filter->args, $escape, $phpFile);
+			if ($escape)
+				$var = 'htmlentities('. $var . ')';
 		}
 		$phpFile->addPageContent(PHPFile::PHP_OPENTAG . 'ob_start();' .
 			PHPFile::PHP_CLOSETAG . $content . PHPFile::PHP_OPENTAG .
