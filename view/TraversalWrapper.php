@@ -26,8 +26,10 @@ class TraversalWrapper {
 
 	public function __get($name) {
 		$this->traversed[] = $name;
-		if ($this->nullIfNotFound && is_null($this->var))
-			return new TraversalWrapper($this->var, true, $this->traversed);
+		if ($this->nullIfNotFound && is_null($this->var)) {
+			return new TraversalWrapper($this->var, $this->nullIfNotFound,
+				$this->traversed);
+		}
 		if (is_array($this->var) && isset($this->var[$name])) {
 			return new TraversalWrapper($this->var[$name],
 				$this->nullIfNotFound, $this->traversed);
