@@ -142,6 +142,18 @@ Config::setVal("view", "url_path", "themes/default");
 Config::setVal("view", "print_missing_var", true);
 
 
+/***  For THE 'hydrogen' VIEW ENGINE ONLY:
+ ***  [view] -> allow_php
+ ***  Default if not set: false
+ ***
+ ***  If false, a TemplateSyntaxException will be thrown when raw PHP code is
+ ***  used inside a Hydrogen template file.  Set to 'true' to allow templates
+ ***  to contain raw PHP.  This is not recommended in environments where
+ ***  third parties can submit template code.
+ ***/	
+//Config::setVal("view", "allow_php", true);
+
+
 /***  [view] -> use_cache
  ***  This is a REQUIRED value
  ***

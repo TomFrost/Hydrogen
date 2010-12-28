@@ -62,7 +62,7 @@ class Parser {
 		while ($token = array_shift($this->tokens)) {
 			switch ($token::TOKEN_TYPE) {
 				case Lexer::TOKEN_TEXT:
-					$nodes[] = new TextNode($token->raw);
+					$nodes[] = new TextNode($token->raw, $token->origin);
 					$this->originNodes[$token->origin] = true;
 					break;
 				case Lexer::TOKEN_VARIABLE:
