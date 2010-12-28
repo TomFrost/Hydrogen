@@ -39,8 +39,13 @@ class VariableNode implements Node {
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);
 	}
 	
-	public function getVariablePHP($phpFile, $forSetting=false) {
+	public function getVariablePHP($phpFile, $forSetting=false,
+			$nullIfNotFound=false) {
 		$var = '$context';
+		if ($nullIfNotFound) {
+			$var .= '->getWrapped(\'' . array_shift($this->varLevels) .
+				'\', true)';
+		}
 		foreach ($this->varLevels as $level)
 			$var .= "->" . $level;
 		if (!$forSetting)

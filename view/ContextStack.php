@@ -80,10 +80,10 @@ class ContextStack {
 		return $this->stack[$this->stackLevel[$key]][$key];
 	}
 
-	public function getWrapped($key) {
-		$var = $this->get($key);
+	public function getWrapped($key, $nullIfNotFound=false) {
+		$var = $this->get($key, $nullIfNotFound);
 		$traversed = array($key);
-		return new TraversalWrapper($var, $traversed);
+		return new TraversalWrapper($var, $nullIfNotFound, $traversed);
 	}
 
 	public function delete($key) {
