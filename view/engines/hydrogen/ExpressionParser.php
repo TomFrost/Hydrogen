@@ -392,16 +392,19 @@ class ExpressionParser {
 				if (isset($tokens[$i + 1]) &&
 						$tokens[$i + 1]->type === self::TOKEN_VAR) {
 					$var = $tokens[$i + 1];
+					$var->type = self::TOKEN_PHP;
+					$var->value = static::parseVariableString($var->value,
+						$phpFile, $origin, true);
 					$inst = array(
-						new TypedValue(self::TOKEN_PHP, '(!is_null('),
+						new TypedValue(self::TOKEN_PHP, '(is_null('),
 						$var,
-						new TypedValue(self::TOKEN_PHP, ') && '),
-						clone $var,
+						new TypedValue(self::TOKEN_PHP, ') || '),
+						$var,
 						new TypedValue(self::TOKEN_PHP,
-							' !== "" && (!is_array('),
-						clone $var,
-						new TypedValue(self::TOKEN_PHP, ') || count('),
-						clone $var,
+							' === "" || (is_array('),
+						$var,
+						new TypedValue(self::TOKEN_PHP, ') && count('),
+						$var,
 						new TypedValue(self::TOKEN_PHP, ') === 0))')
 					);
 					array_splice($tokens, $i, 2, $inst);
