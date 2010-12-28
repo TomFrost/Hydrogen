@@ -370,6 +370,9 @@ class ExpressionParser {
 				if (isset($tokens[$i + 1]) &&
 						$tokens[$i + 1]->type === self::TOKEN_VAR) {
 					$var = $tokens[$i + 1];
+					$var->type = self::TOKEN_PHP;
+					$var->value = static::parseVariableString($var->value,
+						$phpFile, $origin, true);
 					$inst = array(
 						new TypedValue(self::TOKEN_PHP, '!is_null('),
 						$var,
@@ -445,15 +448,15 @@ class ExpressionParser {
 			}
 		}
 
-		// Rewrite the variables to be evaluated by this class
+		// Rewrite the variables to be pulled from the context
 		$len = count($tokens);
 		for ($i = 0; $i < $len; $i++) {
-			// Format the variables
 			if ($tokens[$i]->type === self::TOKEN_VAR) {
 				$tokens[$i]->value = static::parseVariableString(
 					$tokens[$i]->value, $phpFile, $origin);
 			}
 		}
+		
 		return implode(' ', $tokens);
 	}
 
@@ -476,11 +479,11 @@ class ExpressionParser {
 	}
 
 	protected static function parseVariableString($varString,
-			$phpFile, $origin) {
+			$phpFile, $origin, $nullIfNotFound=false) {
 		$token = Lexer::getVariableToken($origin, $varString);
 		$vNode = new VariableNode($token->varLevels, $token->filters,
 			false, $origin);
-		return $vNode->getVariablePHP($phpFile);
+		return $vNode->getVariablePHP($phpFile, false, $nullIfNotFound);
 	}
 }
 
