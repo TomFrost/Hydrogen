@@ -241,8 +241,7 @@ class ExpressionParser {
 								$lastToken === self::TOKEN_FUNC ||
 								$lastToken === self::TOKEN_CONCAT) {
 							$tokens[] = new TypedValue(self::TOKEN_VAR,
-								static::parseVariableString($token, $phpFile,
-								$origin));
+								$token);
 							$state = self::TOKEN_NONE;
 							$lastToken = self::TOKEN_VAR;
 							$varInFilter = false;
@@ -446,6 +445,15 @@ class ExpressionParser {
 			}
 		}
 
+		// Rewrite the variables to be evaluated by this class
+		$len = count($tokens);
+		for ($i = 0; $i < $len; $i++) {
+			// Format the variables
+			if ($tokens[$i]->type === self::TOKEN_VAR) {
+				$tokens[$i]->value = static::parseVariableString(
+					$tokens[$i]->value, $phpFile, $origin);
+			}
+		}
 		return implode(' ', $tokens);
 	}
 
