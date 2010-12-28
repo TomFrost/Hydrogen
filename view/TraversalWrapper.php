@@ -16,7 +16,7 @@ class TraversalWrapper {
 	public function __construct(&$var, &$nullIfNotFound=false,
 			&$traversed=array()) {
 		$this->var = &$var;
-		$this->nullIfNotExist = &$nullIfNotFound;
+		$this->nullIfNotFound = &$nullIfNotFound;
 		$this->traversed = &$traversed;
 	}
 
@@ -26,15 +26,15 @@ class TraversalWrapper {
 
 	public function __get($name) {
 		$this->traversed[] = $name;
-		if ($this->nullIfNotExist && is_null($this->var))
+		if ($this->nullIfNotFound && is_null($this->var))
 			return new TraversalWrapper($this->var, true, $this->traversed);
 		if (is_array($this->var) && isset($this->var[$name])) {
 			return new TraversalWrapper($this->var[$name],
-				$this->nullIfNotExist, $this->traversed);
+				$this->nullIfNotFound, $this->traversed);
 		}
 		if (isset($this->var->$name)) {
 			return new TraversalWrapper($this->var->$name,
-				$this->nullIfNotExist, $this->traversed);
+				$this->nullIfNotFound, $this->traversed);
 		}
 		if (is_object($this->var)) {
 			$methods = get_class_methods($this->var);
@@ -44,9 +44,9 @@ class TraversalWrapper {
 					in_array(($func = "is_" . $name), $methods))
 				return new TraversalWrapper(
 					call_user_func(array($this->var, $func)),
-					$this->nullIfNotExist, $this->traversed);
+					$this->nullIfNotFound, $this->traversed);
 		}
-		if ($this->nullIfNotExist) {
+		if ($this->nullIfNotFound) {
 			$var = null;
 			return new TraversalWrapper($var, true, $this->traversed);
 		}
