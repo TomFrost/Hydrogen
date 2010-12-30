@@ -127,7 +127,7 @@ class Parser {
 	}
 	
 	public function stackPeek($stack) {
-		if (isset($this->stacks[$stack]))
+		if (isset($this->stacks[$stack]) && count($this->stacks[$stack]) > 0)
 			return $this->stacks[$stack][count($this->stacks[$stack]) - 1];
 		return null;
 	}
