@@ -52,6 +52,6 @@ function fileNotFoundHandler($errno, $errstr, $errfile, $errline) {
 }
 
 spl_autoload_register(__NAMESPACE__ . '\load');
-include(__DIR__ . DIRECTORY_SEPARATOR . 'hydrogen.autoconfig.php');
+include(__DIR__ . '/' . 'hydrogen.autoconfig.php');
 
 ?>
