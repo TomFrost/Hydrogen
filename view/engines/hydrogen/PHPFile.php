@@ -70,10 +70,10 @@ class PHPFile {
 			foreach ($this->privateDeclarations as $var => $val)
 				$page .= '$' . $var . " = $val;";
 			foreach ($this->functions as $name => $data) {
-				$page .= "function $name(";
+				$page .= 'function ' . $name . '(';
 				if (is_array($data[0]))
 					$page .= implode(', ', $data[0]);
-				$page .= ") {$data[1]}";
+				$page .= ') { ' . $data[1] . '}';
 			}
 			$page .= self::PHP_CLOSETAG;
 		}
