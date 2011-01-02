@@ -1,4 +1,12 @@
 <?php
+/**
+ * Copyright 2011 Koen Klaren
+ * Made for use with Hydrogen, Copyright Tom Frost 2011
+ * --------------------------
+ * Takes a filesize in bytes and returns a nicely formatted size:
+ * KB, MB or GB
+ */
+
 namespace hydrogen\view\engines\hydrogen\filters;
 
 use hydrogen\view\engines\hydrogen\Filter;
