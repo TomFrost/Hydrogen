@@ -22,14 +22,16 @@ class FilesizeformatFilter implements Filter {
 			$type = '';
 			if ($size < 1024)
 				$type = 'bytes';
-			else if (($size = $size / 1024) < 1024)
+			else if (($size /= 1024) < 1024)
 				$type = 'KB';
-			else if (($size = $size / 1024) < 1024)
+			else if (($size /= 1024) < 1024)
 				$type = 'MB';
-			else if (($size = $size / 1024) < 1024)
+			else if (($size /= 1024) < 1024)
 				$type = 'GB';
-			else if (($size = $size / 1024) < 1024)
+			else {
+				$size /= 1024;
 				$type = 'TB';
+			}
 			$size = (string)number_format($size, $decimals);
 			while (($char = $size[strlen($size) - 1]) === '0' || $char === '.')
 				$size = substr($size, 0, -1);
@@ -46,4 +48,5 @@ PHP
 	}
 
 }
+
 ?>
