@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2010, Frosted Design
+ * Copyright (c) 2009 - 2011, Frosted Design
  * All rights reserved.
  */
 
@@ -76,7 +76,6 @@ class Dispatcher {
 	
 	protected static $dispatchRules = array();
 	protected static $controllerPaths = array();
-	protected static $oldHandler = false;
 	
 	/**
 	 * Initiates the process of analyzing the current request against the
@@ -1144,7 +1143,7 @@ class Dispatcher {
 			// Call it, Cap'n.
 			$inst = $class::getInstance();
 			if ($argProtection === true) {
-				static::$oldHandler = set_error_handler(
+				set_error_handler(
 					"\hydrogen\controller\Dispatcher::missingArgHandler",
 					E_WARNING);
 			}
@@ -1152,11 +1151,17 @@ class Dispatcher {
 				call_user_func_array(array($inst, $function), $args ?: array());
 			}
 			catch (NoSuchMethodException $e) {
+				if ($argProtection === true)
+					restore_error_handler();
 				return false;
 			}
 			catch (MissingArgumentException $e) {
+				if ($argProtection === true)
+					restore_error_handler();
 				return false;
 			}
+			if ($argProtection === true)
+				restore_error_handler();
 			return true;
 		}
 		return false;

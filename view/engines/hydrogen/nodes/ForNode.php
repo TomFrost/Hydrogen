@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2010, Frosted Design
+ * Copyright (c) 2009 - 2011, Frosted Design
  * All rights reserved.
  */
 
@@ -39,7 +39,7 @@ class ForNode implements Node {
 			$phpFile->addPageContent(PHPFile::PHP_OPENTAG . '} else { ');
 		}
 		$phpFile->addPageContent('$forStackIdx[] = -1; ' .
-			'$forStackStat[] = $context->get("forloop", true); ' .
+			'$forStackStat[] = $context->get(\'forloop\', true); ' .
 			'foreach ($array as ');
 		if ($this->keyVar)
 			$phpFile->addPageContent('$key => ');
@@ -69,7 +69,7 @@ PHP;
 		$this->forNodes->render($phpFile);
 		$phpFile->addPageContent(PHPFile::PHP_OPENTAG .
 			' $context->pop(); } array_pop($forStackIdx); ' .
-			'array_pop($forStackStat);');
+			'$context->set(\'forloop\', array_pop($forStackStat));');
 		if ($this->emptyNodes)
 			$phpFile->addPageContent(' }');
 		$phpFile->addPageContent(PHPFile::PHP_CLOSETAG);

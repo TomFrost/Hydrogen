@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2010, Frosted Design
+ * Copyright (c) 2009 - 2011, Frosted Design
  * All rights reserved.
  *
  *************************************************************************
@@ -10,27 +10,24 @@
  */
 namespace hydrogen;
 
+use hydrogen\common\exceptions\ClassFileNotFoundException;
+
 function load($namespace) {
-	$splitpath = explode('\\', $namespace);
-	$path = '';
-	$name = '';
-	$firstword = true;
-	for ($i = 0; $i < count($splitpath); $i++) {
-		if ($splitpath[$i] && !$firstword) {
-			if ($i == count($splitpath) - 1)
-				$name = $splitpath[$i];
-			else
-				$path .= DIRECTORY_SEPARATOR . $splitpath[$i];
+	while ($namespace[0] === '\\')
+		$namespace = substr($namespace, 1);
+	if (strpos($namespace, __NAMESPACE__) === 0) {
+		$path = __DIR__ . '/' . str_replace('\\', '/', substr($namespace,
+			strlen(__NAMESPACE__) + 1)) . '.php';
+		set_error_handler('\hydrogen\fileNotFoundHandler', E_WARNING);
+		try {
+			include_once($path);
 		}
-		if ($splitpath[$i] && $firstword) {
-			if ($splitpath[$i] != __NAMESPACE__)
-				break;
-			$firstword = false;
+		catch (ClassFileNotFoundException $e) {
+			restore_error_handler();
+			return false;
 		}
-	}
-	if (!$firstword) {
-		$fullpath = __DIR__ . $path . DIRECTORY_SEPARATOR . $name . '.php';
-		return include_once($fullpath);
+		restore_error_handler();
+		return true;
 	}
 	return false;
 }
@@ -39,7 +36,22 @@ function loadPath($absPath) {
 	return include_once($absPath);
 }
 
+function fileNotFoundHandler($errno, $errstr, $errfile, $errline) {
+	if (preg_match('/^include_once.*' . __NAMESPACE__ .
+			'.*failed to open stream/', $errstr)) {
+		throw new ClassFileNotFoundException();
+	}
+	else {
+		$caller = debug_backtrace();
+		$caller = $caller[1];
+		trigger_error($errstr . ' in <strong>' . $caller['function'] .
+			'</strong> called from <strong>' . $caller['file'] . 
+			'</strong> on line <strong>' . $caller['line'] .
+			"</strong>\n<br />error handler", E_USER_WARNING);
+	}
+}
+
 spl_autoload_register(__NAMESPACE__ . '\load');
-include(__DIR__ . DIRECTORY_SEPARATOR . 'hydrogen.autoconfig.php');
+include(__DIR__ . '/' . 'hydrogen.autoconfig.php');
 
 ?>

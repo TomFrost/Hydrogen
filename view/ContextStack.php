@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2010, Frosted Design
+ * Copyright (c) 2009 - 2011, Frosted Design
  * All rights reserved.
  */
 
@@ -44,14 +44,12 @@ class ContextStack {
 		return new ContextStack(array_pop($this->stack));
 	}
 
-	public function set($key, $value, $forceTop=false) {
+	public function set($key, $value) {
 		$level = false;
-		if (!$forceTop) {
-			for ($i = count($this->stack) - 1; $i >= 0 ; $i--) {
-				if (array_key_exists($key, $this->stack[$i])) {
-					$level = $i;
-					break;
-				}
+		for ($i = count($this->stack) - 1; $i >= 0 ; $i--) {
+			if (array_key_exists($key, $this->stack[$i])) {
+				$level = $i;
+				break;
 			}
 		}
 		if ($level === false) {

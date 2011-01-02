@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2010, Frosted Design
+ * Copyright (c) 2009 - 2011, Frosted Design
  * All rights reserved.
  */
 
@@ -25,7 +25,7 @@ class FilterArgument {
 				$this->data->origin);
 			return $var->getVariablePHP($phpFile);
 		}
-		return "'" . $this->data . "'";
+		return "'" . str_replace("'", '\\\'', $this->data) . "'";
 	}
 }
 
