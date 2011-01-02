@@ -1,10 +1,7 @@
 <?php
-/**
- * Copyright 2011 Koen Klaren
- * Made for use with Hydrogen, Copyright Tom Frost 2011
- * --------------------------
- * Takes a filesize in bytes and returns a nicely formatted size:
- * KB, MB or GB
+/*
+ * Copyright (c) 2009 - 2011, Frosted Design
+ * All rights reserved.
  */
 
 namespace hydrogen\view\engines\hydrogen\filters;
