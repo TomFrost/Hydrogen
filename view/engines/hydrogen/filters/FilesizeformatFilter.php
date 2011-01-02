@@ -19,16 +19,21 @@ class FilesizeformatFilter implements Filter {
 		$phpfile->addFunction('fileSizeFormatFilter',
 				array('$size', '$decimals=2'), <<<'PHP'
 			$size = (int)$size;
-			if (($size = $size / 1024) < 1024){
-				$size = number_format($size, $decimals);
-				return $size . ' KB';
-			} else if (($size = $size / 1024) < 1024) {
-				$size = number_format($size, $decimals);
-				return $size . ' MB';
-			} else if (($size = $size / 1024) < 1024) {
-				$size = number_format($size, $decimals);
-				return $size . ' GB';
-			}
+			$type = '';
+			if ($size < 1024)
+				$type = 'bytes';
+			else if (($size = $size / 1024) < 1024)
+				$type = 'KB';
+			else if (($size = $size / 1024) < 1024)
+				$type = 'MB';
+			else if (($size = $size / 1024) < 1024)
+				$type = 'GB';
+			else if (($size = $size / 1024) < 1024)
+				$type = 'TB';
+			$size = (string)number_format($size, $decimals);
+			while (($char = $size[strlen($size) - 1]) === '0' || $char === '.')
+				$size = substr($size, 0, -1);
+			return $size . ' ' . $type;
 PHP
 		);
 		$escape = false;
