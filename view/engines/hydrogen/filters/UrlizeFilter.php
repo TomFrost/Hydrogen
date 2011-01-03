@@ -20,7 +20,7 @@ class UrlizeFilter implements Filter {
 				'<a href="$0">$0</a>', $str);
 			if ($esc) {
 				$pos = -1;
-				while (($pos = strpos($str, '<', $pos + 1)) !== false) {
+				while (($pos = strpos($str, '<a', $pos + 1)) !== false) {
 					$end = strpos($str, '>', $pos) + 1;
 					$sub = substr($str, $pos, $end - $pos);
 					$fix = str_replace('&amp;', '&', $sub);
