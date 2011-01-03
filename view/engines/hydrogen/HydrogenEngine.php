@@ -24,22 +24,33 @@ class HydrogenEngine implements TemplateEngine {
 		);
 
 	public static function addFilter($filterName, $className, $path=false) {
+		$filterName = strtolower($filterName);
 		static::$filterClass[$filterName] = $className;
 		if ($path)
 			static::$filterPath[$filterName] = Config::getAbsolutePath($path);
 	}
 	
 	public static function addFilterNamespace($namespace) {
+		static::$filterNamespace[] = static::formatNamespace($namespace);
+	}
+	
+	public static function addTag($tagName, $className, $path=false) {
+		$tagName = strtolower($tagName);
+		static::$tagClass[$tagName] = $className;
+		if ($path)
+			static::$tagPath[$tagName] = Config::getAbsolutePath($path);
+	}
+	
+	public static function addTagNamespace($namespace) {
+		static::$tagNamespace[] = static::formatNamespace($namespace);
+	}
+	
+	protected static function formatNamespace($namespace) {
 		if ($namespace[0] !== '\\')
 			$namespace = '\\' . $namespace;
 		if ($namespace[strlen($namespace) - 1] !== '\\')
 			$namespace .= '\\';
-	}
-	
-	public static function addTag($tagName, $className, $path=false) {
-		static::$tagClass[$tagName] = $className;
-		if ($path)
-			static::$tagPath[$tagName] = Config::getAbsolutePath($path);
+		return $namespace;
 	}
 
 	public static function getPHP($templateName, $loader) {
