@@ -31,11 +31,14 @@ class SetTag extends Tag {
 		$toVar = false;
 		$toNodes = false;
 		if (count($args) === 2) {
-			if (Lexer::surroundedBy($args[1], '"', '"') ||
+			if (($isString = Lexer::surroundedBy($args[1], '"', '"')) ||
 					is_numeric($args[1]) ||
 					$args[1] === 'true' ||
 					$args[1] === 'false') {
-				$toNative = $args[1];
+				if ($isString)
+					$toNative = str_replace('$', '\$', $args[1]);
+				else
+					$toNative = $args[1];
 			}
 			else {
 				$token = Lexer::getVariableToken($origin, $args[1]);
