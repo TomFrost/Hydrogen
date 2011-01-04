@@ -33,10 +33,6 @@ class HydrogenEngine implements TemplateEngine {
 			static::$filterPath[$filterName] = Config::getAbsolutePath($path);
 	}
 	
-	public static function addFilterNamespace($namespace) {
-		static::$filterNamespace[] = static::formatNamespace($namespace);
-	}
-	
 	public static function addTag($tagName, $className, $path=false) {
 		$tagName = strtolower($tagName);
 		static::$tagClass[$tagName] = static::formatNamespace($className,
@@ -45,16 +41,12 @@ class HydrogenEngine implements TemplateEngine {
 			static::$tagPath[$tagName] = Config::getAbsolutePath($path);
 	}
 	
-	public static function addTagNamespace($namespace) {
-		static::$tagNamespace[] = static::formatNamespace($namespace);
+	public static function addFilterNamespace($namespace) {
+		static::$filterNamespace[] = static::formatNamespace($namespace);
 	}
 	
-	protected static function formatNamespace($namespace, $endSlash=true) {
-		if ($namespace[0] !== '\\')
-			$namespace = '\\' . $namespace;
-		if ($endSlash && $namespace[strlen($namespace) - 1] !== '\\')
-			$namespace .= '\\';
-		return $namespace;
+	public static function addTagNamespace($namespace) {
+		static::$tagNamespace[] = static::formatNamespace($namespace);
 	}
 	
 	public static function getFilterClass($filterName, $origin=false) {
@@ -67,6 +59,20 @@ class HydrogenEngine implements TemplateEngine {
 		return static::getModuleClass($tagName, 'Tag',
 			static::$tagClass, static::$tagPath,
 			static::$tagNamespace, $origin);
+	}
+	
+	public static function getPHP($templateName, $loader) {
+		$parser = new Parser($templateName, $loader);
+		$nodes = $parser->parse();
+		return $nodes->render();
+	}
+	
+	protected static function formatNamespace($namespace, $endSlash=true) {
+		if ($namespace[0] !== '\\')
+			$namespace = '\\' . $namespace;
+		if ($endSlash && $namespace[strlen($namespace) - 1] !== '\\')
+			$namespace .= '\\';
+		return $namespace;
 	}
 	
 	protected static function getModuleClass($modName, $modType, &$modClasses,
@@ -91,12 +97,6 @@ class HydrogenEngine implements TemplateEngine {
 			throw new NoSuchFilterException($error);
 		else
 			throw new NoSuchTagException($error);
-	}
-
-	public static function getPHP($templateName, $loader) {
-		$parser = new Parser($templateName, $loader);
-		$nodes = $parser->parse();
-		return $nodes->render();
 	}
 
 }
