@@ -134,7 +134,7 @@ class HydrogenEngine implements TemplateEngine {
 	 * used with no further error checking.
 	 *
 	 * @param string $filterName The filter for which to obtain the full
-	 * 		namespace + class name for.
+	 * 		namespace + class name.
 	 * @param string $origin The template originating the request for this
 	 * 		filter.  It is optional, but if provided, will be used to create
 	 * 		a more helpful error message should the requested filter not be
@@ -149,6 +149,22 @@ class HydrogenEngine implements TemplateEngine {
 			static::$filterNamespace, $origin);
 	}
 	
+	/**
+	 * Gets the full class name (with namespace) for the given tag.  The
+	 * class will either be pre-loaded by this function, or is expected to be
+	 * autoloaded when it is first accessed.  The returned class name can be
+	 * used with no further error checking.
+	 *
+	 * @param string $tagName The tag for which to obtain the full
+	 * 		namespace + class name.
+	 * @param string $origin The template originating the request for this
+	 * 		tag.  It is optional, but if provided, will be used to create
+	 * 		a more helpful error message should the requested tag not be
+	 * 		found.
+	 * @return string the full namespace + class name, with leading backslash,
+	 * 		for the provided tag name.
+	 * @throws NoSuchTagException when the requested tag was not found.
+	 */
 	public static function getTagClass($tagName, $origin=false) {
 		return static::getModuleClass($tagName, 'Tag',
 			static::$tagClass, static::$tagPath,
