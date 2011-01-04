@@ -15,6 +15,17 @@ use hydrogen\view\engines\hydrogen\tokens\TextToken;
 use hydrogen\view\engines\hydrogen\tokens\VariableToken;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
+/**
+ * The Hydrogen Templating Engine Lexer is responsible for knowing the core
+ * syntax of the templating language, and breaking a template into logical
+ * tokens that the {@link \hydrogen\view\engines\hydrogen\Parser} can
+ * iterate through.
+ *
+ * The Lexer also exposes methods that can be useful for tag, node, and filter
+ * extensions to the templating languages, allowing them the ability to use
+ * quote-safe explosion, check strings for surrounding characters, and
+ * lexically parse variable strings just like the Lexer does.
+ */
 class Lexer {
 	const TOKEN_BLOCK = 1;
 	const TOKEN_COMMENT = 2;
@@ -33,6 +44,18 @@ class Lexer {
 	const VARIABLE_FILTER_SEPARATOR = "|";
 	const VARIABLE_FILTER_ARGUMENT_SEPARATOR = ":";
 
+	/**
+	 * Turns a given template string into an array of tokens, each defining a
+	 * small piece of the template that can be independently parsed.
+	 *
+	 * @param string $origin The name of the template whose data is to be
+	 * 		tokenized.
+	 * @param string $data The fully loaded template to be tokenized.
+	 * @return array An array of {@link Token} objects representing this
+	 * 		template.
+	 * @throws TemplateSyntaxException when any illegal template syntax is
+	 * 		found that cannot be parsed.
+	 */
 	public static function tokenize($origin, $data) {
 		$splitRegex = '/(' .
 			self::VARIABLE_OPENTAG . '.*' . self::VARIABLE_CLOSETAG . '|' .
@@ -75,6 +98,16 @@ class Lexer {
 		return $tokens;
 	}
 
+	/**
+	 * Creates a {@link BlockToken} from the contents of a block tag.
+	 *
+	 * @param string $origin The template in which the block tag was found
+	 * @param string $data The contents of the block tag, without the
+	 * 		surrounding opening and closing tags
+	 * @return BlockToken A BlockToken created from the provided tag contents.
+	 * @throws TemplateSyntaxException if the block tag contents were illegally
+	 * 		formatted.
+	 */
 	public static function getBlockToken($origin, $data) {
 		$split = explode(self::BLOCK_COMMAND_ARG_SEPARATOR, $data, 2);
 		if (!$split)
@@ -83,6 +116,17 @@ class Lexer {
 			isset($split[1]) ? $split[1] : false);
 	}
 
+	/**
+	 * Creates a {@link VariableToken} from the contents of a variable tag.
+	 *
+	 * @param string $origin The template in which the variable tag was found
+	 * @param string $data The contents of the variable tag, without the
+	 * 		surrounding opening and closing tags
+	 * @return VariableToken A VariableToken created from the provided tag
+	 * 		contents.
+	 * @throws TemplateSyntaxException if the variable tag contents were
+	 * 		illegally formatted.
+	 */
 	public static function getVariableToken($origin, $data) {
 		$tokens = static::quoteSafeExplode($data,
 			self::VARIABLE_FILTER_SEPARATOR);
@@ -135,6 +179,30 @@ class Lexer {
 		return new VariableToken($origin, $data, $varLevels, $filters);
 	}
 
+	/**
+	 * Breaks a string into an array based on delimiters found in the string,
+	 * but ignores delimiters that fall between quote characters (or another
+	 * defined character).  This is an extension of PHP's native
+	 * {@link http://php.net/manual/en/function.explode.php explode()}
+	 * function.
+	 *
+	 * @param string $str The string to be broken into an array.
+	 * @param string $delim The delimiter at which pieces of the string should
+	 * 		be split
+	 * @param string $enclosure The character (usually a single or double
+	 * 		quote) which defines a boundary in which the delimiter should be
+	 * 		ignored.  If not specified, a double-quote (") is used by default.
+	 * @param string $esc The escape character to allow the enclosure character
+	 * 		to be used within an enclosure boundary.  If not specified, a
+	 * 		backslash (\) is used by default.
+	 * @param int|boolean $limit The maximum number of elements to break the
+	 * 		string into.  If this limit is reached, the last element of the
+	 * 		returned array will contain the remainder of the string.  If
+	 * 		false, there will be no limit to the array size.  Default is false.
+	 * @return array An array of strings broken at the specified delimiter,
+	 * 		with the delimiter removed (with the exception of those in an
+	 * 		enclosure).
+	 */
 	public static function quoteSafeExplode($str, $delim,
 			$enclosure='"', $esc='\\', $limit=false) {
 		$exploded = array();
@@ -189,6 +257,15 @@ class Lexer {
 		return $exploded;
 	}
 
+	/**
+	 * Finds the minimum number in an array of numbers, ignoring any array
+	 * elements that are boolean false.
+	 *
+	 * @param array $nums An array of numbers and, potentially, boolean false
+	 * 		values.
+	 * @return int|float|boolean The minimum integer or float found in the
+	 * 		array, or false if no numeric values were found in the array.
+	 */
 	protected static function minIgnoreFalse($nums) {
 		$min = false;
 		foreach ($nums as $num) {
@@ -198,6 +275,19 @@ class Lexer {
 		return $min;
 	}
 
+	/**
+	 * Checks to see if the provided string is surrounded by the given starting
+	 * and ending strings.
+	 *
+	 * @param string $haystack The string to check for surrounding characters
+	 * @param string $startsWith The character(s) to check for at the beginning
+	 * 		of the string
+	 * @param string $endsWith The character(s) to check for at the end of the
+	 * 		string
+	 * @return boolean true if the string begins with the character(s) defined
+	 * 		in $startsWith and ends with the character(s) defined in $endsWith,
+	 * 		false otherwise.
+	 */
 	public static function surroundedBy($haystack, $startsWith, $endsWith) {
 		$sLen = strlen($startsWith);
 		$eLen = strlen($endsWith);
