@@ -206,6 +206,30 @@ class HydrogenEngine implements TemplateEngine {
 		return $namespace;
 	}
 	
+	/**
+	 * Gets the full class name for a certain module (tag or filter) using the
+	 * provided arrays of data.  This is an abstraction for
+	 * {@link getFilterClass} and {@link getTagClass}.
+	 *
+	 * @param string $modName The name of the filter or tag module for which
+	 * 		to search.
+	 * @param string $modType The type of module to be loaded.  Should be
+	 * 		either 'Tag' or 'Filter', case sensitive.  There is no error
+	 * 		checking for this value.
+	 * @param array $modClasses An associative array of lowercase module
+	 * 		names to full namespace + class names.
+	 * @param array $modPaths An associative array of lowercase module names
+	 * 		to absolute paths to the PHP file that contains them.
+	 * @param array $modNamespaces An array of namespaces in which to search
+	 * 		for $modName+$modType if it was not found in $modClasses.
+	 * @param string $origin The template name requesting this module.  This
+	 * 		value is optional, but helps to produce more helpful error messages
+	 * 		should the module not be found.
+	 * @throws NoSuchFilterException if the $modType is 'Filter' and the
+	 * 		filter was not found.
+	 * @throws NoSuchTagException if the $modType is 'Tag' and the tag was not
+	 * 		found.
+	 */
 	protected static function getModuleClass($modName, $modType, &$modClasses,
 			&$modPaths, &$modNamespaces, $origin=false) {
 		$lowName = strtolower($modName);
