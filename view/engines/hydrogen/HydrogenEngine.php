@@ -64,7 +64,7 @@ class HydrogenEngine implements TemplateEngine {
 		}
 		$filterClass = ucfirst($filterName) . 'Filter';
 		foreach (static::$filterNamespace as $namespace) {
-			$class = $namespace . $filterName;
+			$class = $namespace . $filterClass;
 			if (@class_exists($class)) {
 				static::$filterClass[$filterClass] = $class;
 				return $class;
