@@ -56,28 +56,33 @@ class HydrogenEngine implements TemplateEngine {
 	}
 	
 	public static function getFilterClass($filterName, $origin=false) {
-		$filterName = strtolower($filterName);
-		if (isset(static::$filterClass[$filterName])) {
-			if (isset(static::$filterPath[$filterName]))
-				require_once(static::$filterPath[$filterName]);
-			return static::$filterClass[$filterName];
+		return static::getModuleClass($filterName, 'Filter',
+			static::$filterClass, static::$filterPath,
+			static::$filterNamespace, $origin);
+	}
+	
+	protected static function getModuleClass($modName, $modType, &$modClasses,
+			&$modPaths, &$modNamespaces, $origin=false) {
+		$lowName = strtolower($modName);
+		if (isset($modClasses[$lowName])) {
+			if (isset($modPaths[$lowName]))
+				require_once($modPaths[$lowName]);
+			return $modClasses[$lowName];
 		}
-		$filterClass = ucfirst($filterName) . 'Filter';
-		foreach (static::$filterNamespace as $namespace) {
-			$class = $namespace . $filterClass;
+		$properName = ucfirst($lowName) . $modType;
+		foreach ($modNamespaces as $namespace) {
+			$class = $namespace . $properName;
 			if (@class_exists($class)) {
-				static::$filterClass[$filterClass] = $class;
+				$modClasses[$lowName] = $class;
 				return $class;
 			}
 		}
-		if ($origin) {
-			throw new NoSuchFilterException('Filter "' . $filterName .
-				'" does not exist in template "' . $origin . '".');
-		}
-		else {
-			throw new NoSuchFilterException('Filter "' . $filterName .
-				'" does not exist.');
-		}
+		$error = $modType . ' "' . $modName . '" does not exist' .
+			($origin ? ' in template "' . $origin . '".' : '.');
+		if ($modType === 'Filter')
+			throw new NoSuchFilterException($error);
+		else
+			throw new NoSuchTagException($error);
 	}
 
 	public static function getPHP($templateName, $loader) {
