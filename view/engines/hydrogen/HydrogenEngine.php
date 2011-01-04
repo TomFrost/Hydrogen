@@ -12,6 +12,15 @@ use hydrogen\view\engines\hydrogen\Parser;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchTagException;
 
+/**
+ * The Hydrogen Templating Engine is a robust template parser based on the
+ * highly-acclaimed Django template language, with some key changes for
+ * increased performance and more flexibility for template creators.  See
+ * linked documentation for more information.
+ *
+ * @link http://www.webdevrefinery.com/forums/topic/6404-hydrogen-templates-for-front-end-developers
+ * 		Frontend Development Documentation
+ */
 class HydrogenEngine implements TemplateEngine {
 	
 	protected static $filterClass = array();
