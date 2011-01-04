@@ -73,6 +73,29 @@ class HydrogenEngine implements TemplateEngine {
 			static::$tagPath[$tagName] = Config::getAbsolutePath($path);
 	}
 	
+	/**
+	 * Adds a namespace from which filters will be automatically loaded if
+	 * they're not found in the default hydrogen namespace or any namespaces
+	 * previously added using this function.  Only the namespace is to be
+	 * provided; Hydrogen will then attempt to load any unknown filters by
+	 * adding [filtername]Filter to the end of the namespace.
+	 *
+	 * For example, if the filter {{someVar|swedishchef}} is used in a
+	 * template, and this function was called with the namespace
+	 * '\myapp\filters', Hydrogen would attempt to load the class
+	 * '\myapp\filters\SwedishchefFilter' if it hasn't already been defined
+	 * with {@link addFilter()}.  Note the capitalization: for autoloaded
+	 * filter names, only the first character of the filter name must be
+	 * capitalized, followed by 'Filter' with a capital F.
+	 *
+	 * The autoloading of this class is up to the programmer, though the file
+	 * hydrogen.inc.php can be used as a basis for good autoloading practices
+	 * for your own class files.  If your code does not use namespaces, a
+	 * backslash can be provided for the $namespace argument.
+	 *
+	 * @param string $namespace The namespace to which filter classes should
+	 * 		be added to attempt to autoload them.
+	 */
 	public static function addFilterNamespace($namespace) {
 		static::$filterNamespace[] = static::formatNamespace($namespace);
 	}
