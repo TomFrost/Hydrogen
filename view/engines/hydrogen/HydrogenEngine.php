@@ -188,6 +188,16 @@ class HydrogenEngine implements TemplateEngine {
 		return $nodes->render();
 	}
 	
+	/**
+	 * Adds a leading backslash to the provided namespace if it's missing one,
+	 * and optionally adds as trailing backslash as well.
+	 *
+	 * @param string $namespace The namespace to start with.
+	 * @param boolean $endSlash true to add a trailing slash to the namespace
+	 * 		if it doesn't already have one, false otherwise.  This is an
+	 * 		optional argument.  Defaults to true.
+	 * @return string the formatted namespace.
+	 */
 	protected static function formatNamespace($namespace, $endSlash=true) {
 		if ($namespace[0] !== '\\')
 			$namespace = '\\' . $namespace;
