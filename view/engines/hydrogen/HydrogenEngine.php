@@ -72,11 +72,11 @@ class HydrogenEngine implements TemplateEngine {
 		}
 		if ($origin) {
 			throw new NoSuchFilterException('Filter "' . $filterName .
-				'" does not exist.');
+				'" does not exist in template "' . $origin . '".');
 		}
 		else {
 			throw new NoSuchFilterException('Filter "' . $filterName .
-				'" does not exist in template "' . $origin . '".');
+				'" does not exist.');
 		}
 	}
 
