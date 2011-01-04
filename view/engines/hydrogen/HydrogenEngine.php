@@ -27,7 +27,8 @@ class HydrogenEngine implements TemplateEngine {
 
 	public static function addFilter($filterName, $className, $path=false) {
 		$filterName = strtolower($filterName);
-		static::$filterClass[$filterName] = $className;
+		static::$filterClass[$filterName] = static::formatNamespace($className,
+			false);
 		if ($path)
 			static::$filterPath[$filterName] = Config::getAbsolutePath($path);
 	}
@@ -38,7 +39,8 @@ class HydrogenEngine implements TemplateEngine {
 	
 	public static function addTag($tagName, $className, $path=false) {
 		$tagName = strtolower($tagName);
-		static::$tagClass[$tagName] = $className;
+		static::$tagClass[$tagName] = static::formatNamespace($className,
+			false);
 		if ($path)
 			static::$tagPath[$tagName] = Config::getAbsolutePath($path);
 	}
@@ -47,10 +49,10 @@ class HydrogenEngine implements TemplateEngine {
 		static::$tagNamespace[] = static::formatNamespace($namespace);
 	}
 	
-	protected static function formatNamespace($namespace) {
+	protected static function formatNamespace($namespace, $endSlash=true) {
 		if ($namespace[0] !== '\\')
 			$namespace = '\\' . $namespace;
-		if ($namespace[strlen($namespace) - 1] !== '\\')
+		if ($endSlash && $namespace[strlen($namespace) - 1] !== '\\')
 			$namespace .= '\\';
 		return $namespace;
 	}
