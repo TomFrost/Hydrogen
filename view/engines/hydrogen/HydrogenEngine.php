@@ -61,6 +61,12 @@ class HydrogenEngine implements TemplateEngine {
 			static::$filterNamespace, $origin);
 	}
 	
+	public static function getTagClass($tagName, $origin=false) {
+		return static::getModuleClass($tagName, 'Tag',
+			static::$tagClass, static::$tagPath,
+			static::$tagNamespace, $origin);
+	}
+	
 	protected static function getModuleClass($modName, $modType, &$modClasses,
 			&$modPaths, &$modNamespaces, $origin=false) {
 		$lowName = strtolower($modName);
