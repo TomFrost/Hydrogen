@@ -6,6 +6,7 @@
 
 namespace hydrogen\view\engines\hydrogen\nodes;
 
+use hydrogen\view\engines\hydrogen\HydrogenEngine;
 use hydrogen\view\engines\hydrogen\ExpressionParser;
 use hydrogen\view\engines\hydrogen\Node;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
@@ -52,13 +53,7 @@ class VariableNode implements Node {
 			$var .= "->getValue()";
 		$escape = $this->escape;
 		foreach ($this->filters as $filter) {
-			$class = '\hydrogen\view\engines\hydrogen\filters\\' .
-				ucfirst(strtolower($filter->filter)) . 'Filter';
-			if (!@class_exists($class)) {
-				throw new NoSuchFilterException('Filter in "' .
-					$this->origin . '" does not exist: "' .
-					$filter->filter . '".');
-			}
+			$class = HydrogenEngine::getFilterClass($filter);
 			$var = $class::applyTo($var, $filter->args, $escape, $phpFile);
 		}
 		if ($escape)
