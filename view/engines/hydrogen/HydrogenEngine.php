@@ -25,6 +25,22 @@ class HydrogenEngine implements TemplateEngine {
 		'\hydrogen\view\engines\hydrogen\tags\\'
 		);
 
+	/**
+	 * Adds an external filter to the Hydrogen template engine.  Once added,
+	 * the filter can be used in any Hydrogen template file for the duration
+	 * of that request.
+	 *
+	 * @param string $filterName The name of the filter to add.  The name is
+	 * 		what will be typed in the template files themselves.
+	 * @param string $className The class name (with namespace) of this
+	 * 		filter.  The filter must implement the interface
+	 * 		{@link \hydrogen\view\engines\hydrogen\Filter}.
+	 * @param string $path The path to the PHP to require_once before using
+	 * 		the given class, either absolute or relative to the base_url
+	 * 		defined in the hydrogen.autoconfig.php file.  This argument is
+	 * 		OPTIONAL: if omitted, Hydrogen will assume the class will be
+	 * 		automatically loaded when accessed.
+	 */
 	public static function addFilter($filterName, $className, $path=false) {
 		$filterName = strtolower($filterName);
 		static::$filterClass[$filterName] = static::formatNamespace($className,
@@ -33,6 +49,22 @@ class HydrogenEngine implements TemplateEngine {
 			static::$filterPath[$filterName] = Config::getAbsolutePath($path);
 	}
 	
+	/**
+	 * Adds an external tag to the Hydrogen template engine.  Once added,
+	 * the tag can be used in any Hydrogen template file for the duration
+	 * of that request.
+	 *
+	 * @param string $tagName The name of the tag to add.  The name is
+	 * 		what will be typed in the template files themselves.
+	 * @param string $className The class name (with namespace) of this
+	 * 		tag.  The tag must extend the class
+	 * 		{@link \hydrogen\view\engines\hydrogen\Tag}.
+	 * @param string $path The path to the PHP to require_once before using
+	 * 		the given class, either absolute or relative to the base_url
+	 * 		defined in the hydrogen.autoconfig.php file.  This argument is
+	 * 		OPTIONAL: if omitted, Hydrogen will assume the class will be
+	 * 		automatically loaded when accessed.
+	 */
 	public static function addTag($tagName, $className, $path=false) {
 		$tagName = strtolower($tagName);
 		static::$tagClass[$tagName] = static::formatNamespace($className,
