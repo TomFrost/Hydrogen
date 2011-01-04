@@ -100,6 +100,29 @@ class HydrogenEngine implements TemplateEngine {
 		static::$filterNamespace[] = static::formatNamespace($namespace);
 	}
 	
+	/**
+	 * Adds a namespace from which tags will be automatically loaded if
+	 * they're not found in the default hydrogen namespace or any namespaces
+	 * previously added using this function.  Only the namespace is to be
+	 * provided; Hydrogen will then attempt to load any unknown tags by
+	 * adding [tagname]Tag to the end of the namespace.
+	 *
+	 * For example, if the tag {% piglatin %} is used in a
+	 * template, and this function was called with the namespace
+	 * '\myapp\tags', Hydrogen would attempt to load the class
+	 * '\myapp\tags\PiglatinFilter' if it hasn't already been defined
+	 * with {@link addTag()}.  Note the capitalization: for autoloaded
+	 * tag names, only the first character of the tag name must be
+	 * capitalized, followed by 'Tag' with a capital T.
+	 *
+	 * The autoloading of this class is up to the programmer, though the file
+	 * hydrogen.inc.php can be used as a basis for good autoloading practices
+	 * for your own class files.  If your code does not use namespaces, a
+	 * backslash can be provided for the $namespace argument.
+	 *
+	 * @param string $namespace The namespace to which tag classes should
+	 * 		be added to attempt to autoload them.
+	 */
 	public static function addTagNamespace($namespace) {
 		static::$tagNamespace[] = static::formatNamespace($namespace);
 	}
