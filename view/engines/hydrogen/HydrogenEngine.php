@@ -9,6 +9,8 @@ namespace hydrogen\view\engines\hydrogen;
 use hydrogen\config\Config;
 use hydrogen\view\TemplateEngine;
 use hydrogen\view\engines\hydrogen\Parser;
+use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
+use hydrogen\view\engines\hydrogen\exceptions\NoSuchTagException;
 
 class HydrogenEngine implements TemplateEngine {
 	
@@ -51,6 +53,31 @@ class HydrogenEngine implements TemplateEngine {
 		if ($namespace[strlen($namespace) - 1] !== '\\')
 			$namespace .= '\\';
 		return $namespace;
+	}
+	
+	public static function getFilterClass($filterName, $origin=false) {
+		$filterName = strtolower($filterName);
+		if (isset(static::$filterClass[$filterName])) {
+			if (isset(static::$filterPath[$filterName]))
+				require_once(static::$filterPath[$filterName]);
+			return static::$filterClass[$filterName];
+		}
+		$filterClass = ucfirst($filterName) . 'Filter';
+		foreach (static::$filterNamespace as $namespace) {
+			$class = $namespace . $filterName;
+			if (@class_exists($class)) {
+				static::$filterClass[$filterClass] = $class;
+				return $class;
+			}
+		}
+		if ($origin) {
+			throw new NoSuchFilterException('Filter "' . $filterName .
+				'" does not exist.');
+		}
+		else {
+			throw new NoSuchFilterException('Filter "' . $filterName .
+				'" does not exist in template "' . $origin . '".');
+		}
 	}
 
 	public static function getPHP($templateName, $loader) {
