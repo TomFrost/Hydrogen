@@ -127,6 +127,22 @@ class HydrogenEngine implements TemplateEngine {
 		static::$tagNamespace[] = static::formatNamespace($namespace);
 	}
 	
+	/**
+	 * Gets the full class name (with namespace) for the given filter.  The
+	 * class will either be pre-loaded by this function, or is expected to be
+	 * autoloaded when it is first accessed.  The returned class name can be
+	 * used with no further error checking.
+	 *
+	 * @param string $filterName The filter for which to obtain the full
+	 * 		namespace + class name for.
+	 * @param string $origin The template originating the request for this
+	 * 		filter.  It is optional, but if provided, will be used to create
+	 * 		a more helpful error message should the requested filter not be
+	 * 		found.
+	 * @return string the full namespace + class name, with leading backslash,
+	 * 		for the provided filter name.
+	 * @throws NoSuchFilterException when the requested filter was not found.
+	 */
 	public static function getFilterClass($filterName, $origin=false) {
 		return static::getModuleClass($filterName, 'Filter',
 			static::$filterClass, static::$filterPath,
