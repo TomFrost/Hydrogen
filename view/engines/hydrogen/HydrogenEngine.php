@@ -171,6 +171,17 @@ class HydrogenEngine implements TemplateEngine {
 			static::$tagNamespace, $origin);
 	}
 	
+	/**
+	 * Generates the raw PHP for the given template, using the given loader to
+	 * load the template files.  Works as specified by
+	 * {@link \hydrogen\view\TemplateEngine}.
+	 *
+	 * @param string $templateName The name of the template to load.
+	 * @param \hydrogen\view\Loader $loader The loader with which to load
+	 * 		template files.
+	 * @return string the full, raw PHP that can be executed in a
+	 * 		{@link \hydrogen\view\ViewSandbox}.
+	 */
 	public static function getPHP($templateName, $loader) {
 		$parser = new Parser($templateName, $loader);
 		$nodes = $parser->parse();
