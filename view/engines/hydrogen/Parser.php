@@ -6,11 +6,11 @@
 
 namespace hydrogen\view\engines\hydrogen;
 
+use hydrogen\view\engines\hydrogen\HydrogenEngine;
 use hydrogen\view\engines\hydrogen\Lexer;
 use hydrogen\view\engines\hydrogen\NodeArray;
 use hydrogen\view\engines\hydrogen\nodes\TextNode;
 use hydrogen\view\engines\hydrogen\nodes\VariableNode;
-use hydrogen\view\engines\hydrogen\exceptions\NoSuchTagException;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
 class Parser {
@@ -146,10 +146,7 @@ class Parser {
 	}
 
 	protected function getBlockNode($origin, $cmd, $args) {
-		$class = '\\' . __NAMESPACE__ . '\tags\\' .
-			ucfirst(strtolower($cmd)) . 'Tag';
-		if (!@class_exists($class))
-			throw new NoSuchTagException("Tag in template \"$origin\" does not exist: $cmd");
+		$class = HydrogenEngine::getTagClass($cmd, $origin);
 		if ($class::mustBeFirst() && $this->originHasNodes($origin)) {
 			throw new TemplateSyntaxException(
 				"Tag must be first in template: $cmd");
