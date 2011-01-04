@@ -53,7 +53,7 @@ class VariableNode implements Node {
 			$var .= "->getValue()";
 		$escape = $this->escape;
 		foreach ($this->filters as $filter) {
-			$class = HydrogenEngine::getFilterClass($filter);
+			$class = HydrogenEngine::getFilterClass($filter->filter);
 			$var = $class::applyTo($var, $filter->args, $escape, $phpFile);
 		}
 		if ($escape)

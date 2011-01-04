@@ -26,7 +26,7 @@ class FilterNode implements Node {
 		$content = $this->nodes->render();
 		$var = '$temp';
 		foreach ($this->filters as $filter) {
-			$class = HydrogenEngine::getFilterClass($filter);
+			$class = HydrogenEngine::getFilterClass($filter->filter);
 			$escape = false;
 			$var = $class::applyTo($var, $filter->args, $escape, $phpFile);
 			if ($escape)
