@@ -8,7 +8,6 @@ namespace hydrogen\view\engines\hydrogen\nodes;
 
 use hydrogen\view\engines\hydrogen\Node;
 use hydrogen\view\engines\hydrogen\HydrogenEngine;
-use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\PHPFile;
 
 class FilterNode implements Node {
