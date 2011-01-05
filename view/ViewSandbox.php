@@ -11,6 +11,12 @@ use hydrogen\view\ContextStack;
 use hydrogen\view\exceptions\NoSuchVariableException;
 use hydrogen\view\exceptions\NoSuchViewException;
 
+/**
+ * The ViewSandbox is the environment in which all views (rendered templates)
+ * are executed.  At the start of execution, each is provided with a
+ * {@link ContextStack} in the $context variable and access to various helper
+ * functions through the $this variable.
+ */
 class ViewSandbox {
 	
 	protected $context;
