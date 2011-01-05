@@ -12,6 +12,18 @@ use hydrogen\view\engines\hydrogen\nodes\VariableNode;
 use hydrogen\view\engines\hydrogen\exceptions\NoSuchFilterException;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
 
+/**
+ * ExpressionParser provides the Hydrogen Templating Engine with a way to
+ * support context variables (with filters) in expressions, along with a few
+ * convenience operators and basic validity checking.  After being parsed, the
+ * resulting expression should be in a format executable by PHP itself.
+ *
+ * See the Hydrogen Front-End Development documentation for more information
+ * on how Hydrogen template expressions are formatted.
+ *
+ * @link http://www.webdevrefinery.com/forums/topic/6404-hydrogen-templates-for-front-end-developers
+ * 		Frontend Development Documentation
+ */
 class ExpressionParser {
 
 	const TOKEN_NONE = 0;
@@ -47,10 +59,27 @@ class ExpressionParser {
 		"!" => array(self::TOKEN_INVERT, '!')
 	);
 
-	// This is a statically accessed class
+	/**
+	 * This is a statically accessed class and should never be instantiated.
+	 */
 	protected function __construct() {}
 
-	public static function exprToPHP(&$expr, $phpFile, $origin='expression') {
+	/**
+	 * Transforms a Hydrogen template expression to a pure PHP expression that
+	 * can be executed directly or inserted in a PHP file.
+	 *
+	 * @param string $expr The Hydrogen template expression string to parse
+	 * @param \hydrogen\view\engines\hydrogen\PHPFile $phpFile The instance
+	 * 		of PHPFile being used to render this template.  This function will
+	 * 		not add any content to the page, but variable filters (if used) may
+	 * 		use it to add functions and variable declarations.
+	 * @param string $origin The name of the template that this expression was
+	 * 		taken from.  If not specified, the default is 'expression'.
+	 * @return string An expression in pure executable PHP.
+	 * @throws TemplateSyntaxException if a syntax error is found in the
+	 * 		provided expression.
+	 */
+	public static function exprToPHP($expr, $phpFile, $origin='expression') {
 		$state = self::TOKEN_NONE;
 		$token = '';
 		$tokens = array();
@@ -463,6 +492,18 @@ class ExpressionParser {
 		return implode(' ', $tokens);
 	}
 
+	/**
+	 * Takes a source array of strings and returns a new array made up only of
+	 * elements that start with a specified string.  The elements will remain
+	 * in the same order in the resulting array, just with elements removed.
+	 *
+	 * @param string $needle The string with which to filter the source array.
+	 * 		Only elements that start with this string will be put in the
+	 * 		resulting array.
+	 * @param array $haystack The source array to be filtered.
+	 * @return array A new array with a subset of the items in the source
+	 * 		array, each starting with the string specified in $needle.
+	 */
 	protected static function filterArrayStartsWith($needle, $haystack) {
 		$num = count($haystack);
 		$len = strlen($needle);
@@ -481,6 +522,21 @@ class ExpressionParser {
 		return $haystack;
 	}
 
+	/**
+	 * Turns a variable string (similar to what might be found in a variable
+	 * tag within a template) into pure PHP.
+	 *
+	 * @param string $varString The variable string to be parsed into PHP.
+	 * @param \hydrogen\view\engines\hydrogen\PHPFile $phpFile The instance
+	 * 		of PHPFile being used to render this template.
+	 * @param string $origin The name of the template from which this variable
+	 * 		string was taken.
+	 * @param boolean $nullIfNotFound true if a variable should evaluate to
+	 * 		NULL if it's not found, false if it should throw an exception in
+	 * 		that case.
+	 * @return string the pure PHP code that will evaluate the provided
+	 * 		variable string.
+	 */
 	protected static function parseVariableString($varString,
 			$phpFile, $origin, $nullIfNotFound=false) {
 		$token = Lexer::getVariableToken($origin, $varString);
