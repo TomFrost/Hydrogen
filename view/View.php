@@ -13,6 +13,12 @@ use hydrogen\view\exceptions\NoSuchVariableException;
 use hydrogen\view\exceptions\NoSuchViewException;
 use hydrogen\view\exceptions\ViewCacheException;
 
+/**
+ * View is the gateway class to loading and displaying templates, as well as
+ * setting variables for those templates to render.  It is statically accessed
+ * and never needs to be instantiated, and most templates can be loaded with a
+ * simple call to {@link load()}.
+ */
 class View {
 	
 	const DEFAULT_ENGINE = "hydrogen";
@@ -22,8 +28,8 @@ class View {
 	/**
 	 * Gets a variable's value from the default View context.
 	 *
-	 * @param string key The key for which to get the value.
-	 * @return the value of the key.
+	 * @param string $key The key for which to get the value.
+	 * @return mixed the value of the key.
 	 * @throws NoSuchVariableException If the key does not exist in the
 	 * 		default View context.
 	 */
@@ -39,9 +45,9 @@ class View {
 	 * will be available to any view loaded using the {@link #load}
 	 * function.
 	 *
-	 * @param keyOrArray string|array A variable name to set, or an
+	 * @param string|array $keyOrArray A variable name to set, or an
 	 * 		associative array of varName => value pairs.
-	 * @param value mixed The value for the specified key.  If keyOrArray
+	 * @param mixed $value The value for the specified key.  If keyOrArray
 	 * 		is an associative array, this value is not used.
 	 */
 	public static function setVar($keyOrArray, $value=false) {
@@ -57,9 +63,9 @@ class View {
 	 * Loads and displays the specified view inside of a new ViewSandbox
 	 * with the default context (unless otherwise specified).
 	 *
-	 * @param string viewName The name of the view to load.
-	 * @param array|ContextStack|boolean context A context in which to load the
-	 * 		view, or an associative array of key/value pairs to be added to
+	 * @param string $viewName The name of the view to load.
+	 * @param array|ContextStack|boolean $context A context in which to load
+	 * 		the view, or an associative array of key/value pairs to be added to
 	 * 		the default context before loading the view.  This argument
 	 * 		is optional -- use boolean false to ignore.
 	 */
@@ -79,8 +85,8 @@ class View {
 	 * to load the specified view from the cache (or write it into the cache
 	 * if it does not exist there) if appropriate.
 	 *
-	 * @param string viewName The name of the view to load.
-	 * @param ViewSandbox sandbox The sandbox into which the view should be
+	 * @param string $viewName The name of the view to load.
+	 * @param ViewSandbox $sandbox The sandbox into which the view should be
 	 * 		loaded.
 	 */
 	public static function loadIntoSandbox($viewName, $sandbox) {
@@ -98,9 +104,9 @@ class View {
 	 * that Config::setCachePath has been called (probably already done in the
 	 * autoconfig file).
 	 *
-	 * @param string viewName The view file to load from the cache, or create
+	 * @param string $viewName The view file to load from the cache, or create
 	 * 		in the cache if it is not found.
-	 * @param ViewSandbox sandbox The sandbox into which the cached view should
+	 * @param ViewSandbox $sandbox The sandbox into which the cached view should
 	 * 		be loaded.
 	 * @throws NoSuchViewException if the specified view cannot be found.
 	 * @throws ViewCacheException if there is any problem creating/writing to
@@ -152,7 +158,7 @@ class View {
 	 * the view loader and template engine specified in the Hydrogen
 	 * autoconfig file.
 	 *
-	 * @param string viewName The name of the view for which the raw PHP should
+	 * @param string $viewName The name of the view for which the raw PHP should
 	 * 		be retreived.
 	 * @return string A string containing the raw PHP of the specified view.
 	 * @throws NoSuchViewException if the specified view cannot be found or
