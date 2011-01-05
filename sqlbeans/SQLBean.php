@@ -69,6 +69,12 @@ abstract class SQLBean {
 		return $this->get($var);
 	}
 	
+	public function __isset($var) {
+		if (isset($this->stored[$var]) || method_exists($this, 'get_' . $var))
+			return true;
+		return false;
+	}
+	
 	public function __set($var, $val) {
 		return $this->set($var, $val);
 	}
