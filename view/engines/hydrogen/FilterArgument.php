@@ -7,7 +7,6 @@
 namespace hydrogen\view\engines\hydrogen;
 
 use hydrogen\view\engines\hydrogen\nodes\VariableNode;
-use hydrogen\view\engines\hydrogen\ExpressionEvaluator;
 
 class FilterArgument {
 	protected $data;
