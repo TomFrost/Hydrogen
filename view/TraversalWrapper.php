@@ -47,6 +47,18 @@ class TraversalWrapper {
 				return new TraversalWrapper(
 					call_user_func(array($this->var, $func)),
 					$this->nullIfNotFound, $this->traversed);
+			// The requested variable might be available through the __get()
+			// magic method.  This tests for that without generating errors.
+			set_error_handler(array($this, 'fieldNotFoundHandler'));
+			try {
+				$result = $this->var->$name;
+			}
+			catch (\Exception $e) {}
+			restore_error_handler();
+			if (isset($result)) {
+				return new TraversalWrapper($result, $this->nullIfNotFound,
+					$this->traversed);
+			}
 		}
 		if ($this->nullIfNotFound) {
 			$var = null;
@@ -93,6 +105,11 @@ class TraversalWrapper {
 
 	public function __toString() {
 		return $this->var;
+	}
+	
+	protected function fieldNotFoundHandler($errno, $errstr, $errfile,
+			$errline) {
+		throw new \Exception();
 	}
 }
 
