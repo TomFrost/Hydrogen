@@ -16,6 +16,9 @@ namespace hydrogen\view;
  * where the blank is the name of the loader with a capital first letter.  They
  * should implement this interface and its method, then can be selected for use
  * in the hydrogen.autoconfig.php file.
+ *
+ * Loaders should never be instantiated directly.  Instead, get an instance
+ * of the loader from {@link \hydrogen\view\LoaderFactory::getLoader()}.
  */
 interface Loader {
 	
