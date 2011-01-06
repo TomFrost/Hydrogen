@@ -35,7 +35,7 @@ class ViewSandbox {
 		if ($this->cleanAppURL[strlen($this->cleanAppURL) - 1] == '/')
 			$this->cleanAppURL = substr($this->cleanAppURL, 0, -1);
 		$this->cleanViewURL = Config::getVal("view", "root_url");
-		if ($this->cleanViewURL === false) {
+		if ($this->cleanViewURL === null) {
 			$this->cleanViewURL = $this->appURL(Config::getRequiredVal("view", 
 				"url_path"));
 		}
