@@ -43,6 +43,8 @@ use hydrogen\view\exceptions\NoSuchVariableException;
  * an instance of {@link TraversalWrpper}.  See the documentation for
  * TraversalWrapper for the benefits that offers.  To get a value not wrapped
  * in that class, the actual {@link get()} method must be used.
+ *
+ * @see \hydrogen\view\TraversalWrapper
  */
 class ContextStack {
 	protected $stack;
@@ -220,6 +222,7 @@ class ContextStack {
 	 * 		exist in this context.
 	 * @throws NoSuchVariableException if $nullIfNotFound is false and the
 	 * 		specified key does not exist in this context.
+	 * @see \hydrogen\view\TraversalWrapper
 	 */
 	public function getWrapped($key, $nullIfNotFound=false) {
 		$var = $this->get($key, $nullIfNotFound);
