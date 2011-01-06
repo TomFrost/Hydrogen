@@ -130,7 +130,7 @@ Config::setVal("view", "url_path", "themes/default");
 //Config::setVal("view", "root_url", "http://cloud.domain.com/theme/default");
 
 
-/***  For THE 'hydrogen' VIEW ENGINE ONLY:
+/***  FOR THE 'hydrogen' VIEW ENGINE ONLY:
  ***  [view] -> print_missing_var
  ***  Default if not set: false
  ***
@@ -142,7 +142,7 @@ Config::setVal("view", "url_path", "themes/default");
 Config::setVal("view", "print_missing_var", true);
 
 
-/***  For THE 'hydrogen' VIEW ENGINE ONLY:
+/***  FOR THE 'hydrogen' VIEW ENGINE ONLY:
  ***  [view] -> allow_php
  ***  Default if not set: false
  ***
@@ -152,6 +152,19 @@ Config::setVal("view", "print_missing_var", true);
  ***  third parties can submit template code.
  ***/	
 //Config::setVal("view", "allow_php", true);
+
+
+/***  FOR THE 'hydrogen' VIEW ENGINE ONLY:
+ ***  [view] -> autoescape
+ ***  Default if not set: true
+ ***
+ ***  By default, the Hydrogen Templating Engine will escape all variable
+ ***  tags with the htmlentities() PHP method.  This value can be set to
+ ***  false to turn that feature off.  Just be aware that each potential
+ ***  output will need to be escaped manually if there's any risk of them
+ ***  containing code!
+ ***/
+//Config::setVal("view", "autoescape", false);
 
 
 /***  [view] -> use_cache
