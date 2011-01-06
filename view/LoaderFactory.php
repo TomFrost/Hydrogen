@@ -20,7 +20,7 @@ class LoaderFactory {
 	/**
 	 * LoaderFactory should never be instantiated.
 	 */
-	protected static function __construct() {}
+	protected function __construct() {}
 	
 	/**
 	 * Gets an instance (newly created or old) of a Loader.
