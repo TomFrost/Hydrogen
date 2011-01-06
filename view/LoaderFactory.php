@@ -11,6 +11,8 @@ use hydrogen\config\Config;
 class LoaderFactory {
 	protected static $loaders = array();
 	
+	protected static function __construct() {}
+	
 	public static function getLoader($loaderType=false) {
 		if (!$loaderType)
 			$loaderType = Config::getVal("view", "loader") ?: "File";
