@@ -139,7 +139,7 @@ class Config {
 	 * @param boolean exceptionOnError <code>true</code> to have this method
 	 * 		throw a {@link ConfigKeyNotFoundException} if the config file is not
 	 * 		found; <code>false</code> to return <code>false</code> instead.
-	 * @return The value of the requested section/key, or <code>false</code> if
+	 * @return The value of the requested section/key, or <code>NULL</code> if
 	 * 		the specified section/key pair does not exist and <code>false</code>
 	 * 		was specified for exceptionOnError.
 	 * @throws ConfigKeyNotFoundException if the requested section/key pair does
