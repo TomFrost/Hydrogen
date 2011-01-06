@@ -90,7 +90,7 @@ class TraversalWrapper {
 	 * 		instantiated.
 	 */
 	public function __construct(&$var, &$nullIfNotFound=false,
-			&$traversed=false) {
+			&$traversed=array()) {
 		$this->var = &$var;
 		$this->nullIfNotFound = &$nullIfNotFound;
 		$this->traversed = &$traversed;
