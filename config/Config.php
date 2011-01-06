@@ -171,7 +171,7 @@ class Config {
 				$msg .= " Value is required by $call";
 			throw new ConfigKeyNotFoundException($msg, $call);
 		}
-		return false;
+		return null;
 	}
 	
 	/**
