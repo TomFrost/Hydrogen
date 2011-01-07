@@ -10,6 +10,7 @@
 namespace hydrogen;
 
 use hydrogen\config\Config;
+use hydrogen\view\engines\hydrogen\HydrogenEngine;
 
 /***  Set the base path for the application here.  This should not be the path
  ***  to Hydrogen, but rather, the "root" folder of this webapp.
@@ -165,6 +166,38 @@ Config::setVal("view", "print_missing_var", true);
  ***  containing code!
  ***/
 //Config::setVal("view", "autoescape", false);
+
+
+/***  FOR THE 'hydrogen' VIEW ENGINE ONLY:
+ ***  Custom filter declarations
+ ***
+ ***  The following methods can be used to add custom filters to the Hydrogen
+ ***  templating engine without them physically existing in the Hydrogen
+ ***  library folder or namespace.  The first method declares classes
+ ***  individually (with optional file path if it won't be autoloaded), while
+ ***  the second adds a namespace from which filters can be autoloaded.  See
+ ***  the documentation in hydrogen/view/engines/hydrogen/HydrogenEngine.php
+ ***  for details and usage.
+ ***/
+/*HydrogenEngine::addFilter('swedishchef', '\myapp\filters\BorkFilter',
+	Config::getBasePath() . '/lib/myapp/filters/BorkFilter.php'); */
+//HydrogenEngine::addFilterNamespace('\myapp\filters');
+
+
+/***  FOR THE 'hydrogen' VIEW ENGINE ONLY:
+ ***  Custom tag declarations
+ ***
+ ***  The following methods can be used to add custom tags to the Hydrogen
+ ***  templating engine without them physically existing in the Hydrogen
+ ***  library folder or namespace.  The first method declares classes
+ ***  individually (with optional file path if it won't be autoloaded), while
+ ***  the second adds a namespace from which tags can be autoloaded.  See
+ ***  the documentation in hydrogen/view/engines/hydrogen/HydrogenEngine.php
+ ***  for details and usage.
+ ***/
+/*HydrogenEngine::addTag('onweekdays', '\myapp\tags\OnweekdaysTag',
+	Config::getBasePath() . '/lib/myapp/tags/OnweekdaysTag.php'); */
+//HydrogenEngine::addTagNamespace('\myapp\tags');
 
 
 /***  [view] -> use_cache
