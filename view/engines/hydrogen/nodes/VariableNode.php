@@ -18,6 +18,13 @@ class VariableNode implements Node {
 	protected $filters;
 	protected $origin;
 	protected $escape;
+	
+	public static function createFromString($varString, $escape=null,
+			$origin='VariableNode') {
+		$token = Lexer::getVariableToken($origin, $varString);
+		return new VariableNode($token->varLevels, $token->filters, $escape,
+			$origin);
+	}
 
 	public function __construct($varLevels, $filters, $escape, $origin) {
 		$this->varLevels = $varLevels;
