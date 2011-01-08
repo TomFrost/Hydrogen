@@ -5,6 +5,29 @@
 ChangeLog
 ---------
 
+### v0.3.0
+- **Hydrogen**
+	- The autoloader has been rewritten to be many, many times faster.  Also, when you use a class in the \hydrogen namespace that doesn't actually exist, the error will come from the file that actually contains the nonexistant class name instead of from hydrogen.inc.php.
+	- Important changes to the autoconfig file to support new Config library features.  Current Hydrogen users will need to update their autoconfigs to use the new sample template.  Many of these changes regard the addition of the View templating engines.
+	- Completely rewrote the View library.  See the "View" section below for all the details.
+	
+- **Common**
+	- Added the TypedValue class, a simple class to contain both a value and some open-ended "type" variable to identify it.  Using an instance of TypedValue as a string will use the string representation of the stored value, and TypedValue also supports cloning.
+
+- **Config**
+	- Config::getVal() now returns NULL instead of false when a value is not found.  As PHP evaluates NULL to a false value, it's unlikely this will require any code changes unless the type-specific operator === is used.
+
+- **SQLBeans**
+	- Added the 'isset' magic method to supplement 'get' and 'set'.
+
+- **View**
+	- View has been completely rewritten from the ground up to use templating engines.  Its API remains exactly the same, however, so no view-calling code should need to change.
+	- The old-style pure PHP views still exist; simply specify the 'purephp' engine in the new autoconfig file.  Absolutely no changes will be required in your existing views under the purephp engine.
+	- The Hydrogen Templating Engine has been added.  This is an extremely robust templating engine that's similar to other languages such as Django, Smarty, Twig, and others that you may be already used to.  It compiles to a flat, objectless PHP file that executes just as quickly as if you'd have written it yourself.  There's plenty of in-code documentation for this, but please consider reviewing the guides **[Hydrogen Templates for Front-End Developers](http://www.webdevrefinery.com/forums/topic/6404-hydrogen-templates-for-front-end-developers/)** and **[Hydrogen Templates for Back-End Developers](http://www.webdevrefinery.com/forums/topic/6686-hydrogen-templates-for-back-end-developers/)**.
+	- Views now execute within a ViewSandbox object, exposing an API specific to executing templates.  This API is the same as what the old PHP views have always used.
+	- The concepts of a ContextStack and TraversalWrapper have been added to the view layer for managing variables and scope.  Much of this is handled transparently in the background, but these classes have plenty of documentation in the PHP files for anyone interested in digging in deeper.
+	- Loaders have been added, which are responsible for loading the contents of a template given their name.  The only current loader is FileLoader, which loads templates from the filesystem.  Others can be written to pull templates from a database, a remote storage location, or anywhere else a template could be stored.
+
 ### v0.2.5
 - **Hydrogen**
 	- Added 'common' library to store classes used across multiple Hydrogen libraries.
