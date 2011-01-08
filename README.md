@@ -20,13 +20,18 @@ Requirements
 -------------
 Hydrogen requires PHP 5.3 or later.  It makes heavy use of namespaces and other features introduced with this version of PHP, and cannot be ported back to earlier PHP versions.
 
-Other requirements include a web server, a computer, and usually, a keyboard ;-)
+Use of an opcode cache such as XCache is highly recommended, as Hydrogen is able to run entirely without stat() calls when paired with an opcode cache.  Also recommended (but optional) is a RAM-caching engine such as memcached.
 
 Documentation
 --------------
 While there is _some_ PHPDoc-style documentation in the code, it's not currently complete.  The best up-to-date Hydrogen guide available is here:
 
 **[webdevRefinery.com Hydrogen Overview](http://www.webdevrefinery.com/forums/topic/1440-hydrogen-overview/)**
+
+And two specialized tutorials for the new and robust Hydrogen Templating Engine:
+
+**[Hydrogen Templates for Front-End Developers](http://www.webdevrefinery.com/forums/topic/6404-hydrogen-templates-for-front-end-developers/)**
+**[Hydrogen Templates for Back-End Developers](http://www.webdevrefinery.com/forums/topic/6686-hydrogen-templates-for-back-end-developers/)**
 
 Support
 --------
