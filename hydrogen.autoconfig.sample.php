@@ -180,7 +180,7 @@ Config::setVal("view", "print_missing_var", true);
  ***  for details and usage.
  ***/
 /*HydrogenEngine::addFilter('swedishchef', '\myapp\filters\BorkFilter',
-	Config::getBasePath() . '/lib/myapp/filters/BorkFilter.php'); */
+	'lib/myapp/filters/BorkFilter.php'); */
 //HydrogenEngine::addFilterNamespace('\myapp\filters');
 
 
@@ -196,7 +196,7 @@ Config::setVal("view", "print_missing_var", true);
  ***  for details and usage.
  ***/
 /*HydrogenEngine::addTag('onweekdays', '\myapp\tags\OnweekdaysTag',
-	Config::getBasePath() . '/lib/myapp/tags/OnweekdaysTag.php'); */
+	'lib/myapp/tags/OnweekdaysTag.php'); */
 //HydrogenEngine::addTagNamespace('\myapp\tags');
 
 
