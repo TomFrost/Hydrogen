@@ -31,6 +31,7 @@ While there is _some_ PHPDoc-style documentation in the code, it's not currently
 And two specialized tutorials for the new and robust Hydrogen Templating Engine:
 
 **[Hydrogen Templates for Front-End Developers](http://www.webdevrefinery.com/forums/topic/6404-hydrogen-templates-for-front-end-developers/)**
+
 **[Hydrogen Templates for Back-End Developers](http://www.webdevrefinery.com/forums/topic/6686-hydrogen-templates-for-back-end-developers/)**
 
 Support
