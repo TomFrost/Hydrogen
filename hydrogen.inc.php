@@ -18,7 +18,8 @@ function load($namespace) {
 	if (strpos($namespace, __NAMESPACE__) === 0) {
 		$path = __DIR__ . '/' . str_replace('\\', '/', substr($namespace,
 			strlen(__NAMESPACE__) + 1)) . '.php';
-		set_error_handler('\hydrogen\fileNotFoundHandler', E_WARNING);
+		set_error_handler('\\' . __NAMESPACE__ . '\fileNotFoundHandler',
+			E_WARNING);
 		try {
 			include_once($path);
 		}
