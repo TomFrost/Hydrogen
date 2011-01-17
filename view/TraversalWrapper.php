@@ -176,7 +176,8 @@ class TraversalWrapper {
 		}
 		if ($this->nullIfNotFound) {
 			$var = null;
-			return new TraversalWrapper($var, true, $this->traversed);
+			return new TraversalWrapper($var, $this->nullIfNotFound,
+				$this->traversed);
 		}
 		$varName = implode('.', $this->traversed);
 		$e = new NoSuchVariableException(
