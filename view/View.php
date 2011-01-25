@@ -70,11 +70,11 @@ class View {
 	 * 		is optional -- use boolean false to ignore.
 	 */
 	public static function load($viewName, $context=false) {
-		$viewContext = static::$defaultContext;
-		if (is_array($context))
+		if (is_array($context)) {
 			static::setVar($context);
-		else if ($context !== false)
-			$viewContext = $context;
+			$context = false;
+		}
+		$viewContext = $context ?: static::$defaultContext;
 		$sandbox = new ViewSandbox($viewContext);
 		static::loadIntoSandbox($viewName, $sandbox);
 	}
