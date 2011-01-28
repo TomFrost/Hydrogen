@@ -144,12 +144,12 @@ class TraversalWrapper {
 			return new TraversalWrapper($this->var, $this->nullIfNotFound,
 				$this->traversed);
 		}
-		if (isset($this->var->$name)) {
-			return new TraversalWrapper($this->var->$name,
-				$this->nullIfNotFound, $this->traversed);
-		}
 		if (is_array($this->var) && isset($this->var[$name])) {
 			return new TraversalWrapper($this->var[$name],
+				$this->nullIfNotFound, $this->traversed);
+		}
+		if (isset($this->var->$name)) {
+			return new TraversalWrapper($this->var->$name,
 				$this->nullIfNotFound, $this->traversed);
 		}
 		if (is_object($this->var)) {
