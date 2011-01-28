@@ -16,7 +16,7 @@ class UrlizeFilter implements Filter {
 			if ($esc)
 				$str = htmlentities($str);
 			$str = preg_replace(
-				'#(https?://[a-zA-Z0-9~\#\-\?\&_/]+(([.=;][a-zA-Z0-9~\#\-\?\&_/]+)+)?)#',
+				'#(https?://[a-zA-Z0-9~\#\-\?\&_/]+(([.=;%][a-zA-Z0-9~\#\-\?\&_/]+)+)?)#',
 				'<a href="$0">$0</a>', $str);
 			if ($esc) {
 				$pos = -1;
