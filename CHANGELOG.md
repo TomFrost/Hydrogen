@@ -5,6 +5,17 @@
 ChangeLog
 ---------
 
+### v0.3.1
+- **Hydrogen**
+	- The hardcoded namespace has been removed from the autoloader, so that Hydrogen's autoloader may be more easily adapted for use in other projects.  See the new [Hydrogen MVC Starter](https://github.com/TomFrost/Hydrogen-MVC-Starter) sample application on GitHub for the best example of how to set up a new Hydrogen MVC project with this loader.
+	- Created a new constant, allowing the location of the hydrogen.autoconfig.php file to be defined by the programmer.  This is _especially_ useful for projects on Git that link to Hydrogen as a submodule.  By setting "HYDROGEN_AUTOCONFIG_PATH" to the absolute path of the autoconfig file, that file can be pulled out the main hydrogen folder, allowing it to be checked in.
+
+- **View**
+	- Fixed a 'Cannot pass by reference' bug that would be triggered in certain scenarios when accessing a variable from a template in the Hydrogen templating engine.
+	- Fixed a bug causing view variables to not be set in the context if they were passed in using View::load without having called View::setVar at all beforehand.
+	- Changed TraversalWrapper to accommodate a bug in PHP 5.3.0-5.3.2 that caused arrays to be cast as objects when accessed objectively.  This is a fix for the "Line 148 in TraversalWrapper.php" error for people using a version of PHP in that range.
+	- Added the '%' symbol to the legal URL characters for the 'urlize' filter.
+
 ### v0.3.0
 - **Hydrogen**
 	- The autoloader has been rewritten to be many, many times faster.  Also, when you use a class in the \hydrogen namespace that doesn't actually exist, the error will come from the file that actually contains the nonexistant class name instead of from hydrogen.inc.php.
