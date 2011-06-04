@@ -369,7 +369,7 @@ class Dispatcher {
 					$args = array();
 				return static::passRequest(
 					$tokens[1],
-					isset($tokens[2]) ? $tokens[2] : "index",
+					!empty($tokens[2]) ? $tokens[2] : "index",
 					$args, $namespace, $suffix, true);
 			}
 		}
