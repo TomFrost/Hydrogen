@@ -1136,7 +1136,7 @@ class Dispatcher {
 		
 		// Include the file if this class isn't loaded
 		if (!@class_exists($class) && isset(static::$controllerPaths[$class]))
-			\hydrogen\loadPath(static::$controllerPaths[$class]);
+			include(static::$controllerPaths[$class]);
 			
 		// Call it if everything's there
 		if (@class_exists($class)) {
