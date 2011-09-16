@@ -35,7 +35,7 @@ class Autoloader {
 				$path = static::$namespaces[$namespace];
 				$path .= str_replace('\\', '/', substr($class, $pos));
 				$path .= '.php';
-				return require($path);
+				return !!include($path);
 			}
 		}
 		return false;
