@@ -26,7 +26,7 @@ class Autoloader {
 	 * 		to be loaded.
 	 * @return boolean true if the class was loaded; false otherwise.
 	 */
-	protected static function loadClass($class) {
+	public static function loadClass($class) {
 		$class = ltrim($class, '\\');
 		$rootNamespace = '';
 		if ($firstSlash = strpos($class, '\\'))
