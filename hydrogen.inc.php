@@ -16,7 +16,7 @@ require_once(__DIR__ . '/autoloader/Autoloader.php');
 
 // All other classes are loaded through the autoloader.
 use hydrogen\autoloader\Autoloader;
-Autoloader::registerNamespace('hydrogen', __DIR__);
+Autoloader::registerNamespace('hydrogen', __DIR__, false);
 Autoloader::register();
 
 // Run the autoconfig

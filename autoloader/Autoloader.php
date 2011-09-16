@@ -28,15 +28,27 @@ class Autoloader {
 	 */
 	protected static function loadClass($class) {
 		$class = ltrim($class, '\\');
-		$pos = strpos($class, '\\');
-		if ($pos) {
-			$namespace = substr($class, 0, $pos);
-			if (isset(static::$namespaces[$namespace])) {
-				$path = static::$namespaces[$namespace];
-				$path .= str_replace('\\', '/', substr($class, $pos));
-				$path .= '.php';
-				return !!include($path);
+		$rootNamespace = '';
+		if ($firstSlash = strpos($class, '\\'))
+			$rootNamespace = substr($class, 0, $firstSlash);
+		if (isset(static::$namespaces[$rootNamespace])) {
+			$subNamespace = '';
+			if ($lastSlash = strrpos($class, '\\')) {
+				$fileName = substr($class, $lastSlash + 1);
+				if ($firstSlash < $lastSlash) {
+					$subNamespace = substr($class, $firstSlash + 1,
+						$lastSlash - $firstSlash);
+				}
 			}
+			else
+				$fileName = $class;
+			$path = static::$namespaces[$rootNamespace][0];
+			$path .= DIRECTORY_SEPARATOR;
+			$path .= str_replace('\\', DIRECTORY_SEPARATOR, $subNamespace);
+			$path .= (static::$namespaces[$rootNamespace][1] ?
+				str_replace('_', DIRECTORY_SEPARATOR, $fileName) :
+				$fileName) . '.php';
+			return !!include($path);
 		}
 		return false;
 	}
@@ -70,6 +82,11 @@ class Autoloader {
 	 * models/exceptions/UserNotFoundException.php within the root folder
 	 * for the 'myapp' namespace.
 	 *
+	 * The Autoloader also supports replacing underscores in a filename with
+	 * directory separators, which is useful for compatibility with old code
+	 * written with a Zend-style autoloader.  This feature is optional on a
+	 * per-namespace basis.
+	 *
 	 * The root folder supplied to this function should point to the first
 	 * folder of the namespace itself.  For example, if the above PHP file were
 	 * located at this path:
@@ -82,10 +99,16 @@ class Autoloader {
 	 * @param string $rootFolder The folder that the namespace's files reside
 	 * 		in.  Relative paths will be evaluated relative to the base path set
 	 * 		in the autoconfig.
+	 * @param boolean $replaceUnderscores true to replace any underscores in
+	 * 		the class name with directory separators when loading; false to
+	 * 		treat them as part of the file name.
 	 */
-	public static function registerNamespace($namespace, $rootFolder) {
+	public static function registerNamespace($namespace, $rootFolder,
+			$replaceUnderscores=true) {
 		$rootFolder = Config::getAbsolutePath($rootFolder);
-		static::$namespaces[$namespace] = $rootFolder;
+		$rootFolder = rtrim($rootFolder, DIRECTORY_SEPARATOR);
+		static::$namespaces[$namespace] = array($rootFolder,
+			$replaceUnderscores);
 	}
 	
 	/**
