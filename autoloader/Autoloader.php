@@ -24,6 +24,7 @@ class Autoloader {
 	 *
 	 * @param string $class The full namespace/class string of the class
 	 * 		to be loaded.
+	 * @return boolean true if the class was loaded; false otherwise.
 	 */
 	protected static function loadClass($class) {
 		while ($class[0] === '\\')
@@ -35,9 +36,10 @@ class Autoloader {
 				$path = static::$namespaces[$namespace];
 				$path .= str_replace('\\', '/', substr($class, $pos));
 				$path .= '.php';
-				require($path);
+				return require($path);
 			}
 		}
+		return false;
 	}
 	
 	/**
