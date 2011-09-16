@@ -27,8 +27,7 @@ class Autoloader {
 	 * @return boolean true if the class was loaded; false otherwise.
 	 */
 	protected static function loadClass($class) {
-		while ($class[0] === '\\')
-			$class = substr($class, 1);
+		$class = ltrim($class, '\\');
 		$pos = strpos($class, '\\');
 		if ($pos) {
 			$namespace = substr($class, 0, $pos);
