@@ -74,6 +74,14 @@ class QueryStatement extends DatabaseStatement {
 	public function fetchBound() {
 		return $this->stmt->fetchBound();
 	}
+	
+	public function fetchInto($object) {
+		return $this->stmt->fetchInto($object);
+	}
+	
+	public function fetchIntoNew($classname, $ctorargs=array()) {
+		return $this->stmt->fetchIntoNew($classname, $ctorargs);
+	}
 
 	public function fetchObject() {
 		return $this->stmt->fetchObject();

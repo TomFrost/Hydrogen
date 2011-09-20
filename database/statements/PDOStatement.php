@@ -55,6 +55,16 @@ class PDOStatement extends DatabaseStatement {
 		return $this->stmt->fetch(PDO::FETCH_BOUND);
 	}
 	
+	public function fetchInto($object) {
+		$this->stmt->setFetchMode(PDO::FETCH_INTO, $object);
+		return $this->fetch();
+	}
+	
+	public function fetchIntoNew($classname, $ctorargs=array()) {
+		$this->stmt->setFetchMode(PDO::FETCH_CLASS, $classname, $ctorargs);
+		return $this->fetch();
+	}
+
 	public function fetchObject() {
 		return $this->stmt->fetch(PDO::FETCH_OBJ);
 	}
