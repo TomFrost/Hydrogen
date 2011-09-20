@@ -13,7 +13,6 @@ use hydrogen\config\exceptions\InvalidConfigFileException;
 use hydrogen\config\exceptions\ConfigCacheDirNotWritableException;
 use hydrogen\config\exceptions\ConfigCacheDirNotFoundException;
 use hydrogen\common\exceptions\InvalidPathException;
-use hydrogen\semaphore\SemaphoreEngineFactory;
 
 /**
  * The Config class offers a project-wide app configuration solution.  It can be
