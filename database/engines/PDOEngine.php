@@ -57,6 +57,17 @@ abstract class PDOEngine extends DatabaseEngine {
 		}
 	}
 	
+	/**
+	 * Gets the PDO object wrapped by this engine.  Note that it is not good
+	 * practice to use this function in finalized code, but can be useful to
+	 * migrate existing PDO codebases to Hydrogen.
+	 *
+	 * @return PDO the raw PDO connection object used by this engine.
+	 */
+	public function getPDO() {
+		return $this->pdo;
+	}
+	
 	public function lastInsertId($name=NULL) {
 		return $this->pdo->lastInsertId($name);
 	}
