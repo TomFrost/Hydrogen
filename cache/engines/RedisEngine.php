@@ -144,7 +144,7 @@ class RedisEngine implements CacheEngine {
 	 * @return array An associative array of statistics specific to the cache engine. 
 	 */
 	public function getStats() {
-		return $redis->info();
+		return $this->engine->info();
 	}
 	
 	/**
