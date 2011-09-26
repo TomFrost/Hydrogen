@@ -51,7 +51,7 @@ class RedisEngine implements CacheEngine {
 	 */
 	public function add($key, $value, $ttl) {
 		$success = $this->engine->setnx($key, $value);
-		if ($success)
+		if ($success && $ttl)
 			$this->engine->setTimeout($key, $ttl);
 		return $success;
 	}
