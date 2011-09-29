@@ -14,15 +14,13 @@ use hydrogen\view\exceptions\NoSuchViewException;
 class DatabaseLoader implements Loader {
 	
 	/**
-	 * Database template loader
-	 * Assumes that the table specified in the config has
-	 * a 'path' and 'content' field.
-	 * The former should contain the path as it would be
-	 * loaded through a controller (e.g. ucp/user_logged_in)
-	 * The latter should contain the Hydrogen/purephp template
-	 * as it would be in a file.
+	 * Loads the contents of the specified template.
 	 *
-	 * @param string viewName The name of the view to be found.
+	 * @param string $templateName The name of the template to be loaded.
+	 * @return string The unaltered, unparsed contents of the specified
+	 * 		template.
+	 * @throws hydrogen\view\exceptions\NoSuchViewException if the specified
+	 * 		template is not found or cannot be loaded.
 	 */
 	public function load($viewName) {
 		$table = Config::getRequiredVal("view", "table_name");
