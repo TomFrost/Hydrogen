@@ -86,8 +86,10 @@ Config::addConfig(
  ***  The view loader to be used.  You're almost always going to want this to
  ***  be 'File', but Hydrogen can also be made to pull templates out of
  ***  databases or remote servers or whatever you like!
+ ***  For database, put "Database"
  ***/
 //Config::setVal("view", "loader", "File");
+//Config::setVal("view", "loader", "Database");
 
 
 /***  FOR THE FILE LOADER ONLY:
@@ -107,6 +109,19 @@ Config::setVal("view", "folder", "themes/default");
  ***  The extension of view filenames.
  ***/
 Config::setVal("view", "file_extension", ".tpl.php");
+
+/***  FOR THE DATABASE LOADER ONLY:
+ ***  [view] -> table_name
+ ***  This is a REQUIRED value (if using the Database loader)
+ ***
+ ***  The table name in your database to pull templates from.
+ ***  The table will need a "path" and "content" field.
+ ***  The former should contain the path as it would be
+ ***  loaded through a controller (e.g. ucp/user_logged_in)
+ ***  The latter should contain the Hydrogen/purephp raw template
+ ***  content.
+ ***/
+Config::setVal("view", "table_name", "templates");
 
 
 /***  [view] -> url_path
