@@ -334,7 +334,12 @@ class Config {
 				$origTime = @filemtime($configFile);
 				if (!$origTime)
 					throw new ConfigFileNotFoundException('Config file not found.');
-				$cacheTime = @filemtime($fullPath);
+				try {
+					$cacheTime = @filemtime($fullPath);					
+				}
+				catch (\Exception $e) {
+					$cacheTime = false;
+				}
 				if ($cacheTime && ($origTime > $cacheTime))
 					$cacheValid = false;
 			}
@@ -470,7 +475,7 @@ class Config {
 				$path[1] === ':' && $path[2] === DIRECTORY_SEPARATOR)
 				return false;
 		}
-		if ($path[0] === DIRECTORY_SEPARATOR)
+		if (strlen($path) > 0 && $path[0] === DIRECTORY_SEPARATOR)
 			return false;
 		return true;
 	}

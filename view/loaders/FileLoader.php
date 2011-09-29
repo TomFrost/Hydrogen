@@ -27,6 +27,15 @@ class FileLoader implements Loader {
 		return Config::getAbsolutePath($path);
 	}
 	
+	/**
+	 * Loads the contents of the specified template.
+	 *
+	 * @param string $templateName The name of the template to be loaded.
+	 * @return string The unaltered, unparsed contents of the specified
+	 * 		template.
+	 * @throws hydrogen\view\exceptions\NoSuchViewException if the specified
+	 * 		template is not found or cannot be loaded.
+	 */
 	public function load($viewName) {
 		$path = $this->getViewPath($viewName);
 		$page = file_get_contents($path);

@@ -112,6 +112,22 @@ abstract class DatabaseStatement {
 	abstract public function fetchBound();
 	
 	/**
+	 * Fetches the results into an existing object.  This is an analogue
+	 * of PDO's FETCH_INTO fetch mode.
+	 *
+	 * @link http://php.net/manual/en/pdostatement.setfetchmode.php
+	 */
+	abstract public function fetchInto($object);
+	
+	/**
+	 * Fetches the results into a new instance of a class.  This is an analogue
+	 * of PDO's FETCH_CLASS fetch mode.
+	 *
+	 * @link http://php.net/manual/en/pdostatement.setfetchmode.php
+	 */
+	abstract public function fetchIntoNew($classname, $ctorargs=array());
+	
+	/**
 	 * 
 	 *
 	 * @link http://www.php.net/manual/en/pdostatement.fetchobject.php

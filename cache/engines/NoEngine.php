@@ -50,6 +50,21 @@ class NoEngine implements CacheEngine {
 	public function getStats() {
 		return false;
 	}
+	
+	/**
+	 * Retrieves the raw cache connection object that this cache engine wraps.
+	 * This is useful to access in-depth caching features that Hydrogen may not
+	 * be able to make available, but WILL eliminate compatibility with other
+	 * cache engines.  Use this function if and only if a certain cache engine
+	 * is required for the program to run, and if there is no plan to allow any
+	 * alternatives to be used.
+	 *
+	 * @return mixed The raw connection object for this particular cache
+	 * 		engine, or null if no such object exists.
+	 */
+	public function getRawEngine() {
+		return null;
+	}
 }
 
 ?>
