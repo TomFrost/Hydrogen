@@ -83,12 +83,15 @@ Config::addConfig(
 /***  [view] -> loader
  ***  Default if not set: "File"
  ***
- ***  The view loader to be used.  You're almost always going to want this to
- ***  be 'File', but Hydrogen can also be made to pull templates out of
- ***  databases or remote servers or whatever you like!
- ***  For database, put "Database"
+ ***  The view loader to be used.  Hydrogen can be extended to load templates
+ ***  from anywhere; however, out of the box, the options are "File" and
+ ***  "Database".  File, the default, will pull templates out of the main
+ ***  filesystem.  Database requires that you have a table within the
+ ***  configured Hydrogen database, with a column for the template name (such
+ ***  as "artcle" or "account/login") and a column (probably of the TEXT type)
+ ***  for the actual template content.  If you choose the Database loader, see
+ ***  below to set these field/table names.
  ***/
-//Config::setVal("view", "loader", "File");
 //Config::setVal("view", "loader", "Database");
 
 
@@ -110,18 +113,40 @@ Config::setVal("view", "folder", "themes/default");
  ***/
 Config::setVal("view", "file_extension", ".tpl.php");
 
+
 /***  FOR THE DATABASE LOADER ONLY:
  ***  [view] -> table_name
  ***  This is a REQUIRED value (if using the Database loader)
  ***
- ***  The table name in your database to pull templates from.
- ***  The table will need a "path" and "content" field.
- ***  The former should contain the path as it would be
- ***  loaded through a controller (e.g. ucp/user_logged_in)
- ***  The latter should contain the Hydrogen/purephp raw template
- ***  content.
+ ***  The table name in your database from which templates will be pulled.
  ***/
-Config::setVal("view", "table_name", "templates");
+//Config::setVal("view", "table_name", "templates");
+
+
+/***  FOR THE DATABASE LOADER ONLY:
+ ***  [view] -> name_field
+ ***  This is a REQUIRED value (if using the Database loader)
+ ***
+ ***  The name of the column that contains the template name in the table
+ ***  specified above.  The template name is the same as what would be used
+ ***  with the file loader; so it could contain a simple name like "artcle" or
+ ***  a path-style name like "account/login".  This field should probably be
+ ***  a VARCHAR between 30 and 60 characters.
+ ***/
+//Config::setVal("view", "name_field", "name");
+
+
+/***  FOR THE DATABASE LOADER ONLY:
+ ***  [view] -> content_field
+ ***  This is a REQUIRED value (if using the Database loader)
+ ***
+ ***  The name of the column that contains the template content in the table
+ ***  specified above.  This field should probably be either TEXT or MEDIUMTEXT
+ ***  unless the application has very specific template needs.  Note that this
+ ***  field can contain templates for any template engine supported by
+ ***  Hydrogen.
+ ***/
+//Config::setVal("view", "content_field", "content");
 
 
 /***  [view] -> url_path

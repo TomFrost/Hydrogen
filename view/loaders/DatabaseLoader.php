@@ -14,16 +14,6 @@ use hydrogen\view\exceptions\NoSuchViewException;
 class DatabaseLoader implements Loader {
 	
 	/**
-	 * Gets the table name in which the templates are
-	 * stored.
-	 *
-	 * @return string table name.
-	 */
-	public function getTableName() {
-		return Config::getRequiredVal("view", "table_name");
-	}
-	
-	/**
 	 * Database template loader
 	 * Assumes that the table specified in the config has
 	 * a 'path' and 'content' field.
@@ -35,19 +25,24 @@ class DatabaseLoader implements Loader {
 	 * @param string viewName The name of the view to be found.
 	 */
 	public function load($viewName) {
+		$table = Config::getRequiredVal("view", "table_name");
+		$nameCol = Config::getRequiredVal("view", "name_field");
+		$contentCol = Config::getRequiredVal("view", "content_field");
+		
 		$query = new Query("SELECT");
-		$query->from($this->getTableName());
-		$query->where("path = ?", $viewName);
+		$query->field($contentCol);
+		$query->from($table);
+		$query->where($nameCol . " = ?", $viewName);
 		$query->limit(1);
 		$stmt = $query->prepare();
 		$stmt->execute();
 		$result = $stmt->fetchObject();
 		
-		if (!$result->content) {
+		if (!$result->$contentCol) {
 			throw new NoSuchViewException("View " . $viewName .
 				" does not exist in database.");
 		}
-		return $result->content;
+		return $result->$contentCol;
 	}
 }
 
