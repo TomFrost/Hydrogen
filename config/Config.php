@@ -333,7 +333,12 @@ class Config {
 				$origTime = @filemtime($configFile);
 				if (!$origTime)
 					throw new ConfigFileNotFoundException('Config file not found.');
-				$cacheTime = @filemtime($fullPath);
+				try {
+					$cacheTime = @filemtime($fullPath);					
+				}
+				catch (\Exception $e) {
+					$cacheTime = false;
+				}
 				if ($cacheTime && ($origTime > $cacheTime))
 					$cacheValid = false;
 			}

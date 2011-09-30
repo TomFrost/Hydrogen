@@ -102,7 +102,6 @@ abstract class MagicCacheable {
 	 */
 	public function __call($func, $args) {
 		$methods = get_class_methods($this);
-		$valids = array();
 		$useCache = false;
 		if (strrpos($func, 'Cached') === strlen($func) - 6) {
 			$useCache = true;
