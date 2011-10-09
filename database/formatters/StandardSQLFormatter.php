@@ -54,7 +54,8 @@ class StandardSQLFormatter extends QueryFormatter {
 	
 	public function getPreparedQuery() {
 		$str = '';
-		for ($i = 0; $i < count($this->parsed); $i += 2)
+		$nodes = count($this->parsed);
+		for ($i = 0; $i < $nodes; $i += 2)
 			$str .= $this->parsed[$i] . '?';
 		return substr($str, 0, -1);
 	}
@@ -62,7 +63,8 @@ class StandardSQLFormatter extends QueryFormatter {
 	public function getPreparedValues($valueArray=false) {
 		$vars = array();
 		$inc = 0;
-		for ($i = 1; $i < count($this->parsed); $i += 2) {
+		$nodes = count($this->parsed);
+		for ($i = 1; $i < $nodes; $i += 2) {
 			if ($this->parsed[$i] == '?') {
 				if (!isset($this->incVals[$inc]))
 					throw new InvalidSQLException('Value mismatch error: More ? symbols were used than values provided.');
@@ -81,7 +83,8 @@ class StandardSQLFormatter extends QueryFormatter {
 	public function getCompleteQuery($valueArray=false) {
 		$str = '';
 		$vars = $this->getPreparedValues($valueArray);
-		for ($i = 0; $i < count($this->parsed); $i += 2) {
+		$nodes = count($this->parsed);
+		for ($i = 0; $i < $nodes; $i += 2) {
 			$val = false;
 			if (isset($vars[$i / 2])) {
 				if (is_string($vars[$i / 2]))
