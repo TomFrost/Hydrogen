@@ -78,7 +78,7 @@ class ExcerptFilter implements Filter {
                     return substr($str, 0, $cutpos) . $append;
             }
             return $str;
-PHP
+PHP;
         );
         $num = isset($args[0]) ? $args[0]->getValue($phpfile) : 20;
         $mode = isset($args[1]) ? trim($args[1]->getValue($phpfile), "'") : 'w';
