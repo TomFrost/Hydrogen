@@ -31,6 +31,14 @@ class ForTag extends Tag {
 					$origin, true);
 				$isKeyVal = true;
 			}
+			// If token contains a comma, we have both the k and v right here
+			else if ($pos = strpos($token, ',')) {
+				$keyVar = static::toVarNode(substr($token, 0, $pos), $origin,
+					true);
+				$valVar = static::toVarNode(substr($token, $pos + 1), $origin,
+					true);
+			}
+			// All we have's a key.
 			else
 				$valVar = static::toVarNode($token, $origin, true);
 		}
