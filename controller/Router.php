@@ -77,12 +77,52 @@ class Router {
 			$transforms = array();
 		if ($this->defaultTransforms)
 			$transforms = array_merge($this->defaultTransforms, $transforms);
-		// TODO: Iterate through transforms and break them up into segments
+		// Iterate through transforms and break them up into segments
+		foreach ($transforms as $var => $val) {
+			// Break the string into variables and literals
+			$tokens = preg_split(
+				'`%(?:([a-zA-Z_][a-zA-Z0-9_\|]*)|{([a-zA-Z_][a-zA-Z0-9_\|]*)})`',
+				$val, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$set = array();
+			// Iterate through each token to convert variables into arrays.
+			// String literals stay as they are.
+			foreach ($tokens as $segment) {
+				if (preg_match('`^%[a-zA-Z_{]`', $segment[0])) {
+					// This segment is a variable; put it in an array and add
+					// any filters as additional array elements
+					$segment = trim($segment, '%{}');
+					if (strlen($segment)) {
+						$segment = explode('|', $segment);
+						$varBlock = array(array_shift($segment));
+						foreach ($segment as $filter) {
+							// Only allow legal filters
+							switch ($filter) {
+								case 'ucfirst':
+								case 'upper':
+								case 'lower':
+									$varBlock[] = $filter;
+									break;
+								default:
+									throw new RouteSyntaxException(
+										"Illegal transform filter: '$filter'");
+							}
+						}
+						// Add the array package to the set
+						$set[] = $varBlock;
+					}
+				}
+				else
+					$set[] = $segment;
+			}
+			// If our set only contains a single string literal, save it
+			// that way so that only variables are arrays.
+			$transforms[$var] = count($set) == 1 && !is_array($set[0]) ?
+				$set[0] : $set;
+		}
 		return $transforms;
 	}
 	
 	protected function processPath($path, $restrictions=null, &$args=null) {
-		// TODO: Turn the routing path into RegEx and keep track of the args.
 		// Turn the parentheses into non-capturing optional groups.
 		$path = str_replace('(', '(?:', $path, $openParens);
 		$path = str_replace(')', ')?', $path, $closeParens);
