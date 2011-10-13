@@ -51,35 +51,50 @@ class Router {
 	}
 	
 	public function catchAll($defaults, $transforms=array(), $argOrder=null,
-			$arsAsArray=false) {
+			$argsAsArray=false) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
 			return false;
 		// Construct the catch-all rule
-		if ($this->defaultTransforms)
-			$transforms = array_merge($this->defaultTransforms, $transforms);
 		$ruleSet[] = array(
 			'regex' => '`.*`',
 			'defaults' => $defaults,
-			'transforms' => $this->parseTransforms($transforms),
+			'transforms' => $this->processTransforms($transforms),
 			'args' => $argOrder,
-			'argArray' => !!$argOrder
+			'argArray' => !!$argsAsArray
 		);
 		return true;
 	}
 	
-	protected function parseTransforms($transforms) {
+	protected function processTransforms($transforms) {
+		if (!$transforms)
+			$transforms = array();
+		if ($this->defaultTransforms)
+			$transforms = array_merge($this->defaultTransforms, $transforms);
 		// TODO: Iterate through transforms and break them up into segments
+		return $transforms;
 	}
 	
-	public function request($url, $defaults=null, $transforms=null,
+	protected function processPath($path, $restrictions=null, &$args=array()) {
+		// TODO: Turn the routing path into RegEx and keep track of the args.
+	}
+	
+	public function request($path, $defaults=null, $transforms=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false,
 			$httpMethod=null) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
 			return false;
-		// TODO: Set up the new rule
-		
+		// Set up the new rule
+		$ruleSet[] = array(
+			'method' => $httpMethod ?: false,
+			'regex' => $this->processPath($path, $restrictions, $args),
+			'defaults' => $defaults,
+			'transforms' => $this->processTransforms($transforms),
+			'args' => $argOrder ?: $args,
+			'argArray' => !!$argsAsArray
+		);
+		return true;
 	}
 	
 	public function start() {
