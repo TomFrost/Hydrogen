@@ -17,6 +17,9 @@ class Router {
 	
 	const DEFAULT_CACHE_TIME = 900;
 	
+	const KEYWORD_CONTROLLER = 'controller';
+	const KEYWORD_FUNCTION = 'function';
+	
 	const TRANSFORM_EXPAND_ARRAY = 1;
 	const TRANSFORM_EXPAND_PARAMS = 2;
 	
@@ -78,8 +81,37 @@ class Router {
 		return $transforms;
 	}
 	
-	protected function processPath($path, $restrictions=null, &$args=array()) {
+	protected function processPath($path, $restrictions=null, &$args=null) {
 		// TODO: Turn the routing path into RegEx and keep track of the args.
+		// Turn the parentheses into non-capturing optional groups.
+		$path = str_replace('(', '(?:', $path, $openParens);
+		$path = str_replace(')', ')?', $path, $closeParens);
+		if ($openParens !== $closeParens) {
+			throw new RouterSyntaxException(
+				"Unequal number of closing and opening parentheses in '" .
+				$path . "'.");
+		}
+		// Collect our variables
+		preg_match_all('`(?<!\(\?):(?!(?:' . self::KEYWORD_CONTROLLER .
+			'|' . self::KEYWORD_FUNCTION .
+			')(?:/|$))([a-zA-Z_][a-zA-Z0-9_]*)`', $path, $args);
+		// Clean the args array
+		if (isset($args[1]))
+			$args = $args[1];
+		else
+			$args = array();
+		// Turn restricted variables into named entities
+		foreach ($restrictions as $var => $regex) {
+			$path = preg_replace('`(?<!\(\?):' . $var . '`',
+				'(?P<' . $var . '>' . $regex . ')', $path);
+		}
+		// Turn wildcard variables into named entities
+		$path = preg_replace('`(?<!\(\?):\*([a-zA-Z_][a-zA-Z0-9_]*)`',
+			'(?P<$1>.+)', $path);
+		// Turn all other variables into named entities
+		$path = preg_replace('`(?<!\(\?):([a-zA-Z_][a-zA-Z0-9_]*)`',
+			'(?P<$1>[^/]+)', $path);
+		return $path;
 	}
 	
 	public function request($path, $defaults=null, $transforms=null,
