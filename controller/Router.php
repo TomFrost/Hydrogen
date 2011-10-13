@@ -46,7 +46,10 @@ class Router {
 		if ($this->rulesFromCache)
 			return false;
 		// Merge in the rules
-		$this->defaultTransforms($this->defaultTransforms, $transforms);
+		if ($this->defaultTransforms)
+			$this->defaultTransforms($this->defaultTransforms, $transforms);
+		else
+			$this->defaultTransforms = $transforms;
 		return true;
 	}
 	
