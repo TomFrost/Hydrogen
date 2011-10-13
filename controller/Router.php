@@ -9,6 +9,7 @@ namespace hydrogen\controller;
 use hydrogen\recache\RECacheManager;
 use hydrogen\common\exceptions\NoSuchMethodException;
 use hydrogen\controller\exceptions\MissingArgumentException;
+use hydrogen\controller\exceptions\RouteSyntaxException;
 
 /**
  * TODO: Documentation
