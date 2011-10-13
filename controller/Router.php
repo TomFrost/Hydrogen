@@ -22,7 +22,6 @@ class Router {
 	
 	protected $defaultTransforms;
 	protected $ruleSet = array();
-	protected $catchAll;
 	protected $rulesFromCache = false;
 	protected $name, $expireTime, $groups;
 	
@@ -51,15 +50,26 @@ class Router {
 		return true;
 	}
 	
-	public function catchAll($defaults, $transforms=null, $argOrder=null,
+	public function catchAll($defaults, $transforms=array(), $argOrder=null,
 			$arsAsArray=false) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
 			return false;
-		// TODO: Construct the catch-all rule
-		$this->catchAll = array(
-			'regex' => '.*'
+		// Construct the catch-all rule
+		if ($this->defaultTransforms)
+			$transforms = array_merge($this->defaultTransforms, $transforms);
+		$ruleSet[] = array(
+			'regex' => '`.*`',
+			'defaults' => $defaults,
+			'transforms' => $this->parseTransforms($transforms),
+			'args' => $argOrder,
+			'argArray' => !!$argOrder
 		);
+		return true;
+	}
+	
+	protected function parseTransforms($transforms) {
+		// TODO: Iterate through transforms and break them up into segments
 	}
 	
 	public function request($url, $defaults=null, $transforms=null,
@@ -73,9 +83,6 @@ class Router {
 	}
 	
 	public function start() {
-		// Append the catch-all to the ruleset
-		if ($this->catchAll)
-			$ruleSet[] = &$catchAll;
 		// If we need to cache the rules, do so
 		if (!$this->rulesFromCache && $this->name) {
 			$cm = RECacheManager::getInstance();
