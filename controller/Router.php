@@ -81,14 +81,15 @@ class Router {
 		// Iterate through transforms and break them up into segments
 		foreach ($transforms as $var => $val) {
 			// Break the string into variables and literals
-			$tokens = preg_split(
-				'`%(?:([a-zA-Z_][a-zA-Z0-9_\|]*)|{([a-zA-Z_][a-zA-Z0-9_\|]*)})`',
-				$val, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			$splitRegex = '`(%(?:(?:[a-zA-Z_][a-zA-Z0-9_\|]*)|{(?:[a-zA-Z_][a-zA-Z0-9_\|]*)}))`';
+			$tokens = preg_split($splitRegex, $val, null,
+				PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+			var_dump($tokens);
 			$set = array();
 			// Iterate through each token to convert variables into arrays.
 			// String literals stay as they are.
 			foreach ($tokens as $segment) {
-				if (preg_match('`^%[a-zA-Z_{]`', $segment[0])) {
+				if (preg_match($splitRegex, $segment)) {
 					// This segment is a variable; put it in an array and add
 					// any filters as additional array elements
 					$segment = trim($segment, '%{}');
@@ -135,16 +136,18 @@ class Router {
 		// Collect our variables
 		preg_match_all('`(?<!\(\?):(?!(?:' . self::KEYWORD_CONTROLLER .
 			'|' . self::KEYWORD_FUNCTION .
-			')(?:/|$))([a-zA-Z_][a-zA-Z0-9_]*)`', $path, $args);
+			')(?:/|\(|$))\*?([a-zA-Z_][a-zA-Z0-9_]*)`', $path, $args);
 		// Clean the args array
 		if (isset($args[1]))
 			$args = $args[1];
 		else
 			$args = array();
 		// Turn restricted variables into named entities
-		foreach ($restrictions as $var => $regex) {
-			$path = preg_replace('`(?<!\(\?):' . $var . '`',
-				'(?P<' . $var . '>' . $regex . ')', $path);
+		if ($restrictions) {
+			foreach ($restrictions as $var => $regex) {
+				$path = preg_replace('`(?<!\(\?):' . $var . '`',
+					'(?P<' . $var . '>' . $regex . ')', $path);
+			}
 		}
 		// Turn wildcard variables into named entities
 		$path = preg_replace('`(?<!\(\?):\*([a-zA-Z_][a-zA-Z0-9_]*)`',
