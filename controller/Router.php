@@ -165,7 +165,7 @@ class Router {
 		if ($this->rulesFromCache)
 			return false;
 		// Set up the new rule
-		$ruleSet[] = array(
+		$$this->ruleSet[] = array(
 			'method' => $httpMethod ?: false,
 			'regex' => $this->processPath($path, $restrictions, $args),
 			'defaults' => $defaults,
@@ -184,7 +184,66 @@ class Router {
 				$this->expireTime !== null ? $this->expireTime :
 				self::DEFAULT_CACHE_TIME, $this->groups);
 		}
-		// TODO: Iterate through the rules until a match is found
+		// Get a proper PATH_INFO
+		$path = isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] ?
+			$_SERVER['PATH_INFO'] : '/';
+		// Iterate through the rules until a match is found
+		foreach ($this->ruleSet as $rule) {
+			if ((!isset($rule['method']) || !$rule['method'] ||
+					$rule['method'] == $_SERVER['REQUEST_METHOD']) &&
+					preg_match($rule['regex'], $path, $vars)) {
+				// Collect all the variables
+				if (isset($rule['defaults']) && $rule['defaults'])
+					$vars = array_merge($rule['defaults'], $vars);
+				// Apply the transformations
+				if (isset($rule['transforms'])) {
+					foreach ($rule['transforms'] as $var => $val) {
+						if (is_array($val)) {
+							// Construct a value from the array elements
+							$newVal = '';
+							foreach ($val as $elem) {
+								if (is_array($elem)) {
+									if (!isset($vars[$elem[0]])) {
+										throw new RouteSyntaxException(
+											'Variable "' . $elem[0] .
+											'" is required for the "' .
+											$var . '" transform.');
+									}
+									$elem = $vars[array_shift($elem)];
+									foreach ($elem as $filter) {
+										switch ($filter) {
+											case 'ucfirst':
+												$elem = ucfirst($elem);
+												break;
+											case 'upper':
+												$elem = strtoupper($elem);
+												break;
+											case 'lower':
+												$elem = strtolower($elem);
+												break;
+											default:
+												throw new RouteSyntaxException(
+													'Filter "' . $filter .
+													'" does not exist.'
+												);
+										}
+									}
+								}
+								$newVal .= $elem;
+							}
+						}
+						else if (is_string($val))
+							$vars[$var] = $val;
+						else {
+							// TODO: Check for each transform type
+						}
+					}
+				}
+				// At this point, we must have a controller and function
+				// TODO: Throw exceptions if they don't exist
+			}
+		}
+		return false;
 	}
 }
 
