@@ -196,6 +196,7 @@ class Router {
 				if (isset($rule['defaults']) && $rule['defaults'])
 					$vars = array_merge($rule['defaults'], $vars);
 				// Apply the transformations
+				$arraysAsParams = array();
 				if (isset($rule['transforms'])) {
 					foreach ($rule['transforms'] as $var => $val) {
 						if (is_array($val)) {
@@ -235,7 +236,16 @@ class Router {
 						else if (is_string($val))
 							$vars[$var] = $val;
 						else {
-							// TODO: Check for each transform type
+							switch ($val) {
+								case self::TRANSFORM_EXPAND_PARAMS:
+									$arraysAsParams[$var] = true;
+								case self::TRANSFORM_EXPAND_ARRAY:
+									$vars[$var] = explode('/', $vars[$var]);
+									break;
+								default:
+									throw new RouteSyntaxException(
+										"Invalid transform type: '$val'");
+							}
 						}
 					}
 				}
