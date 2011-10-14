@@ -240,7 +240,17 @@ class Router {
 					}
 				}
 				// At this point, we must have a controller and function
-				// TODO: Throw exceptions if they don't exist
+				if (!isset($vars[self::KEYWORD_CONTROLLER])) {
+					throw new RouteSyntaxException(
+						"Matched route is missing a '" .
+						self::KEYWORD_CONTROLLER . "' variable.");
+				}
+				if (!isset($vars[self::KEYWORD_FUNCTION])) {
+					throw new RouteSyntaxException(
+						"Matched route is missing a '" .
+						self::KEYWORD_FUNCTION . "' variable.");
+				}
+				// TODO: Call the controller
 			}
 		}
 		return false;
