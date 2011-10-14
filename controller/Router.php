@@ -45,15 +45,11 @@ class Router {
 		}
 	}
 	
-	public function addDefaultTransforms($transforms) {
+	public function setDefaultTransforms($transforms) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
 			return false;
-		// Merge in the rules
-		if ($this->defaultTransforms)
-			$this->defaultTransforms($this->defaultTransforms, $transforms);
-		else
-			$this->defaultTransforms = $transforms;
+		$this->defaultTransforms = $transforms;
 		return true;
 	}
 	
@@ -73,6 +69,93 @@ class Router {
 		return true;
 	}
 	
+	/**
+	 * The handler used by the argument protection system in
+	 * {@link #passRequest}.  Even though this argument is public for PHP
+	 * error handling purposes, it should never be called directly.
+	 *
+	 * This error handler throws a {@link MissingArgumentException} whenever
+	 * the error is, in fact, for a missing argument.  Otherwise, the handler
+	 * re-throws the error as an E_USER_WARNING.
+	 *
+	 * @param int $errno The error type number.
+	 * @param string $errstr A string describing the error.
+	 * @param string $errfile The filename in which the error occurred.
+	 * @param int $errline The line number on which the error occurred.
+	 */
+	public function missingArgHandler($errno, $errstr, $errfile,
+			$errline) {
+		$errCheck = "Missing argument";
+		if ($errCheck === substr($errstr, 0, strlen($errCheck)))
+			throw new MissingArgumentException();
+		else {
+			$caller = debug_backtrace();
+			$caller = $caller[1];
+			trigger_error($errstr . ' in <strong>' . $caller['function'] .
+				'</strong> called from <strong>' . $caller['file'] . 
+				'</strong> on line <strong>' . $caller['line'] .
+				"</strong>\n<br />error handler", E_USER_WARNING);
+		}
+	}
+	
+	/**
+	 * Attempts to pass the current page request to a specified controller,
+	 * calling a function with a list of arguments.
+	 *
+	 * @param string $controller The class name of the controller to which the
+	 * 		request should be passed.  This can either be a fully qualified
+	 * 		class name with a namespace, or a simple name that can have
+	 * 		a namespace prepended and a suffix appended to it later.
+	 * @param string $function The name of the function inside of the controller
+	 * 		to be called.
+	 * @param array $args An array of arguments to be passed to the
+	 * 		specified function, in order; null for no arguments.
+	 * @param boolean $argProtection true to have this function return false if
+	 * 		the specified function has more required arguments than what was
+	 * 		included in the args array.  If false, this protection will be
+	 * 		turned off and PHP's usual warning when a function with missing
+	 * 		parameters is called will be fired.  Note that, if this is true,
+	 * 		any warnings that are generated naturally by PHP will come as an
+	 * 		E_USER_WARNING rather than an E_WARNING, due to limitations in
+	 * 		PHP's error system.
+	 * @return boolean true if the request was dispatched successfully,
+	 * 		false otherwise.
+	 */
+	protected function passRequest($controller, $function, $args=null, 
+			$argProtection=null) {
+		var_dump($controller);
+		var_dump($function);
+		var_dump($args);
+		var_dump($argProtection);
+		// Only proceed if the controller exists
+		if (@class_exists($class)) {
+			// Call it, Cap'n.
+			$inst = $class::getInstance();
+			if ($argProtection) {
+				set_error_handler(
+					array($this, 'missingArgHandler'),
+					E_WARNING);
+			}
+			try {
+				call_user_func_array(array($inst, $function), $args ?: array());
+			}
+			catch (NoSuchMethodException $e) {
+				if ($argProtection)
+					restore_error_handler();
+				return false;
+			}
+			catch (MissingArgumentException $e) {
+				if ($argProtection)
+					restore_error_handler();
+				return false;
+			}
+			if ($argProtection)
+				restore_error_handler();
+			return true;
+		}
+		return false;
+	}
+	
 	protected function processTransforms($transforms) {
 		if (!$transforms)
 			$transforms = array();
@@ -84,8 +167,8 @@ class Router {
 			$splitRegex = '`(%(?:(?:[a-zA-Z_][a-zA-Z0-9_\|]*)|{(?:[a-zA-Z_][a-zA-Z0-9_\|]*)}))`';
 			$tokens = preg_split($splitRegex, $val, null,
 				PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			var_dump($tokens);
 			$set = array();
+			var_dump($tokens);
 			// Iterate through each token to convert variables into arrays.
 			// String literals stay as they are.
 			foreach ($tokens as $segment) {
@@ -155,7 +238,7 @@ class Router {
 		// Turn all other variables into named entities
 		$path = preg_replace('`(?<!\(\?):([a-zA-Z_][a-zA-Z0-9_]*)`',
 			'(?P<$1>[^/]+)', $path);
-		return $path;
+		return '`' . $path . '`';
 	}
 	
 	public function request($path, $defaults=null, $transforms=null,
@@ -165,7 +248,7 @@ class Router {
 		if ($this->rulesFromCache)
 			return false;
 		// Set up the new rule
-		$$this->ruleSet[] = array(
+		$this->ruleSet[] = array(
 			'method' => $httpMethod ?: false,
 			'regex' => $this->processPath($path, $restrictions, $args),
 			'defaults' => $defaults,
@@ -198,7 +281,10 @@ class Router {
 				// Apply the transformations
 				$arraysAsParams = array();
 				if (isset($rule['transforms'])) {
+					var_dump($rule);
 					foreach ($rule['transforms'] as $var => $val) {
+						var_dump($var);
+						var_dump($val);
 						if (is_array($val)) {
 							// Construct a value from the array elements
 							$newVal = '';
@@ -232,6 +318,7 @@ class Router {
 								}
 								$newVal .= $elem;
 							}
+							$vars[$var] = $newVal;
 						}
 						else if (is_string($val))
 							$vars[$var] = $val;
@@ -260,7 +347,33 @@ class Router {
 						"Matched route is missing a '" .
 						self::KEYWORD_FUNCTION . "' variable.");
 				}
-				// TODO: Call the controller
+				// Collect the arguments to be sent to the function
+				$args = $rule['args'];
+				foreach ($args as $key) {
+					if (!isset($vars[$key])) {
+						throw new RouteSyntaxException(
+							"Argument '$key' was never set.");
+					}
+					$args[$key] = $vars[$key];
+				}
+				// Put the arguments into the requested format
+				if (isset($rule['argArray']) && $rule['argArray'])
+					$args = array($args);
+				else {
+					$argList = array();
+					foreach ($args as $key => $val) {
+						if (is_array($val) && isset($arraysAsParams[$key]))
+							$argList = array_merge($argList, $val);
+						else
+							$argList[] = $val;
+					}
+					$args = $argList;
+				}
+				// Pass the request!
+				$success = $this->passRequest($vars[self::KEYWORD_CONTROLLER],
+					$vars[self::KEYWORD_FUNCTION], $args, true);
+				if ($success)
+					return true;
 			}
 		}
 		return false;
