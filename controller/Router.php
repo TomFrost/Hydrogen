@@ -253,7 +253,7 @@ class Router {
 		// Turn all other variables into named entities
 		$path = preg_replace('`(?<!\(\?):([a-zA-Z_][a-zA-Z0-9_]*)`',
 			'(?P<$1>[^/]+)', $path);
-		return '`' . $path . '`';
+		return '`^' . $path . '$`';
 	}
 	
 	public function put($path, $defaults=null, $overrides=null,
