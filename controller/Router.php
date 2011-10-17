@@ -327,16 +327,27 @@ class Router {
 	}
 	
 	public function start() {
-		// If we need to cache the rules, do so
-		if (!$this->rulesFromCache && $this->name) {
-			$cm = RECacheManager::getInstance();
-			$cm->set("Router:" . $this->name, $this->ruleSet,
-				$this->expireTime !== null ? $this->expireTime :
-				self::DEFAULT_CACHE_TIME, $this->groups);
-		}
 		// Get a proper PATH_INFO
 		$path = isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] ?
 			$_SERVER['PATH_INFO'] : '/';
+		// Are we caching?
+		if ($this->name) {
+			$cm = RECacheManager::getInstance();
+			// Cache the rules if they're not already there.
+			if (!$this->rulesFromCache) {
+				$cm->set("Router:" . $this->name, $this->ruleSet,
+					$this->expireTime !== null ? $this->expireTime :
+					self::DEFAULT_CACHE_TIME, $this->groups);
+			}
+			// Is this exact route cached?
+			if ($rule = $cm->get("Router:" . $this->name . ":$path")) {
+				$success = $this->passRequest($rule['controller'],
+					$rule['function'], $rule['args'], $rule['argProtect']);
+				if ($success)
+					return true;
+			}
+		}
+		
 		// Iterate through the rules until a match is found
 		foreach ($this->ruleSet as $rule) {
 			if ((!$rule['method'] ||
@@ -389,8 +400,20 @@ class Router {
 				// Pass the request!
 				$success = $this->passRequest($vars[self::KEYWORD_CONTROLLER],
 					$vars[self::KEYWORD_FUNCTION], $args, $variableParams);
-				if ($success)
+				if ($success) {
+					// Cache the route
+					if ($this->name) {
+						$cm = RECacheManager::getInstance();
+						$cm->set("Router:" . $this->name . ":$path", array(
+							'controller' => $vars[self::KEYWORD_CONTROLLER],
+							'function' => $vars[self::KEYWORD_FUNCTION],
+							'args' => $args,
+							'argProtect' => $variableParams
+							), $this->expireTime ?: self::DEFAULT_CACHE_TIME,
+							$this->groups);
+					}
 					return true;
+				}
 			}
 		}
 		return false;
