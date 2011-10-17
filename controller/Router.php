@@ -45,14 +45,6 @@ class Router {
 		}
 	}
 	
-	public function setGlobalOverrides($overrides) {
-		// Early exit if we already have the rules set up
-		if ($this->rulesFromCache)
-			return false;
-		$this->globalOverrides = $overrides;
-		return true;
-	}
-	
 	public function catchAll($defaults, $overrides=array(), $argOrder=null,
 			$argsAsArray=false) {
 		// Early exit if we already have the rules set up
@@ -277,6 +269,14 @@ class Router {
 			'args' => $argOrder ?: $args,
 			'argArray' => !!$argsAsArray
 		);
+		return true;
+	}
+	
+	public function setGlobalOverrides($overrides) {
+		// Early exit if we already have the rules set up
+		if ($this->rulesFromCache)
+			return false;
+		$this->globalOverrides = $overrides;
 		return true;
 	}
 	
