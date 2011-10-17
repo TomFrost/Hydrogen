@@ -45,6 +45,55 @@ class Router {
 		}
 	}
 	
+	protected function applyOverrides(&$vars, &$overrides, &$arraysAsParams) {
+		foreach ($overrides as $var => $val) {
+			if (is_array($val)) {
+				// Construct a value from the array elements
+				$newVal = '';
+				foreach ($val as $elem) {
+					if (is_array($elem)) {
+						$varName = '';
+						if (isset($vars[$elem[0]])) {
+							$varName = $vars[array_shift($elem)];
+							foreach ($elem as $filter) {
+								switch ($filter) {
+								case 'ucfirst':
+									$varName = ucfirst($varName);
+									break;
+								case 'upper':
+									$varName = strtoupper($varName);
+									break;
+								case 'lower':
+									$varName = strtolower($varName);
+									break;
+								default:
+									throw new RouteSyntaxException(
+										"Filter '$filter' does not exist.");
+								}
+							}
+						}
+						$newVal .= $varName;
+					}
+					else
+						$newVal .= $elem;
+				}
+				$vars[$var] = $newVal;
+			}
+			else {
+				switch ($val) {
+					case self::EXPAND_PARAMS:
+						$arraysAsParams[$var] = true;
+					case self::EXPAND_ARRAY:
+						if (isset($vars[$var]))
+							$vars[$var] = explode('/', $vars[$var]);
+						break;
+					default:
+						$vars[$var] = $val;
+				}
+			}
+		}
+	}
+	
 	public function catchAll($defaults, $overrides=array(), $argOrder=null,
 			$argsAsArray=false) {
 		// Early exit if we already have the rules set up
@@ -298,53 +347,8 @@ class Router {
 				// Apply the overrides
 				$arraysAsParams = array();
 				if (isset($rule['overrides'])) {
-					foreach ($rule['overrides'] as $var => $val) {
-						if (is_array($val)) {
-							// Construct a value from the array elements
-							$newVal = '';
-							foreach ($val as $elem) {
-								if (is_array($elem)) {
-									$varName = '';
-									if (isset($vars[$elem[0]])) {
-										$varName = $vars[array_shift($elem)];
-										foreach ($elem as $filter) {
-											switch ($filter) {
-											case 'ucfirst':
-												$varName = ucfirst($varName);
-												break;
-											case 'upper':
-												$varName = strtoupper($varName);
-												break;
-											case 'lower':
-												$varName = strtolower($varName);
-												break;
-											default:
-												throw new RouteSyntaxException(
-													'Filter "' . $filter .
-													'" does not exist.'
-												);
-											}
-										}
-									}
-									$elem = $varName;
-								}
-								$newVal .= $elem;
-							}
-							$vars[$var] = $newVal;
-						}
-						else {
-							switch ($val) {
-								case self::EXPAND_PARAMS:
-									$arraysAsParams[$var] = true;
-								case self::EXPAND_ARRAY:
-									if (isset($vars[$var]))
-										$vars[$var] = explode('/', $vars[$var]);
-									break;
-								default:
-									$vars[$var] = $val;
-							}
-						}
-					}
+					$this->applyOverrides($vars, $rule['overrides'],
+						$arraysAsParams);
 				}
 				// At this point, we must have a controller and function
 				if (!isset($vars[self::KEYWORD_CONTROLLER])) {
