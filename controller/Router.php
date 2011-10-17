@@ -21,8 +21,8 @@ class Router {
 	const KEYWORD_CONTROLLER = 'controller';
 	const KEYWORD_FUNCTION = 'function';
 	
-	const TRANSFORM_EXPAND_ARRAY = '%{1}';
-	const TRANSFORM_EXPAND_PARAMS = '%{2}';
+	const EXPAND_ARRAY = '%{1}';
+	const EXPAND_PARAMS = '%{2}';
 	
 	protected $globalOverrides;
 	protected $ruleSet = array();
@@ -336,9 +336,9 @@ class Router {
 						}
 						else {
 							switch ($val) {
-								case self::TRANSFORM_EXPAND_PARAMS:
+								case self::EXPAND_PARAMS:
 									$arraysAsParams[$var] = true;
-								case self::TRANSFORM_EXPAND_ARRAY:
+								case self::EXPAND_ARRAY:
 									if (isset($vars[$var]))
 										$vars[$var] = explode('/', $vars[$var]);
 									break;
