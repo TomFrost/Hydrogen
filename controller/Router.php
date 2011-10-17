@@ -101,6 +101,7 @@ class Router {
 			return false;
 		// Construct the catch-all rule
 		$this->ruleSet[] = array(
+			'method' => null,
 			'regex' => '`.*`',
 			'defaults' => $defaults,
 			'overrides' => $this->processOverrides($overrides),
@@ -338,27 +339,24 @@ class Router {
 			$_SERVER['PATH_INFO'] : '/';
 		// Iterate through the rules until a match is found
 		foreach ($this->ruleSet as $rule) {
-			if ((!isset($rule['method']) || !$rule['method'] ||
+			if ((!$rule['method'] ||
 					$rule['method'] == $_SERVER['REQUEST_METHOD']) &&
 					preg_match($rule['regex'], $path, $vars)) {
 				// Collect all the variables
-				if (isset($rule['defaults']) && $rule['defaults'])
+				if ($rule['defaults'])
 					$vars = array_merge($rule['defaults'], $vars);
 				// Apply the overrides
 				$arraysAsParams = array();
-				if (isset($rule['overrides'])) {
+				if ($rule['overrides']) {
 					$this->applyOverrides($vars, $rule['overrides'],
 						$arraysAsParams);
 				}
 				// At this point, we must have a controller and function
-				if (!isset($vars[self::KEYWORD_CONTROLLER])) {
+				if (!isset($vars[self::KEYWORD_CONTROLLER]) ||
+						!isset($vars[self::KEYWORD_FUNCTION])) {
 					throw new RouteSyntaxException(
-						"Matched route is missing a '" .
-						self::KEYWORD_CONTROLLER . "' variable.");
-				}
-				if (!isset($vars[self::KEYWORD_FUNCTION])) {
-					throw new RouteSyntaxException(
-						"Matched route is missing a '" .
+						"Matched route requires both a '" .
+						self::KEYWORD_CONTROLLER . "' and a '" .
 						self::KEYWORD_FUNCTION . "' variable.");
 				}
 				// Collect the arguments to be sent to the function in the
