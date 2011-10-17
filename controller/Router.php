@@ -69,6 +69,18 @@ class Router {
 		return true;
 	}
 	
+	public function delete($path, $defaults=null, $overrides=null,
+			$restrictions=null, $argOrder=null, $argsAsArray=false) {
+		return request($path, $defaults, $overrides, $restrictions,
+			$argOrder, $argsAsArray, 'DELETE');
+	}
+	
+	public function get($path, $defaults=null, $overrides=null,
+			$restrictions=null, $argOrder=null, $argsAsArray=false) {
+		return request($path, $defaults, $overrides, $restrictions,
+			$argOrder, $argsAsArray, 'GET');
+	}
+	
 	/**
 	 * The handler used by the argument protection system in
 	 * {@link #passRequest}.  Even though this argument is public for PHP
@@ -150,6 +162,12 @@ class Router {
 			return true;
 		}
 		return false;
+	}
+	
+	public function post($path, $defaults=null, $overrides=null,
+			$restrictions=null, $argOrder=null, $argsAsArray=false) {
+		return request($path, $defaults, $overrides, $restrictions,
+			$argOrder, $argsAsArray, 'POST');
 	}
 	
 	protected function processOverrides($overrides) {
@@ -234,6 +252,12 @@ class Router {
 		$path = preg_replace('`(?<!\(\?):([a-zA-Z_][a-zA-Z0-9_]*)`',
 			'(?P<$1>[^/]+)', $path);
 		return '`' . $path . '`';
+	}
+	
+	public function put($path, $defaults=null, $overrides=null,
+			$restrictions=null, $argOrder=null, $argsAsArray=false) {
+		return request($path, $defaults, $overrides, $restrictions,
+			$argOrder, $argsAsArray, 'PUT');
 	}
 	
 	public function request($path, $defaults=null, $overrides=null,
