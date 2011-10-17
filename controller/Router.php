@@ -21,8 +21,8 @@ class Router {
 	const KEYWORD_CONTROLLER = 'controller';
 	const KEYWORD_FUNCTION = 'function';
 	
-	const TRANSFORM_EXPAND_ARRAY = 1;
-	const TRANSFORM_EXPAND_PARAMS = 2;
+	const TRANSFORM_EXPAND_ARRAY = '%{1}';
+	const TRANSFORM_EXPAND_PARAMS = '%{2}';
 	
 	protected $globalOverrides;
 	protected $ruleSet = array();
@@ -313,18 +313,16 @@ class Router {
 							}
 							$vars[$var] = $newVal;
 						}
-						else if (is_string($val))
-							$vars[$var] = $val;
 						else {
 							switch ($val) {
 								case self::TRANSFORM_EXPAND_PARAMS:
 									$arraysAsParams[$var] = true;
 								case self::TRANSFORM_EXPAND_ARRAY:
-									$vars[$var] = explode('/', $vars[$var]);
+									if (isset($vars[$var]))
+										$vars[$var] = explode('/', $vars[$var]);
 									break;
 								default:
-									throw new RouteSyntaxException(
-										"Invalid transform type: '$val'");
+									$vars[$var] = $val;
 							}
 						}
 					}
@@ -343,11 +341,8 @@ class Router {
 				// Collect the arguments to be sent to the function
 				$args = $rule['args'];
 				foreach ($args as $key) {
-					if (!isset($vars[$key])) {
-						throw new RouteSyntaxException(
-							"Argument '$key' was never set.");
-					}
-					$args[$key] = $vars[$key];
+					if (isset($vars[$key]))
+						$args[$key] = $vars[$key];
 				}
 				// Put the arguments into the requested format
 				if (isset($rule['argArray']) && $rule['argArray'])
