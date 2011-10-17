@@ -123,14 +123,10 @@ class Router {
 	 */
 	protected function passRequest($controller, $function, $args=null, 
 			$argProtection=null) {
-		var_dump($controller);
-		var_dump($function);
-		var_dump($args);
-		var_dump($argProtection);
 		// Only proceed if the controller exists
-		if (@class_exists($class)) {
+		if (@class_exists($controller)) {
 			// Call it, Cap'n.
-			$inst = $class::getInstance();
+			$inst = $controller::getInstance();
 			if ($argProtection) {
 				set_error_handler(
 					array($this, 'missingArgHandler'),
@@ -168,7 +164,6 @@ class Router {
 			$tokens = preg_split($splitRegex, $val, null,
 				PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 			$set = array();
-			var_dump($tokens);
 			// Iterate through each token to convert variables into arrays.
 			// String literals stay as they are.
 			foreach ($tokens as $segment) {
@@ -263,7 +258,7 @@ class Router {
 		// If we need to cache the rules, do so
 		if (!$this->rulesFromCache && $this->name) {
 			$cm = RECacheManager::getInstance();
-			$cm->set("Router:$name", $this->ruleSet,
+			$cm->set("Router:" . $this->name, $this->ruleSet,
 				$this->expireTime !== null ? $this->expireTime :
 				self::DEFAULT_CACHE_TIME, $this->groups);
 		}
@@ -281,10 +276,7 @@ class Router {
 				// Apply the transformations
 				$arraysAsParams = array();
 				if (isset($rule['transforms'])) {
-					var_dump($rule);
 					foreach ($rule['transforms'] as $var => $val) {
-						var_dump($var);
-						var_dump($val);
 						if (is_array($val)) {
 							// Construct a value from the array elements
 							$newVal = '';
@@ -296,17 +288,17 @@ class Router {
 											'" is required for the "' .
 											$var . '" transform.');
 									}
-									$elem = $vars[array_shift($elem)];
+									$varName = $vars[array_shift($elem)];
 									foreach ($elem as $filter) {
 										switch ($filter) {
 											case 'ucfirst':
-												$elem = ucfirst($elem);
+												$varName = ucfirst($varName);
 												break;
 											case 'upper':
-												$elem = strtoupper($elem);
+												$varName = strtoupper($varName);
 												break;
 											case 'lower':
-												$elem = strtolower($elem);
+												$varName = strtolower($varName);
 												break;
 											default:
 												throw new RouteSyntaxException(
@@ -315,6 +307,7 @@ class Router {
 												);
 										}
 									}
+									$elem = $varName;
 								}
 								$newVal .= $elem;
 							}
