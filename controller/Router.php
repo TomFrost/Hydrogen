@@ -241,6 +241,8 @@ class Router {
 		// Turn restricted variables into named entities
 		if ($restrictions) {
 			foreach ($restrictions as $var => $regex) {
+				if (is_array($regex))
+					$regex = '(?:' . implode('|', $regex) . ')';
 				$path = preg_replace('`(?<!\(\?):' . $var . '`',
 					'(?P<' . $var . '>' . $regex . ')', $path);
 			}
