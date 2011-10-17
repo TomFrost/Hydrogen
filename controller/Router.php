@@ -24,7 +24,7 @@ class Router {
 	const TRANSFORM_EXPAND_ARRAY = 1;
 	const TRANSFORM_EXPAND_PARAMS = 2;
 	
-	protected $defaultTransforms;
+	protected $globalOverrides;
 	protected $ruleSet = array();
 	protected $rulesFromCache = false;
 	protected $name, $expireTime, $groups;
@@ -45,15 +45,15 @@ class Router {
 		}
 	}
 	
-	public function setDefaultTransforms($transforms) {
+	public function setGlobalOverrides($overrides) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
 			return false;
-		$this->defaultTransforms = $transforms;
+		$this->globalOverrides = $overrides;
 		return true;
 	}
 	
-	public function catchAll($defaults, $transforms=array(), $argOrder=null,
+	public function catchAll($defaults, $overrides=array(), $argOrder=null,
 			$argsAsArray=false) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
@@ -62,7 +62,7 @@ class Router {
 		$ruleSet[] = array(
 			'regex' => '`.*`',
 			'defaults' => $defaults,
-			'transforms' => $this->processTransforms($transforms),
+			'overrides' => $this->processOverrides($overrides),
 			'args' => $argOrder,
 			'argArray' => !!$argsAsArray
 		);
@@ -152,13 +152,13 @@ class Router {
 		return false;
 	}
 	
-	protected function processTransforms($transforms) {
-		if (!$transforms)
-			$transforms = array();
-		if ($this->defaultTransforms)
-			$transforms = array_merge($this->defaultTransforms, $transforms);
-		// Iterate through transforms and break them up into segments
-		foreach ($transforms as $var => $val) {
+	protected function processOverrides($overrides) {
+		if (!$overrides)
+			$overrides = array();
+		if ($this->globalOverrides)
+			$overrides = array_merge($this->globalOverrides, $overrides);
+		// Iterate through overrides and break them up into segments
+		foreach ($overrides as $var => $val) {
 			// Break the string into variables and literals
 			$splitRegex = '`(%(?:(?:[a-zA-Z_][a-zA-Z0-9_\|]*)|{(?:[a-zA-Z_][a-zA-Z0-9_\|]*)}))`';
 			$tokens = preg_split($splitRegex, $val, null,
@@ -196,10 +196,10 @@ class Router {
 			}
 			// If our set only contains a single string literal, save it
 			// that way so that only variables are arrays.
-			$transforms[$var] = count($set) == 1 && !is_array($set[0]) ?
+			$overrides[$var] = count($set) == 1 && !is_array($set[0]) ?
 				$set[0] : $set;
 		}
-		return $transforms;
+		return $overrides;
 	}
 	
 	protected function processPath($path, $restrictions=null, &$args=null) {
@@ -236,7 +236,7 @@ class Router {
 		return '`' . $path . '`';
 	}
 	
-	public function request($path, $defaults=null, $transforms=null,
+	public function request($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false,
 			$httpMethod=null) {
 		// Early exit if we already have the rules set up
@@ -247,7 +247,7 @@ class Router {
 			'method' => $httpMethod ?: false,
 			'regex' => $this->processPath($path, $restrictions, $args),
 			'defaults' => $defaults,
-			'transforms' => $this->processTransforms($transforms),
+			'overrides' => $this->processOverrides($overrides),
 			'args' => $argOrder ?: $args,
 			'argArray' => !!$argsAsArray
 		);
@@ -275,8 +275,8 @@ class Router {
 					$vars = array_merge($rule['defaults'], $vars);
 				// Apply the transformations
 				$arraysAsParams = array();
-				if (isset($rule['transforms'])) {
-					foreach ($rule['transforms'] as $var => $val) {
+				if (isset($rule['overrides'])) {
+					foreach ($rule['overrides'] as $var => $val) {
 						if (is_array($val)) {
 							// Construct a value from the array elements
 							$newVal = '';
