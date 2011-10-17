@@ -131,11 +131,7 @@ class Router {
 		if (@class_exists($controller)) {
 			// Call it, Cap'n.
 			$inst = $controller::getInstance();
-			if ($argProtection) {
-				set_error_handler(
-					array($this, 'missingArgHandler'),
-					E_WARNING);
-			}
+			
 			try {
 				call_user_func_array(array($inst, $function), $args ?: array());
 			}
@@ -364,6 +360,7 @@ class Router {
 				// Collect the arguments to be sent to the function in the
 				// requested format.
 				$args = array();
+				$variableParams = false;
 				if ($rule['args']) {
 					// Array keys format
 					if (isset($rule['argArray']) && $rule['argArray']) {
@@ -375,6 +372,7 @@ class Router {
 					}
 					// Parameters format
 					else {
+						$variableParams = true;
 						foreach ($rule['args'] as $key) {
 							if (isset($vars[$key])) {
 								if (is_array($vars[$key]) &&
@@ -388,7 +386,7 @@ class Router {
 				}
 				// Pass the request!
 				$success = $this->passRequest($vars[self::KEYWORD_CONTROLLER],
-					$vars[self::KEYWORD_FUNCTION], $args, true);
+					$vars[self::KEYWORD_FUNCTION], $args, $variableParams);
 				if ($success)
 					return true;
 			}
