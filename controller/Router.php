@@ -184,7 +184,7 @@ class Router {
 									break;
 								default:
 									throw new RouteSyntaxException(
-										"Illegal transform filter: '$filter'");
+										"Illegal override filter: '$filter'");
 							}
 						}
 						// Add the array package to the set
@@ -273,7 +273,7 @@ class Router {
 				// Collect all the variables
 				if (isset($rule['defaults']) && $rule['defaults'])
 					$vars = array_merge($rule['defaults'], $vars);
-				// Apply the transformations
+				// Apply the overrides
 				$arraysAsParams = array();
 				if (isset($rule['overrides'])) {
 					foreach ($rule['overrides'] as $var => $val) {
@@ -282,15 +282,11 @@ class Router {
 							$newVal = '';
 							foreach ($val as $elem) {
 								if (is_array($elem)) {
-									if (!isset($vars[$elem[0]])) {
-										throw new RouteSyntaxException(
-											'Variable "' . $elem[0] .
-											'" is required for the "' .
-											$var . '" transform.');
-									}
-									$varName = $vars[array_shift($elem)];
-									foreach ($elem as $filter) {
-										switch ($filter) {
+									$varName = '';
+									if (isset($vars[$elem[0]])) {
+										$varName = $vars[array_shift($elem)];
+										foreach ($elem as $filter) {
+											switch ($filter) {
 											case 'ucfirst':
 												$varName = ucfirst($varName);
 												break;
@@ -305,6 +301,7 @@ class Router {
 													'Filter "' . $filter .
 													'" does not exist.'
 												);
+											}
 										}
 									}
 									$elem = $varName;
@@ -338,24 +335,28 @@ class Router {
 						"Matched route is missing a '" .
 						self::KEYWORD_FUNCTION . "' variable.");
 				}
-				// Collect the arguments to be sent to the function
-				$args = $rule['args'];
-				foreach ($args as $key) {
-					if (isset($vars[$key]))
-						$args[$key] = $vars[$key];
-				}
-				// Put the arguments into the requested format
-				if (isset($rule['argArray']) && $rule['argArray'])
-					$args = array($args);
-				else {
-					$argList = array();
-					foreach ($args as $key => $val) {
-						if (is_array($val) && isset($arraysAsParams[$key]))
-							$argList = array_merge($argList, $val);
-						else
-							$argList[] = $val;
+				// Collect the arguments to be sent to the function in the
+				// requested format.
+				$args = array();
+				// Array keys format
+				if (isset($rule['argArray']) && $rule['argArray']) {
+					foreach ($rule['args'] as $key) {
+						if (isset($vars[$key]))
+							$args[$key] = $vars[$key];
 					}
-					$args = $argList;
+					$args = array($args);
+				}
+				// Parameters format
+				else {
+					foreach ($rule['args'] as $key) {
+						if (isset($vars[$key])) {
+							if (is_array($vars[$key]) &&
+									isset($arraysAsParams[$key]))
+								$args = array_merge($args, $vars[$key]);
+							else
+								$args[] = $vars[$key];
+						}
+					}
 				}
 				// Pass the request!
 				$success = $this->passRequest($vars[self::KEYWORD_CONTROLLER],
