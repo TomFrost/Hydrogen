@@ -59,7 +59,7 @@ class Router {
 		if ($this->rulesFromCache)
 			return false;
 		// Construct the catch-all rule
-		$ruleSet[] = array(
+		$this->ruleSet[] = array(
 			'regex' => '`.*`',
 			'defaults' => $defaults,
 			'overrides' => $this->processOverrides($overrides),
@@ -364,23 +364,25 @@ class Router {
 				// Collect the arguments to be sent to the function in the
 				// requested format.
 				$args = array();
-				// Array keys format
-				if (isset($rule['argArray']) && $rule['argArray']) {
-					foreach ($rule['args'] as $key) {
-						if (isset($vars[$key]))
-							$args[$key] = $vars[$key];
+				if ($rule['args']) {
+					// Array keys format
+					if (isset($rule['argArray']) && $rule['argArray']) {
+						foreach ($rule['args'] as $key) {
+							if (isset($vars[$key]))
+								$args[$key] = $vars[$key];
+						}
+						$args = array($args);
 					}
-					$args = array($args);
-				}
-				// Parameters format
-				else {
-					foreach ($rule['args'] as $key) {
-						if (isset($vars[$key])) {
-							if (is_array($vars[$key]) &&
-									isset($arraysAsParams[$key]))
-								$args = array_merge($args, $vars[$key]);
-							else
-								$args[] = $vars[$key];
+					// Parameters format
+					else {
+						foreach ($rule['args'] as $key) {
+							if (isset($vars[$key])) {
+								if (is_array($vars[$key]) &&
+										isset($arraysAsParams[$key]))
+									$args = array_merge($args, $vars[$key]);
+								else
+									$args[] = $vars[$key];
+							}
 						}
 					}
 				}
