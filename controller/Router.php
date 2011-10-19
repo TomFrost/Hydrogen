@@ -785,15 +785,9 @@ class Router {
 	 * 		what they should be set to after this rule matches and all other
 	 * 		variables are processed.  See the documentation for
 	 * 		{@link \hydrogen\controller\Router} for more information.
-	 * @return boolean true if the rule was successfully added; false if the
-	 * 		overrides have already been loaded from the cached set.
 	 */
 	public function setGlobalOverrides($overrides) {
-		// Early exit if we already have the rules set up
-		if ($this->rulesFromCache)
-			return false;
-		$this->globalOverrides = $overrides;
-		return true;
+		$this->globalOverrides = &$overrides;
 	}
 	
 	/**
