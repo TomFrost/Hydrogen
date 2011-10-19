@@ -39,6 +39,7 @@ class RedisEngine implements CacheEngine {
 			$this->engine->connect($server, $port, $timeout);
 		if ($password)
 			$this->engine->auth($password);
+		$this->engine->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
 	}
 	
 	/**
