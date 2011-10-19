@@ -645,6 +645,8 @@ class Router {
 	 * 		and function variables.
 	 * @return string The path converted to a regular expression string, with
 	 * 		each variable as a named matching group.
+	 * @throws RouterSyntaxException If the path cannot be parsed due to having
+	 * 		an unequal number of opening and closing parentheses.
 	 */
 	protected function processPath($path, $restrictions=null, &$args=null) {
 		// Turn the parentheses into non-capturing optional groups.
