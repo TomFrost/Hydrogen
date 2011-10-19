@@ -365,8 +365,8 @@ class Router {
 	 * 		separate parameter.  Note that, if true, any variable transformed
 	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
 	 * 		were transformed with {@link EXPAND_ARRAY}.
-	 * @return true if the rule was successfully added; false if the rule has
-	 * 		already been loaded from the cached set.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
 	 */
 	public function catchAll($defaults, $overrides=array(), $argOrder=null,
 			$argsAsArray=false) {
@@ -410,8 +410,8 @@ class Router {
 	 * 		separate parameter.  Note that, if true, any variable transformed
 	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
 	 * 		were transformed with {@link EXPAND_ARRAY}.
-	 * @return true if the rule was successfully added; false if the rule has
-	 * 		already been loaded from the cached set.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
 	 */
 	public function delete($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
@@ -444,8 +444,8 @@ class Router {
 	 * 		separate parameter.  Note that, if true, any variable transformed
 	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
 	 * 		were transformed with {@link EXPAND_ARRAY}.
-	 * @return true if the rule was successfully added; false if the rule has
-	 * 		already been loaded from the cached set.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
 	 */
 	public function get($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
@@ -557,8 +557,8 @@ class Router {
 	 * 		separate parameter.  Note that, if true, any variable transformed
 	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
 	 * 		were transformed with {@link EXPAND_ARRAY}.
-	 * @return true if the rule was successfully added; false if the rule has
-	 * 		already been loaded from the cached set.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
 	 */
 	public function post($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
@@ -566,6 +566,17 @@ class Router {
 			$argOrder, $argsAsArray, 'POST');
 	}
 	
+	/**
+	 * Converts an associative array of programmer-supplied overrides into
+	 * a parsed, nested array of tokens that the router can later process
+	 * and apply very quickly.
+	 *
+	 * @param array $overrides An associative array linking variable names to
+	 * 		what they should be set to after a rule matches and all other
+	 * 		variables are processed.  See the documentation for
+	 * 		{@link \hydrogen\controller\Router} for more information.
+	 * @return array A parsed, easily-applied set of tokenized overrides.
+	 */
 	protected function processOverrides($overrides) {
 		if (!$overrides)
 			$overrides = array();
@@ -616,6 +627,25 @@ class Router {
 		return $overrides;
 	}
 	
+	/**
+	 * Converts a path string and a set of variable restrictions into a
+	 * regular expression string and a set of arguments to be sent to the
+	 * controller function when a match is made.
+	 *
+	 * @param string $path A router path as specified in the documentation for
+	 * 		the {@link \hydrogen\controller\Router} class.
+	 * @param array $restrictions An associative array linking variables in the
+	 * 		URL to a regex pattern that those variables must match in order for
+	 * 		the rule as a whole to match.  Alternatively, the value can be an
+	 * 		array of legal words for that particular variable instead of a
+	 * 		regex string.
+	 * @param array $args An array passed by reference that, at the end of
+	 * 		the function call, will contain a list of all arguments in the
+	 * 		path, in order.  These arguments will *not* include the controller
+	 * 		and function variables.
+	 * @return string The path converted to a regular expression string, with
+	 * 		each variable as a named matching group.
+	 */
 	protected function processPath($path, $restrictions=null, &$args=null) {
 		// Turn the parentheses into non-capturing optional groups.
 		$path = str_replace('(', '(?:', $path, $openParens);
@@ -677,8 +707,8 @@ class Router {
 	 * 		separate parameter.  Note that, if true, any variable transformed
 	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
 	 * 		were transformed with {@link EXPAND_ARRAY}.
-	 * @return true if the rule was successfully added; false if the rule has
-	 * 		already been loaded from the cached set.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
 	 */
 	public function put($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
@@ -686,6 +716,42 @@ class Router {
 			$argOrder, $argsAsArray, 'PUT');
 	}
 	
+	/**
+	 * Creates a new routing rule to the given specifications.  Note that
+	 * routing rules are executed in the order they are set, and that no
+	 * further routes are attempted after one matches.  As such, it's good
+	 * practice to define routes in an order of more specific to less
+	 * specific, optionally ending with a {@link #catchAll} rule.
+	 *
+	 * @param string $path The path pattern to match to the request.  See
+	 * 		the {@link \hydrogen\controller\Router} for more information.
+	 * @param array $defaults An associative array linking variable names to
+	 * 		the default value they should have if they are not overridden by
+	 * 		a section of the URL.
+	 * @param array $overrides An associative array linking variable names to
+	 * 		what they should be set to after this rule matches and all other
+	 * 		variables are processed.  See the documentation for
+	 * 		{@link \hydrogen\controller\Router} for more information.
+	 * @param array $restrictions An associative array linking variables in the
+	 * 		URL to a regex pattern that those variables must match in order for
+	 * 		the rule as a whole to match.  Alternatively, the value can be an
+	 * 		array of legal words for that particular variable instead of a
+	 * 		regex string.
+	 * @param array $argOrder An array indicating the order that the variables
+	 * 		should have when passed to the controller function.
+	 * @param boolean $argsAsArray true to call the controller function with
+	 * 		a single argument: an associative array with a key/value pair
+	 * 		or each variable. false (default) to pass each variable as a
+	 * 		separate parameter.  Note that, if true, any variable transformed
+	 * 		with {@link EXPAND_PARAMS} will instead be processed as though it
+	 * 		were transformed with {@link EXPAND_ARRAY}.
+	 * @param string $httpMethod The HTTP verb that this rule should be
+	 * 		restricted to.  Common values are (case sensitive) "DELETE", "GET",
+	 * 		"POST", and "PUT".  If null or unspecified, the rule will match all
+	 * 		HTTP request types.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		rule has already been loaded from the cached set.
+	 */
 	public function request($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false,
 			$httpMethod=null) {
@@ -704,6 +770,24 @@ class Router {
 		return true;
 	}
 	
+	/**
+	 * Stores an associative array of overrides to be automatically applied
+	 * to any rule made after this function is called.  If any overrides are
+	 * specified in any rules set after this function is called, those
+	 * overrides will layer over the ones set here.  For example, if this
+	 * function were called with an override for 'controller' and 'args', and
+	 * {@link #request} was called with an override for 'controller' and
+	 * 'function', the resulting rule will override 'controller', 'args' and
+	 * 'function', with 'controller' being the override specified in the new
+	 * rule.
+	 *
+	 * @param array $overrides An associative array linking variable names to
+	 * 		what they should be set to after this rule matches and all other
+	 * 		variables are processed.  See the documentation for
+	 * 		{@link \hydrogen\controller\Router} for more information.
+	 * @return boolean true if the rule was successfully added; false if the
+	 * 		overrides have already been loaded from the cached set.
+	 */
 	public function setGlobalOverrides($overrides) {
 		// Early exit if we already have the rules set up
 		if ($this->rulesFromCache)
@@ -712,6 +796,15 @@ class Router {
 		return true;
 	}
 	
+	/**
+	 * Runs the router, iteratively looking for a match to each rule in the
+	 * order in which the rules were set up.  When a rule matches, its
+	 * respective controller function is called and the router exits, ignoring
+	 * the remaining rules.
+	 *
+	 * @return boolean true if a rule has matched and the controller/function
+	 * 		was successfully called; false otherwise.
+	 */
 	public function start() {
 		// Get a proper PATH_INFO
 		$path = isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] ?
