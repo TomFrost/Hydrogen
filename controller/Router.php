@@ -14,7 +14,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
 
 /**
  * Router is the preferred method of matching URL requests to Controller
- * objects, making agressive use of caching to stay very quick, regardless of
+ * objects, making aggressive use of caching to stay very quick, regardless of
  * the number or complexity of rules defined.  Many rules can be added to a
  * Router instance without incurring any extra processing or lookup time.
  *
