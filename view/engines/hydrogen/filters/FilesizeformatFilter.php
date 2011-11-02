@@ -34,7 +34,10 @@ class FilesizeformatFilter implements Filter {
 			}
 			$size = (string)number_format($size, $decimals);
 			while (($char = $size[strlen($size) - 1]) === '0' || $char === '.')
+				if(!isset($size[1]))
+					break;
 				$size = substr($size, 0, -1);
+			}
 			return $size . ' ' . $type;
 PHP
 		);
