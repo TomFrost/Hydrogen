@@ -467,7 +467,7 @@ class Router {
 	 * @param string $errfile The filename in which the error occurred.
 	 * @param int $errline The line number on which the error occurred.
 	 */
-	public function missingArgHandler($errno, $errstr, $errfile,
+	public static function missingArgHandler($errno, $errstr, $errfile,
 			$errline) {
 		$errCheck = "Missing argument";
 		if ($errCheck === substr($errstr, 0, strlen($errCheck)))
@@ -511,7 +511,11 @@ class Router {
 		if (@class_exists($controller)) {
 			// Call it, Cap'n.
 			$inst = $controller::getInstance();
-			
+			if ($argProtection === true) {
+				set_error_handler(
+					"\hydrogen\controller\Router::missingArgHandler",
+					E_WARNING);
+			}
 			try {
 				call_user_func_array(array($inst, $function), $args ?: array());
 			}
