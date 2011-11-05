@@ -309,7 +309,7 @@ class Router {
 							$varName = $vars[array_shift($elem)];
 							foreach ($elem as $filter) {
 								switch ($filter) {
-								case 'ucfirst':
+								case 'capfirst':
 									$varName = ucfirst($varName);
 									break;
 								case 'upper':
@@ -606,7 +606,7 @@ class Router {
 						foreach ($segment as $filter) {
 							// Only allow legal filters
 							switch ($filter) {
-								case 'ucfirst':
+								case 'capfirst':
 								case 'upper':
 								case 'lower':
 									$varBlock[] = $filter;
