@@ -649,6 +649,8 @@ class Router {
 	 * 		and function variables.
 	 * @return string The path converted to a regular expression string, with
 	 * 		each variable as a named matching group.
+	 * @throws RouterSyntaxException If the path cannot be parsed due to having
+	 * 		an unequal number of opening and closing parentheses.
 	 */
 	protected function processPath($path, $restrictions=null, &$args=null) {
 		// Turn the parentheses into non-capturing optional groups.
@@ -789,15 +791,9 @@ class Router {
 	 * 		what they should be set to after this rule matches and all other
 	 * 		variables are processed.  See the documentation for
 	 * 		{@link \hydrogen\controller\Router} for more information.
-	 * @return boolean true if the rule was successfully added; false if the
-	 * 		overrides have already been loaded from the cached set.
 	 */
 	public function setGlobalOverrides($overrides) {
-		// Early exit if we already have the rules set up
-		if ($this->rulesFromCache)
-			return false;
-		$this->globalOverrides = $overrides;
-		return true;
+		$this->globalOverrides = &$overrides;
 	}
 	
 	/**
