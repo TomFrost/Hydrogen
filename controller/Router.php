@@ -66,7 +66,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  * With the above rule, a request to /login would look for a Controller class
  * named 'login' and call its 'greeting' function.
  *
- * Consider, though, the liklihood that the controller classes are namespaced
+ * Consider, though, the likelihood that the controller classes are namespaced
  * and probably start with a capital first letter.  To achieve this, overrides
  * can be used.  Just as variables in URLs take precedence over the 'defaults'
  * array, overrides are applied before any controller function is called.
@@ -83,7 +83,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  * Using a second array of overrides, it's easy to transform a value of
  * 'welcome' for the controller into '\myapp\controllers\WelcomeController'.
  * In the array of overrides, existing variables can be referenced with
- * %variable or %{variable}.  Aditionally, it can be appended with a list of
+ * %variable or %{variable}.  Additionally, it can be appended with a list of
  * pipe-separated filters to affect a change on the variable contents.  Legal
  * filters:
  *
