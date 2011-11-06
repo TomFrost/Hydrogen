@@ -76,7 +76,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  *     'controller' => 'welcome',
  *     'function' => 'greeting'
  * ), array(
- *     'controller' => '\myapp\controllers\%{controller|ucfirst}Controller'
+ *     'controller' => '\myapp\controllers\%{controller|capfirst}Controller'
  * ));
  * </pre>
  *
@@ -87,7 +87,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  * pipe-separated filters to affect a change on the variable contents.  Legal
  * filters:
  *
- * - "ucfirst" makes the first letter uppercase
+ * - "capfirst" makes the first letter uppercase
  * - "upper" makes the entire string uppercase
  * - "lower" will lowercase the entire string.
  *
@@ -95,7 +95,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  * array will turn wELcOMe into Welcome:
  *
  * <pre>
- * array('controller' => '%{controller|lower|ucfirst});
+ * array('controller' => '%{controller|lower|capfirst});
  * </pre>
  *
  * Additional arguments aside from 'controller' and 'function' can also be
@@ -126,7 +126,7 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  *     'controller' => 'home',
  *     'function' => 'index'
  * ), array(
- *     'controller' => '\myapp\controllers\%{controller|ucfirst}Controller',
+ *     'controller' => '\myapp\controllers\%{controller|capfirst}Controller',
  * ));
  * </pre>
  *
