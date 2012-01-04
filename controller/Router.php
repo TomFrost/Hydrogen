@@ -415,7 +415,7 @@ class Router {
 	 */
 	public function delete($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
-		return request($path, $defaults, $overrides, $restrictions,
+		return $this->request($path, $defaults, $overrides, $restrictions,
 			$argOrder, $argsAsArray, 'DELETE');
 	}
 	
@@ -449,7 +449,7 @@ class Router {
 	 */
 	public function get($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
-		return request($path, $defaults, $overrides, $restrictions,
+		return $this->request($path, $defaults, $overrides, $restrictions,
 			$argOrder, $argsAsArray, 'GET');
 	}
 	
@@ -562,7 +562,7 @@ class Router {
 	 */
 	public function post($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
-		return request($path, $defaults, $overrides, $restrictions,
+		return $this->request($path, $defaults, $overrides, $restrictions,
 			$argOrder, $argsAsArray, 'POST');
 	}
 	
@@ -653,7 +653,7 @@ class Router {
 		$path = str_replace('(', '(?:', $path, $openParens);
 		$path = str_replace(')', ')?', $path, $closeParens);
 		if ($openParens !== $closeParens) {
-			throw new RouterSyntaxException(
+			throw new RouteSyntaxException(
 				"Unequal number of closing and opening parentheses in '" .
 				$path . "'.");
 		}
@@ -714,7 +714,7 @@ class Router {
 	 */
 	public function put($path, $defaults=null, $overrides=null,
 			$restrictions=null, $argOrder=null, $argsAsArray=false) {
-		return request($path, $defaults, $overrides, $restrictions,
+		return $this->request($path, $defaults, $overrides, $restrictions,
 			$argOrder, $argsAsArray, 'PUT');
 	}
 	
