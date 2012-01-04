@@ -4,3 +4,4 @@
 *.komodoproject
 .komodotools*
 hydrogen.autoconfig.php
+.idea*
