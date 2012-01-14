@@ -54,14 +54,14 @@ class Autoloader {
 	}
 	
 	/**
-	 * Registers this autoloader and makes it active.  This should only
-	 * need to be called in hydrogen.inc.php.
+	 * Registers this autoloader and makes it active.  This method is called
+	 * automatically upon registering a namespace.
 	 *
 	 * @return boolean true if the autoloader was successfully registered;
 	 * 		false if it was not, or if it has already been registered in the
 	 * 		past.
 	 */
-	public static function register() {
+	protected static function register() {
 		if (static::$registered)
 			return false;
 		
@@ -109,6 +109,7 @@ class Autoloader {
 		$rootFolder = rtrim($rootFolder, DIRECTORY_SEPARATOR);
 		static::$namespaces[$namespace] = array($rootFolder,
 			$replaceUnderscores);
+		static::register();
 	}
 	
 	/**
