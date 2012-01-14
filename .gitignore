@@ -3,5 +3,5 @@
 *.kpf
 *.komodoproject
 .komodotools*
-.idea
 hydrogen.autoconfig.php
+.idea*

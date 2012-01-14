@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2011, Frosted Design
+ * Copyright (c) 2009 - 2012, Frosted Design
  * All rights reserved.
  */
 
@@ -28,6 +28,10 @@ class TypedValue {
 	/**
 	 * Creates a new TypedValue.  The type and value passed in the arguments
 	 * will become available in the $type and $value member variables.
+	 *
+	 * @param mixed $type A 'type' to associate with the value.  The type can
+	 *      be any kind of native type or object.
+	 * @param mixed $value The value to be stored.
 	 */
 	public function __construct($type, $value) {
 		$this->type = &$type;
@@ -37,6 +41,8 @@ class TypedValue {
 	/**
 	 * When treated as a string, a TypedValue will default to its value's
 	 * string representation.
+	 *
+	 * @return string A string representation of the stored value.
 	 */
 	public function __toString() {
 		return $this->value;
@@ -44,6 +50,8 @@ class TypedValue {
 	
 	/**
 	 * Allows a TypedValue to be used with the 'clone' keyword.
+	 *
+	 * @return TypedValue A new copy of this TypedValue object.
 	 */
 	public function __clone() {
 		return new TypedValue($this->type, $this->value);

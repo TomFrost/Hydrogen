@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2009 - 2011, Frosted Design
+ * Copyright (c) 2009 - 2012, Frosted Design
  * All rights reserved.
  */
 
@@ -133,7 +133,7 @@ abstract class MagicCacheable {
 		throw new NoSuchMethodException(
 			"Method $func does not exist in class $class.");
 	}
-	
+
 	/**
 	 * Calls the RECache algorithm to facilitate the magic-caching of a
 	 * certain callback function.  By default, it caches the 'return' value of
@@ -141,18 +141,18 @@ abstract class MagicCacheable {
 	 * This function can be overridden to cache, return, or output different
 	 * data.
 	 *
-	 * @param key string The key name to be cached.
-	 * @param ttl int The number of seconds until this key should expire.
-	 * @param groups array|string|boolean The group name, or array of group
-	 * 		names, to associate the key with; or false to not associate the
-	 * 		key with any group.
-	 * @param callback callback A properly formatted callback to a function
-	 * 		within this (extended) class.  The result of calling this function
-	 * 		will be cached.
-	 * @param args array|boolean An array of arguments to send to the callback
-	 * 		function, or false for no arguments.
+	 * @param string $key The key name to be cached.
+	 * @param int $ttl The number of seconds until this key should expire.
+	 * @param array|bool|string $groups The group name, or array of group
+	 *		 names, to associate the key with; or false to not associate the
+	 *		 key with any group.
+	 * @param callback $callback A properly formatted callback to a function
+	 *		 within this (extended) class.  The result of calling this function
+	 *		 will be cached.
+	 * @param array|bool $args An array of arguments to send to the callback
+	 *		 function, or false for no arguments.
 	 * @return mixed The cached value or the result of the callback function,
-	 * 		depending on whether a value was found in the cache.
+	 *		 depending on whether a value was found in the cache.
 	 */
 	protected function __recache(&$key, &$ttl, &$groups, $callback, &$args) {
 		$cm = RECacheManager::getInstance();
