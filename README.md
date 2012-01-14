@@ -1,6 +1,6 @@
 #Hydrogen
-####PHP 5.3+ Performance and Compatibility Library
-####[HydrogenPHP.com](http://www.hydrogenphp.com)
+PHP 5.3+ Performance and Compatibility Library
+[HydrogenPHP.com](http://www.hydrogenphp.com)
 
 Alpha Notice
 -------------
