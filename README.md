@@ -1,5 +1,6 @@
 #Hydrogen
 PHP 5.3+ Performance and Compatibility Library
+
 [HydrogenPHP.com](http://www.hydrogenphp.com)
 
 Alpha Notice
@@ -45,4 +46,5 @@ Use of Hydrogen implies agreement with its software license, available in the **
 Credits
 --------
 Hydrogen was created by [Tom Frost](http://www.frosteddesign.com).
+
 Contributors can be found in the [GitHub Contributor Listing](http://github.com/TomFrost/Hydrogen/contributors).
