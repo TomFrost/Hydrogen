@@ -192,6 +192,12 @@ class Router {
 	 * the called function as separate parameters.
 	 */
 	const EXPAND_PARAMS = '%{2}';
+
+	/**
+	 * When PATH_INFO doesn't exist, Router will fall back to using this
+	 * $_GET[] variable.
+	 */
+	const PATH_GET_VAR = 'Hpath';
 	
 	/**
 	 * @var array An array of overrides that applies to all rules made after
@@ -808,7 +814,11 @@ class Router {
 	public function start() {
 		// Get a proper PATH_INFO
 		$path = isset($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] ?
-			$_SERVER['PATH_INFO'] : '/';
+			$_SERVER['PATH_INFO'] : null;
+		if (!$path) {
+			$path = (isset($_GET[self::PATH_GET_VAR]) &&
+				$_GET[self::PATH_GET_VAR]) ? $_GET[self::PATH_GET_VAR] : '/';
+		}
 		$cm = RECacheManager::getInstance();
 		// Cache the rules if they're not already there.
 		if ($this->doRuleCache && !$this->rulesFromCache) {
