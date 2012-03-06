@@ -19,10 +19,11 @@ use hydrogen\controller\exceptions\RouteSyntaxException;
  * Router instance without incurring any extra processing or lookup time.
  *
  * Each "rule" in Router is simply a test to see if the request's URL
- * (specifically, the PATH_INFO) matches a specific pattern, and if so,
- * calling the appropriate Controller class and function to handle that
- * request.  Router rules can match all request types, or can be set to respond
- * only to DELETE, POST, PUT, or GET HTTP requests.
+ * (specifically, the PATH_INFO or the 'Hpath' veriable in the query string)
+ * matches a specific pattern, and if so, calling the appropriate Controller
+ * class and function to handle that request.  Router rules can match all
+ * request types, or can be set to respond only to DELETE, POST, PUT,
+ * or GET HTTP requests.
  *
  * The main goal of any routing rule is to end up with a variable named
  * 'controller' that defines which class should be loaded, and a variable
