@@ -140,8 +140,7 @@ class Query {
 		$this->assertLegal();
 		if (!$field || ($field = trim($field)) === '')
 			throw new InvalidSQLException('Invalid field name.');
-		if ($this->query['GROUPBY'] != $field)
-			$this->query['GROUPBY'] = $field;
+		$this->query['GROUPBY'] = $field;
 	}
 	
 	public function having($expression, $vars=false, $logic=false) {
