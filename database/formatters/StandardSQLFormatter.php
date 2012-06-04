@@ -174,7 +174,7 @@ class StandardSQLFormatter extends QueryFormatter {
 		if (isset($clause['fields']) && $clause['fields']) {
 			$str .= ' (';
 			foreach ($clause['fields'] as $field)
-				$str .= $field . ', ';
+				$str .= '`' . $field . '`, ';
 			$str = substr($str, 0, -2) . ')';
 		}
 		return $str;
@@ -224,7 +224,7 @@ class StandardSQLFormatter extends QueryFormatter {
 		foreach ($clause as $field) {
 			if (!isset($field['field']))
 				throw new InvalidSQLException('Field not specified in ORDER BY argument.');
-			$str .= $field['field'];
+			$str .= '`' . $field['field'] . '`';
 			if (isset($field['direction']))
 				$str .= ' ' . $field['direction'];
 			$str .= ', ';
@@ -244,9 +244,9 @@ class StandardSQLFormatter extends QueryFormatter {
 			foreach ($clause['fields'] as $field) {
 				if (!isset($field['field']))
 					throw new InvalidSQLException('Field name not set in SELECT statement.');
-				$str .= $field['field'];
+				$str .= '`' . $field['field'] . '`';
 				if (isset($field['alias']) && $field['alias'])
-					$str .= ' ' . $field['alias'];
+					$str .= ' `' . $field['alias'] . '`';
 				$str .= ', ';
 				if (isset($field['vars'])) {
 					foreach ($field['vars'] as $var)
