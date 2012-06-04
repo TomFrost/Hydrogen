@@ -127,9 +127,9 @@ class StandardSQLFormatter extends QueryFormatter {
 			foreach ($clause['tables'] as $table) {
 				if (!isset($table['table']))
 					throw new InvalidSQLException('No table specified in UPDATE table grouping.');
-				$str .= $table['table'];
+				$str .= '`' . $table['table'] . '`';
 				if (isset($table['alias']) && $table['alias'])
-					$str .= ' ' . $table['alias'];
+					$str .= ' `' . $table['alias'] . '`';
 				$str .= ', ';
 			}
 			$str = substr($str, 0, -2);
@@ -142,9 +142,9 @@ class StandardSQLFormatter extends QueryFormatter {
 		foreach ($clause as $table) {
 			if (!isset($table['table']))
 				throw new InvalidSQLExcpetion('FROM argument has no table.');
-			$str .= $table['table'];
+			$str .= '`' . $table['table'] . '`';
 			if (isset($table['alias']) && $table['alias'])
-				$str .= ' ' . $table['alias'];
+				$str .= ' `' . $table['alias'] . '`';
 			$str .= ', ';
 		}
 		return substr($str, 0, -2);
@@ -170,11 +170,11 @@ class StandardSQLFormatter extends QueryFormatter {
 	protected function parseINTO(&$clause) {
 		if (!isset($clause['table']))
 			throw new InvalidSQLException('No table specified for the INTO clause.');
-		$str = 'INTO ' . $clause['table'];
+		$str = 'INTO `' . $clause['table'] . '`';
 		if (isset($clause['fields']) && $clause['fields']) {
 			$str .= ' (';
 			foreach ($clause['fields'] as $field)
-				$str .= $field . ', ';
+				$str .= '`' . $field . '`, ';
 			$str = substr($str, 0, -2) . ')';
 		}
 		return $str;
@@ -191,7 +191,7 @@ class StandardSQLFormatter extends QueryFormatter {
 				throw new InvalidSQLException('Join condition\'s args are not set.');
 			if (isset($join['type']) && $join['type'])
 				$str .= $join['type'] . ' ';
-			$str .= 'JOIN ' . $join['table'] . ' ';
+			$str .= 'JOIN `' . $join['table'] . '` ';
 			if (isset($join['alias']) && $join['alias'])
 				$str .= $join['alias'] . ' ';
 			$str .= $join['condition'] . ' ';
@@ -224,7 +224,7 @@ class StandardSQLFormatter extends QueryFormatter {
 		foreach ($clause as $field) {
 			if (!isset($field['field']))
 				throw new InvalidSQLException('Field not specified in ORDER BY argument.');
-			$str .= $field['field'];
+			$str .= '`' . $field['field'] . '`';
 			if (isset($field['direction']))
 				$str .= ' ' . $field['direction'];
 			$str .= ', ';
@@ -244,9 +244,9 @@ class StandardSQLFormatter extends QueryFormatter {
 			foreach ($clause['fields'] as $field) {
 				if (!isset($field['field']))
 					throw new InvalidSQLException('Field name not set in SELECT statement.');
-				$str .= $field['field'];
+				$str .= '`' . $field['field'] . '`';
 				if (isset($field['alias']) && $field['alias'])
-					$str .= ' ' . $field['alias'];
+					$str .= ' `' . $field['alias'] . '`';
 				$str .= ', ';
 				if (isset($field['vars'])) {
 					foreach ($field['vars'] as $var)
@@ -308,9 +308,9 @@ class StandardSQLFormatter extends QueryFormatter {
 		foreach ($clause['tables'] as $table) {
 			if (!isset($table['table']))
 				throw new InvalidSQLException('No table specified in UPDATE table grouping.');
-			$str .= $table['table'];
+			$str .= '`' . $table['table'] . '`';
 			if (isset($table['alias']) && $table['alias'])
-				$str .= ' ' . $table['alias'];
+				$str .= ' `' . $table['alias'] . '`';
 			$str .= ', ';
 		}
 		return substr($str, 0, -2);
