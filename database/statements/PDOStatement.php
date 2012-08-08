@@ -11,16 +11,31 @@ class PDOStatement extends DatabaseStatement {
 		$this->stmt = $pdoStatement;
 	}
 	
-	public function bindColumn($column, &$param) {
-		return $this->stmt->bindColumn($column, $param);
+	public function bindColumn($column, &$param, $type=null) {
+		if ($type === null) {
+			$type = PDO::PARAM_STR;
+			if (is_int($param))
+				$type = PDO::PARAM_INT;
+		}
+		return $this->stmt->bindColumn($column, $param, $type);
 	}
 	
-	public function bindParam($param, &$variable) {
-		return $this->stmt->bindParam($param, $variable);
+	public function bindParam($param, &$variable, $type=null) {
+		if ($type === null) {
+			$type = PDO::PARAM_STR;
+			if (is_int($variable))
+				$type = PDO::PARAM_INT;
+		}
+		return $this->stmt->bindParam($param, $variable, $type);
 	}
 	
-	public function bindValue($param, $value) {
-		return $this->stmt->bindValue($param, $value);
+	public function bindValue($param, $value, $type=null) {
+		if ($type === null) {
+			$type = PDO::PARAM_STR;
+			if (is_int($value))
+				$type = PDO::PARAM_INT;
+		}
+		return $this->stmt->bindValue($param, $value, $type);
 	}
 	
 	public function closeCursor() {
