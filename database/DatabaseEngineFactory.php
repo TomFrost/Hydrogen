@@ -7,6 +7,7 @@
 namespace hydrogen\database;
 
 use hydrogen\config\Config;
+use hydrogen\database\exceptions\DatabaseConnectionException;
 
 /**
  * The DatabaseEngineFactory is responsible for creating and maintaining DatabaseEngines
@@ -116,17 +117,23 @@ class DatabaseEngineFactory {
 				$dbConfigName = $engines[0];
 			}
 		}
-			
-		return static::getCustomEngine(
-			Config::getRequiredVal('database', 'engine', $dbConfigName),
-			Config::getVal('database', 'host', $dbConfigName),
-			Config::getVal('database', 'port', $dbConfigName),
-			Config::getVal('database', 'socket', $dbConfigName),
-			Config::getVal('database', 'database', $dbConfigName),
-			Config::getVal('database', 'username', $dbConfigName),
-			Config::getVal('database', 'password', $dbConfigName),
-			Config::getVal('database', 'table_prefix', $dbConfigName)
-			);
+		try {
+			$db = static::getCustomEngine(
+				Config::getRequiredVal('database', 'engine', $dbConfigName),
+				Config::getVal('database', 'host', $dbConfigName),
+				Config::getVal('database', 'port', $dbConfigName),
+				Config::getVal('database', 'socket', $dbConfigName),
+				Config::getVal('database', 'database', $dbConfigName),
+				Config::getVal('database', 'username', $dbConfigName),
+				Config::getVal('database', 'password', $dbConfigName),
+				Config::getVal('database', 'table_prefix', $dbConfigName)
+				);
+		}
+		catch (DatabaseConnectionException $e) {
+			// Re-throw exception to remove DB credentials from the stack trace
+			throw new DatabaseConnectionException($e->getMessage());
+		}
+		return $db;
 	}
 }
 
