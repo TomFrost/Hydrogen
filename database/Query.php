@@ -81,7 +81,15 @@ class Query {
 			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		$this->prefix = $this->dbengine->getTablePrefix();
 	}
-	
+
+	public function setDBEngine($dbengine){
+		$this->dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
+	}
+
+	public function getDBEngine(){
+		return $this->dbengine;
+
 	public function getQueryTree() {
 		return $this->query;
 	}
