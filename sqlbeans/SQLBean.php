@@ -231,11 +231,15 @@ abstract class SQLBean {
 		}
 		if ($mapOverride)
 			$mapOverride = array_merge(static::$beanMap, $mapOverride);
+		$q_tree = $query->getQueryTree();
 		if ($doMapping !== false)
 			static::buildMappedSelect($query, $doMapping, $mapOverride);
-		else {
+		elseif(!isset($q_tree['SELECT']['fields'])) {
 			foreach (static::$fields as $field)
-				$query->field(static::$escL . $field . static::$escR);
+				$query->field($field);
+			$query->from(static::$tableNoPrefix);
+		}
+		else {
 			$query->from(static::$tableNoPrefix);
 		}
 		$stmt = $query->prepare();
