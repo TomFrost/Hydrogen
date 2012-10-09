@@ -23,7 +23,7 @@ use hydrogen\database\statements\QueryStatement;
  * {@link hydrogen\database\QueryFormatter}.
  */
 class Query {
-	protected static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
+	protected static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'EXEC');
 	protected static $methods = array(
 		'SELECT' => array(
 			'distinct',
@@ -60,6 +60,9 @@ class Query {
 			'where',
 			'orderby',
 			'limit'
+			),
+		'EXEC' => array(
+			'stroedProcedure'
 			)
 		);
 	protected $joinStack, $whereStack, $havingStack, $tableAliases, $reqJoinCond;
@@ -463,6 +466,19 @@ class Query {
 			throw new InvalidSQLException("${class}->${method}() cannot be used on " . $this->verb . " queries.");
 		}
 	}
+	
+	public function storedProcedure($storedProc, $arguments=NULL) {
+		$this->assertLegal();
+		if (is_string($storedProc) && ($storedProc = trim($storedProc)) !== '') {
+			if (!isset($this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE'] = array();
+			if (!in_array($storedProc, $this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE']['storedProcedure'] = $storedProc;
+			if (!in_array($arguments, $this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE']['arguments'] = $arguments;
+		}
+ 	}
+	
 }
 
 ?>
