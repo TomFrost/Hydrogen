@@ -18,6 +18,7 @@ use hydrogen\sqlbeans\BeanRegistry;
 abstract class SQLBean {
 	protected static $fields, $tableNoPrefix, $primaryKey, $primaryKeyIsAutoIncrement;
 	protected static $tableAlias, $beanMap;
+	protected static $escL, $escR;
 	protected $stored, $mapped, $changed, $sqlkeys, $dbengine, $dbreconstruct;
 	
 	public function __construct($dbengine=false, &$dbrow=false, $fieldPrefix=false, $bindRow=true) {
@@ -176,7 +177,7 @@ abstract class SQLBean {
 		$usedBeans[] = $bean;
 		$alias = ($parentAlias ? $parentAlias . '_' : '') . ($tableAliasOverride ?: $bean::$tableAlias);
 		foreach ($bean::$fields as $field)
-			$query->field($alias . '.' . $field, $alias . '_' . $field);
+			$query->field($alias . '.' . $bean::$escL . $field . $bean::$escR, $alias . '_' . $field);
 		if (!$joinCondType)
 			$query->from($bean::$tableNoPrefix, $alias);
 		else {
@@ -234,7 +235,7 @@ abstract class SQLBean {
 			static::buildMappedSelect($query, $doMapping, $mapOverride);
 		else {
 			foreach (static::$fields as $field)
-				$query->field($field);
+				$query->field(static::$escL . $field . static::$escR);
 			$query->from(static::$tableNoPrefix);
 		}
 		$stmt = $query->prepare();
