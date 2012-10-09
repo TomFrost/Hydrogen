@@ -219,10 +219,15 @@ abstract class SQLBean {
 	}
 	
 	public static function select($query=false, $doMapping=false, $mapOverride=false, $dbengine=false) {
-		$dbengine = ($dbengine instanceof DatabaseEngine) ?
-			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
-		if (!$query)
-			$query = new Query('SELECT', $dbengine);
+		if(!$dbengine) {
+			$query = (!$query) ? new Query('SELECT', $dbengine) : $query ;
+			$dbengine = $query->getDBEngine();
+		}
+		else {
+			$dbengine = ($dbengine instanceof DatabaseEngine) ? $dbengine : DatabaseEngineFactory::getEngine($dbengine);
+			$query = (!$query) ? new Query('SELECT', $dbengine) : $query ;
+			$query->setDBEngine($dbengine);
+		}
 		if ($mapOverride)
 			$mapOverride = array_merge(static::$beanMap, $mapOverride);
 		if ($doMapping !== false)
