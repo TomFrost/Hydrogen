@@ -524,7 +524,8 @@ class Router {
 					E_WARNING);
 			}
 			try {
-				call_user_func_array(array($inst, $function), $args ?: array());
+				$result = call_user_func_array(array($inst, $function), 
+						$args ?: array());
 			}
 			catch (NoSuchMethodException $e) {
 				if ($argProtection)
@@ -538,7 +539,7 @@ class Router {
 			}
 			if ($argProtection)
 				restore_error_handler();
-			return true;
+			return ($result || $result === NULL) ? true : false;
 		}
 		return false;
 	}
