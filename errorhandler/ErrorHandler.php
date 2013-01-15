@@ -119,7 +119,7 @@ class ErrorHandler {
 		static::$errorLevel = $errorLevel;
 		if (static::$handling) {
 			restore_error_handler();
-			set_error_handler("\hydrogen\errorhandler\ErrorHandler::handleError", static::$errorLevel);
+			set_error_handler('\hydrogen\errorhandler\ErrorHandler::handleError', static::$errorLevel);
 		}
 	}
 	
@@ -127,9 +127,9 @@ class ErrorHandler {
 		if (!static::$handling) {
 			if (static::$errorLevel === false)
 				static::$errorLevel = E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING;
-			set_error_handler("\hydrogen\errorhandler\ErrorHandler::handleError", static::$errorLevel);
-			set_exception_handler("\hydrogen\errorhandler\ErrorHandler::handleException");
-			ob_start("\hydrogen\errorhandler\ErrorHandler::printBuffer");
+			set_error_handler('\hydrogen\errorhandler\ErrorHandler::handleError', static::$errorLevel);
+			set_exception_handler('\hydrogen\errorhandler\ErrorHandler::handleException');
+			ob_start('\hydrogen\errorhandler\ErrorHandler::printBuffer');
 			static::$handling = true;
 		}
 	}
