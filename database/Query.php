@@ -89,6 +89,7 @@ class Query {
 
 	public function getDBEngine(){
 		return $this->dbengine;
+	}
 
 	public function getQueryTree() {
 		return $this->query;
