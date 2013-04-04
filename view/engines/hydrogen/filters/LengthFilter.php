@@ -13,7 +13,8 @@ class LengthFilter implements Filter {
 
 	public static function applyTo($string, $args, &$escape, $phpfile) {
 		$escape = false;
-		return '(is_array(' . $string . ') ? count(' . $string . ') : ' .
+		return '(is_array(' . $string . ') || (' . $string .
+			' instanceof \ArrayObject) ? count(' . $string . ') : ' .
 			'strlen(' . $string . '))';
 	}
 
