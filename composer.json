@@ -1,5 +1,5 @@
 {
-    "name" : "hydrogen/hydrogen",
+    "name" : "nbomberger/hydrogen",
     "type":  "library",
     "description" : "5.3+ High Performance and Portability Library",
     "keywords": ["php", "framework", "performance"],
