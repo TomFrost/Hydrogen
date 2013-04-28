@@ -48,3 +48,12 @@ Credits
 Hydrogen was created by [Tom Frost](http://www.frosteddesign.com).
 
 Contributors can be found in the [GitHub Contributor Listing](http://github.com/TomFrost/Hydrogen/contributors).
+
+Experimental Modification Notice
+--------------------------------
+### This branch is experimental! Do not use this version, but download the original [original](http://github.com/TomFrost/Hydrogen)
+
+This is an attempt to make it easier work with Composer.  This is just experimental - Nate Bomberger nathaniel.bomberger@gmail.com
+
+Did I say this isn't stable.  You have been warned.
+

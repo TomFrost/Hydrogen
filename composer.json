@@ -1,0 +1,15 @@
+{
+    "name" : "hydrogen/hydrogen",
+    "license" : "custom",
+    "homepage" : "https://www.frosteddesign.com",
+    "description" : "5.3+ High Performance and Portability Library",
+    "authors":[
+        {
+            "name":"Tom Frost",
+            "email":"tom@frosteddesign.com"
+        }
+    ],
+    "require":{
+        "php": ">=5.3"
+    }
+}
