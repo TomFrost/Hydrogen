@@ -1,15 +1,22 @@
 {
     "name" : "hydrogen/hydrogen",
-    "license" : "custom",
-    "homepage" : "https://www.frosteddesign.com",
+    "type":  "library",
     "description" : "5.3+ High Performance and Portability Library",
+    "keywords": ["php", "framework", "performance"],
+    "homepage" : "http://hydrogenphp.com/",
     "authors":[
         {
             "name":"Tom Frost",
-            "email":"tom@frosteddesign.com"
+            "email":"tom@frosteddesign.com",
+            "homepage": "https://www.frosteddesign.com"
         }
     ],
-    "require":{
+    "require" : {
         "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "Hydrogen": "hydrogen.inc.php"
+        }
     }
 }
