@@ -1,5 +1,5 @@
 {
-    "name": "nbomberger/hydrogen",
+    "name": "hydrogen",
     "description": "PHP 5.3+ High Performance and Portability Library",
     "license": "proprietary",
     "authors": [
@@ -14,7 +14,7 @@
     },
     "autoload" : {
         "psr-0" : {
-            "Hydrogen": "hydrogen.inc.php"
+            "hydrogen": "hydrogen.inc.php"
         }
     }
 }
