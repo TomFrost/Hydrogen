@@ -20,4 +20,9 @@
             "Hydrogen": "hydrogen.inc.php"
         }
     }
+    "extra" {
+        "branch-alias": {
+            "dev-master" : "v0.3.1nb"
+        }
+    }
 }
