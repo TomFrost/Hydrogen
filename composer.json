@@ -1,0 +1,20 @@
+{
+    "name": "hydrogen/hydrogen",
+    "description": "PHP 5.3+ High Performance and Portability Library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Tom Frost",
+            "email": "tom@frosteddesign.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">5.3"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "Hydrogen": ""
+        }
+    }
+}

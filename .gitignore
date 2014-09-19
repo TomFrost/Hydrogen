@@ -5,3 +5,4 @@
 .komodotools*
 hydrogen.autoconfig.php
 .idea*
+/vendor/
