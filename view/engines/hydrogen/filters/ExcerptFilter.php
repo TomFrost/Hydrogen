@@ -39,7 +39,7 @@ use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
  * 
  * <pre>
  * {% set myVar %}
- *	 This is a very long Text.
+ *   This is a very long Text.
  * {% endset %}
  * {{myVar|excerpt:5:"w"}} => This is a very long [...]
  * {{myVar|excerpt:12:"c":"--"}} => This is a ve--
@@ -50,64 +50,64 @@ use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
  * string is not shorter than the original.
  */
 class ExcerptFilter implements Filter {
-	
-	const DEFAULT_APPEND_STRING = " [...]";
+    
+    const DEFAULT_APPEND_STRING = " [...]";
 
-	public static function applyTo($string, $args, &$escape, $phpfile) {
-		if (count($args) > 3) {
-			throw new TemplateSyntaxException(
-				'The "excerpt" filter supports only three arguments.');
-		}
-		$phpfile->addFunction('excerptFilter',
-			array('$str', '$num', '$needle', '$append'), <<<'PHP'
-			if ($str = trim($str)) {
-				$cutpos = 0;
-				if ($needle === false)
-					$cutpos = $num;
-				else {
-					$steps = 0;
-					$findpos = 0;
-					while ($steps < $num && $findpos !== false) {
-						$findpos = strpos($str, $needle, $findpos + 1);
-						$steps++;
-					}
-					if ($findpos)
-						$cutpos = $findpos;
-				}
-				if ($cutpos && strlen($str) > $cutpos)
-					return substr($str, 0, $cutpos) . $append;
-			}
-			return $str;
+    public static function applyTo($string, $args, &$escape, $phpfile) {
+        if (count($args) > 3) {
+            throw new TemplateSyntaxException(
+                'The "excerpt" filter supports only three arguments.');
+        }
+        $phpfile->addFunction('excerptFilter',
+            array('$str', '$num', '$needle', '$append'), <<<'PHP'
+            if ($str = trim($str)) {
+                $cutpos = 0;
+                if ($needle === false)
+                    $cutpos = $num;
+                else {
+                    $steps = 0;
+                    $findpos = 0;
+                    while ($steps < $num && $findpos !== false) {
+                        $findpos = strpos($str, $needle, $findpos + 1);
+                        $steps++;
+                    }
+                    if ($findpos)
+                        $cutpos = $findpos;
+                }
+                if ($cutpos && strlen($str) > $cutpos)
+                    return substr($str, 0, $cutpos) . $append;
+            }
+            return $str;
 PHP
-		);
-		$num = isset($args[0]) ? $args[0]->getValue($phpfile) : 20;
-		$mode = isset($args[1]) ? trim($args[1]->getValue($phpfile), "'") : 'w';
-		$append = isset($args[2]) ? $args[2]->getValue($phpfile) : false;
-		if ($append === false) {
-			$append = Config::getVal('view', 'excerpt_append') ?:
-				self::DEFAULT_APPEND_STRING;
-			$append = "'" . str_replace("'", '\\\'', $append) . "'";
-		}
-		$needle = false;
-		switch($mode) {
-		case 'l':
-			$needle = '"\n"';
-			break;
-		case 'c':
-			$needle = 'false';
-			break;
-		case 'w':
-		default:
-			$needle = '" "';
-		}
-		// Manually handle the escaping here just in case excerptFilter needs
-		// to append something that can't be escaped.
-		if ($escape) {
-			$string = "htmlentities($string)";
-			$escape = false;
-		}
-		return "excerptFilter($string, $num, $needle, $append)";
-	}
+        );
+        $num = isset($args[0]) ? $args[0]->getValue($phpfile) : 20;
+        $mode = isset($args[1]) ? trim($args[1]->getValue($phpfile), "'") : 'w';
+        $append = isset($args[2]) ? $args[2]->getValue($phpfile) : false;
+        if ($append === false) {
+            $append = Config::getVal('view', 'excerpt_append') ?:
+                self::DEFAULT_APPEND_STRING;
+            $append = "'" . str_replace("'", '\\\'', $append) . "'";
+        }
+        $needle = false;
+        switch($mode) {
+        case 'l':
+            $needle = '"\n"';
+            break;
+        case 'c':
+            $needle = 'false';
+            break;
+        case 'w':
+        default:
+            $needle = '" "';
+        }
+        // Manually handle the escaping here just in case excerptFilter needs
+        // to append something that can't be escaped.
+        if ($escape) {
+            $string = "htmlentities($string)";
+            $escape = false;
+        }
+        return "excerptFilter($string, $num, $needle, $append)";
+    }
 }
 
 ?>
