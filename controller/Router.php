@@ -829,7 +829,7 @@ class Router {
 		}
 		// Is this exact route cached?
 		if ($this->doRouteCache &&
-				$rule = $cm->get("Router:" . $this->name . ":$path")) {
+				$rule = $cm->get("Router:" . $this->name . ':' . $_SERVER['REQUEST_METHOD'] . ":$path")) {
 			$success = $this->passRequest($rule['controller'],
 				$rule['function'], $rule['args'], $rule['argProtect']);
 			if ($success)
@@ -891,7 +891,7 @@ class Router {
 				if ($success) {
 					// Cache the route
 					if ($this->doRouteCache) {
-						$cm->set("Router:" . $this->name . ":$path", array(
+						$cm->set("Router:" . $this->name . ':' . $_SERVER['REQUEST_METHOD'] . ":$path", array(
 							'controller' => $vars[self::KEYWORD_CONTROLLER],
 							'function' => $vars[self::KEYWORD_FUNCTION],
 							'args' => $args,
