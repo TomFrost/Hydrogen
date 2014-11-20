@@ -12,6 +12,7 @@ use hydrogen\view\engines\hydrogen\NodeArray;
 use hydrogen\view\engines\hydrogen\nodes\TextNode;
 use hydrogen\view\engines\hydrogen\nodes\VariableNode;
 use hydrogen\view\engines\hydrogen\exceptions\TemplateSyntaxException;
+use hydrogen\view\engines\hydrogen\exceptions\NoSuchBlockException;
 
 /**
  * The Parser layer of the Hydrogen Templating Engine is responsible for
