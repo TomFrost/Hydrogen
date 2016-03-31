@@ -23,7 +23,7 @@ use hydrogen\database\statements\QueryStatement;
  * {@link hydrogen\database\QueryFormatter}.
  */
 class Query {
-	protected static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE');
+	protected static $legalVerbs = array('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'EXEC');
 	protected static $methods = array(
 		'SELECT' => array(
 			'distinct',
@@ -60,6 +60,9 @@ class Query {
 			'where',
 			'orderby',
 			'limit'
+			),
+		'EXEC' => array(
+			'storedProcedure'
 			)
 		);
 	protected $joinStack, $whereStack, $havingStack, $tableAliases, $reqJoinCond;
@@ -80,6 +83,15 @@ class Query {
 		$this->dbengine = ($dbengine instanceof DatabaseEngine) ?
 			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
 		$this->prefix = $this->dbengine->getTablePrefix();
+	}
+	
+	public function setDBEngine($dbengine){
+		$this->dbengine = ($dbengine instanceof DatabaseEngine) ?
+			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
+	}
+	
+	public function getDBEngine(){
+		return $this->dbengine;
 	}
 	
 	public function getQueryTree() {
@@ -134,6 +146,18 @@ class Query {
 		}
 		else
 			throw new InvalidSQLException('Invalid table name or alias.');
+	}
+	
+	public function storedProcedure($storedProc, $arguments=NULL) {
+		$this->assertLegal();
+		if (is_string($storedProc) && ($storedProc = trim($storedProc)) !== '') {
+			if (!isset($this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE'] = array();
+			if (!in_array($storedProc, $this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE']['storedProcedure'] = $storedProc;
+			if (!in_array($arguments, $this->query['STOREDPROCEDURE']))
+				$this->query['STOREDPROCEDURE']['arguments'] = $arguments;
+		}
 	}
 	
 	public function groupby($field) {
@@ -284,6 +308,10 @@ class Query {
 		$formatter = new $fclass($this->query);
 		$stmt = $this->dbengine->prepare($formatter->getPreparedQuery());
 		return new QueryStatement($stmt, $formatter);
+	}
+	
+	public function lastInsertId($name = NULL) {
+		return $this->dbengine->lastInsertId($name);
 	}
 	
 	public function select($queryObj) {

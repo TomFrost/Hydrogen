@@ -18,6 +18,7 @@ use hydrogen\sqlbeans\BeanRegistry;
 abstract class SQLBean {
 	protected static $fields, $tableNoPrefix, $primaryKey, $primaryKeyIsAutoIncrement;
 	protected static $tableAlias, $beanMap;
+	protected static $escL, $escR;
 	protected $stored, $mapped, $changed, $sqlkeys, $dbengine, $dbreconstruct;
 	
 	public function __construct($dbengine=false, &$dbrow=false, $fieldPrefix=false, $bindRow=true) {
@@ -176,7 +177,7 @@ abstract class SQLBean {
 		$usedBeans[] = $bean;
 		$alias = ($parentAlias ? $parentAlias . '_' : '') . ($tableAliasOverride ?: $bean::$tableAlias);
 		foreach ($bean::$fields as $field)
-			$query->field($alias . '.' . $field, $alias . '_' . $field);
+			$query->field($alias . '.' . $bean::$escL . $field . $bean::$escR, $alias . '_' . $field);
 		if (!$joinCondType)
 			$query->from($bean::$tableNoPrefix, $alias);
 		else {
@@ -219,17 +220,26 @@ abstract class SQLBean {
 	}
 	
 	public static function select($query=false, $doMapping=false, $mapOverride=false, $dbengine=false) {
-		$dbengine = ($dbengine instanceof DatabaseEngine) ?
-			$dbengine : DatabaseEngineFactory::getEngine($dbengine);
-		if (!$query)
-			$query = new Query('SELECT', $dbengine);
+		if(!$dbengine) {
+			$query = (!$query) ? new Query('SELECT', $dbengine) : $query ;
+			$dbengine = $query->getDBEngine();
+		}
+		else {
+			$dbengine = ($dbengine instanceof DatabaseEngine) ? $dbengine : DatabaseEngineFactory::getEngine($dbengine);
+			$query = (!$query) ? new Query('SELECT', $dbengine) : $query ;
+			$query->setDBEngine($dbengine);
+		}
 		if ($mapOverride)
 			$mapOverride = array_merge(static::$beanMap, $mapOverride);
+		$q_tree = $query->getQueryTree();
 		if ($doMapping !== false)
 			static::buildMappedSelect($query, $doMapping, $mapOverride);
-		else {
+		elseif(!isset($q_tree['SELECT']['fields'])) {
 			foreach (static::$fields as $field)
 				$query->field($field);
+			$query->from(static::$tableNoPrefix);
+		}
+		else {
 			$query->from(static::$tableNoPrefix);
 		}
 		$stmt = $query->prepare();
